@@ -2744,5 +2744,50 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.Equation("9 - 10 * p ^ 2 + p ^ 4", "(p^2-5)^2-16"))
         self.checkAndOutput(file)
 
+    def testZetaFunction(self):
+        file = compstate.CompFile("interesting", "zeta_function")
+        file.add_definition("zeta(s) = SUM(k, 0, oo, 1/(k+1)^s)")
+        s1 = "(INT x:[0,1]. (INT y:[0,1]. x^a * y^a / (1-x*y)))"
+        s2 = "SUM(n, 0, oo, 1/(n+1+a)^2)"
+        goal01 = file.add_goal(s1+"="+s2, conds=["a>-1"])
+        proof = goal01.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "y ^ a / (-(x * y) + 1)"
+        s2 = "y^a * (1-x*y)^(-1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.SeriesExpansionIdentity(old_expr="(1 - x * y) ^ (-1)", index_var='k'))
+        s1 = "y ^ a * SUM(k, 0, oo, (x * y) ^ k)"
+        s2 = "SUM(k, 0, oo, y^a * (x * y) ^ k)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.OnLocation(rules.IntSumExchange(), "0.1"))
+        s1 = " (x * y) ^ k"
+        s2 = " x^k * y^k"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.1.0.0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.DefiniteIntegralIdentity(), "0"))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "x ^ a * SUM(k, 0, oo, x ^ k / (a + k + 1))"
+        s2 = "SUM(k, 0, oo, x^a * (x ^ k / (a + k + 1)))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.IntSumExchange())
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+
+        #application
+        s1 = "(INT x:[0,1]. (INT y:[0,1]. 1 / (1-x*y)))"
+        s2 = "zeta(2)"
+        goal02 = file.add_goal(s1 + "=" + s2)
+        proof = goal02.proof_by_rewrite_goal(begin = goal01)
+        calc = proof.begin
+        calc.perform_rule(rules.VarSubsOfEquation([{'var':'a', 'expr':'0'}]))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Equation("-(x * y) + 1", "1-x*y"))
+        calc.perform_rule(rules.OnLocation(rules.FoldDefinition('zeta'),'1'))
+        self.checkAndOutput(file)
+
 if __name__ == "__main__":
     unittest.main()
