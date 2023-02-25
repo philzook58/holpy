@@ -2745,6 +2745,8 @@ class IntegralTest(unittest.TestCase):
         self.checkAndOutput(file)
 
     def testZetaFunction(self):
+        # Reference:
+        # Inside interesting integrals, section 5.3
         file = compstate.CompFile("interesting", "zeta_function")
         file.add_definition("zeta(s) = SUM(k, 0, oo, 1/(k+1)^s)")
         s1 = "(INT x:[0,1]. (INT y:[0,1]. x^a * y^a / (1-x*y)))"
