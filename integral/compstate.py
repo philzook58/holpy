@@ -245,6 +245,14 @@ class Goal(StateItem):
     def get_facts(self):
         return [self.goal]
 
+    def get_induct_hyp_goal(self):
+        from integral import context
+        res = self.ctx.get_induct_hyps()
+        if len(res) != None:
+            e = res[0]
+            if isinstance(e, context.Identity):
+                return Goal(self, self.ctx, expr.Op("=", e.lhs, e.rhs), self.conds)
+        raise NotImplementedError
 
 class CalculationStep(StateItem):
     """A step in the calculation."""

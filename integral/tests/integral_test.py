@@ -2789,6 +2789,69 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.Equation("-(x * y) + 1", "1-x*y"))
         calc.perform_rule(rules.OnLocation(rules.FoldDefinition('zeta'),'1'))
+
+        s1 = "(INT x:[0,1]. (INT y:[0,1]. log(x*y)^(s-2)*(x^a * y^a) / (1-x*y)))"
+        s2 = "(-1)^s * factorial(s-1) * SUM(n, 0, oo, 1/(n+a+1)^s)"
+        goal03 = file.add_goal(s1+"="+s2, conds=["a>-1", "s>=2"])
+        proof = goal03.proof_by_induction('s', 2)
+        proof_base = proof.base_case.proof_by_calculation()
+        proof_induct = proof.induct_case.proof_by_rewrite_goal(begin = proof.induct_case.get_induct_hyp_goal())
+        calc = proof_base.lhs_calc
+        calc.perform_rule(rules.Equation("-(x * y) + 1", "1-x*y"))
+        calc.perform_rule(rules.ApplyEquation(goal01.goal))
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof_induct.begin
+        calc.perform_rule(rules.DerivEquation('a'))
+        calc.perform_rule(rules.OnLocation(rules.DerivIntExchange(), "0"))
+        calc.perform_rule(rules.OnLocation(rules.DerivIntExchange(), "0.0"))
+        calc.perform_rule(rules.OnLocation(rules.FullSimplify(), "0.0"))
+        s1 = "x ^ a * y ^ a * log(x) + x ^ a * y ^ a * log(y)"
+        s2 = "x ^ a * y ^ a * (log(x) + log(y))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "log(x) + log(y)"
+        s2 = "log(x*y)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "log(x * y) ^ (s - 2) * (x ^ a * y ^ a * log(x * y))"
+        s2 = "x ^ a * y ^ a * log(x * y) ^ (s - 1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "-(x * y) + 1"
+        s2 = "1 - x*y"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.OnLocation(rules.FullSimplify(), "1"))
+        s1 = "-(s * (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1)))"
+        s2 = "(-1) ^ (s+1) * (s* factorial(s - 1)) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "s* factorial(s - 1)"
+        s2 = "factorial(s)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "1.0.1"))
+
+        s1 = 'zeta(s)'
+        s2 = "(-1)^s / factorial(s-1) * (INT x:[0,1]. (INT y:[0,1]. log(x*y)^(s-2)/ (1-x*y)))"
+        goal04 = file.add_goal(s1+"="+s2)
+        proof = goal04.proof_by_rewrite_goal(begin=goal03)
+        calc = proof.begin
+        calc.perform_rule(rules.VarSubsOfEquation([{'var':'a', 'expr':'0'}]))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "(n + 1) ^ -s"
+        s2 = "1/(n+1)^s"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.OnLocation(rules.FoldDefinition('zeta'), "1.1"))
+        s1 = "-(x * y) + 1"
+        s2 = "1 - x*y"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.SolveEquation("zeta(s)"))
+        s1 = "-s"
+        s2 = "-1*s"
+        calc.perform_rule(rules.Equation(s1,s2))
+        s1 = "(-1) ^ (-1 * s)"
+        s2 = "((-1)^-1^s)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "1.0.0"))
+        s1 = "(-1)^-1"
+        s2 = "-1"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "(-1)^s * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) / factorial(s - 1) "
+        s2 = "(-1)^s / factorial(s-1) * (INT x:[0,1]. (INT y:[0,1]. log(x*y)^(s-2)/ (1-x*y)))"
+        calc.perform_rule(rules.Equation(s1, s2))
         self.checkAndOutput(file)
 
 if __name__ == "__main__":

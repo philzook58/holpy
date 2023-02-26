@@ -262,6 +262,377 @@
                 "type": "RewriteGoalProof"
             },
             "type": "Goal"
+        },
+        {
+            "conds": [
+                {
+                    "cond": "a > -1",
+                    "latex_cond": "a > -1"
+                },
+                {
+                    "cond": "s >= 2",
+                    "latex_cond": "s \\ge 2"
+                }
+            ],
+            "finished": true,
+            "goal": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) * (x ^ a * y ^ a) / (1 - x * y)) = (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s)",
+            "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a})}{1 - x y} \\,dy \\,dx = (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+            "proof": {
+                "base_case": {
+                    "finished": true,
+                    "goal": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a / (-(x * y) + 1)) = SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
+                    "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{-x y + 1} \\,dy \\,dx = \\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
+                    "proof": {
+                        "finished": true,
+                        "goal": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a / (-(x * y) + 1)) = SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
+                        "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{-x y + 1} \\,dy \\,dx = \\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
+                        "lhs_calc": {
+                            "latex_start": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{-x y + 1} \\,dy \\,dx",
+                            "start": "INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a / (-(x * y) + 1)",
+                            "steps": [
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{1 - x y} \\,dy \\,dx",
+                                    "res": "INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a / (1 - x * y)",
+                                    "rule": {
+                                        "latex_str": "rewriting \\(-x y + 1\\) to \\(1 - x y\\)",
+                                        "name": "Equation",
+                                        "new_expr": "1 - x * y",
+                                        "old_expr": "-(x * y) + 1",
+                                        "str": "rewriting -(x * y) + 1 to 1 - x * y"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\sum_{n=0}^{\\infty}{\\frac{1}{(n + 1 + a) ^ {2}}}",
+                                    "res": "SUM(n, 0, oo, 1 / (n + 1 + a) ^ 2)",
+                                    "rule": {
+                                        "eq": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a / (1 - x * y)) = SUM(n, 0, oo, 1 / (n + 1 + a) ^ 2)",
+                                        "latex_str": "apply equation \\(\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{1 - x y} \\,dy \\,dx = \\sum_{n=0}^{\\infty}{\\frac{1}{(n + 1 + a) ^ {2}}}\\)",
+                                        "name": "ApplyEquation",
+                                        "str": "apply equation: (INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a / (1 - x * y)) = SUM(n, 0, oo, 1 / (n + 1 + a) ^ 2)"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
+                                    "res": "SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
+                                    "rule": {
+                                        "name": "FullSimplify",
+                                        "str": "full simplify"
+                                    },
+                                    "type": "CalculationStep"
+                                }
+                            ],
+                            "type": "Calculation"
+                        },
+                        "rhs_calc": {
+                            "latex_start": "\\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
+                            "start": "SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
+                            "steps": [],
+                            "type": "Calculation"
+                        },
+                        "type": "CalculationProof"
+                    },
+                    "type": "Goal"
+                },
+                "finished": true,
+                "goal": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) * (x ^ a * y ^ a) / (1 - x * y)) = (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s)",
+                "induct_case": {
+                    "finished": true,
+                    "goal": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a * log(x * y) ^ (s - 1) / (-(x * y) + 1)) = (-1) ^ (s + 1) * factorial(s) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1))",
+                    "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a} \\log^{s - 1}(x y)}{-x y + 1} \\,dy \\,dx = (-1) ^ {s + 1} s! \\sum_{n=0}^{\\infty}{(a + n + 1) ^ {-s - 1}}",
+                    "proof": {
+                        "finished": true,
+                        "goal": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a * log(x * y) ^ (s - 1) / (-(x * y) + 1)) = (-1) ^ (s + 1) * factorial(s) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1))",
+                        "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a} \\log^{s - 1}(x y)}{-x y + 1} \\,dy \\,dx = (-1) ^ {s + 1} s! \\sum_{n=0}^{\\infty}{(a + n + 1) ^ {-s - 1}}",
+                        "start": {
+                            "latex_start": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a})}{1 - x y} \\,dy \\,dx = (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                            "start": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) * (x ^ a * y ^ a) / (1 - x * y)) = (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s)",
+                            "steps": [
+                                {
+                                    "latex_res": "\\frac{d}{da} \\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a})}{1 - x y} \\,dy \\,dx = \\frac{d}{da} (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                                    "res": "(D a. INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) * (x ^ a * y ^ a) / (1 - x * y)) = (D a. (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s))",
+                                    "rule": {
+                                        "name": "DerivEquation",
+                                        "str": "derivate both sides",
+                                        "var": "a"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\frac{d}{da} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a})}{1 - x y} \\,dy \\,dx = \\frac{d}{da} (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                                    "res": "(INT x:[0,1]. D a. INT y:[0,1]. log(x * y) ^ (s - 2) * (x ^ a * y ^ a) / (1 - x * y)) = (D a. (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s))",
+                                    "rule": {
+                                        "loc": "0",
+                                        "name": "DerivIntExchange",
+                                        "str": "exchange derivative and integral at 0"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{d}{da} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a})}{1 - x y} \\,dy \\,dx = \\frac{d}{da} (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                                    "res": "(INT x:[0,1]. INT y:[0,1]. D a. log(x * y) ^ (s - 2) * (x ^ a * y ^ a) / (1 - x * y)) = (D a. (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s))",
+                                    "rule": {
+                                        "loc": "0.0",
+                                        "name": "DerivIntExchange",
+                                        "str": "exchange derivative and integral at 0.0"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a} \\log{x} + x ^ {a} y ^ {a} \\log{y})}{-x y + 1} \\,dy \\,dx = \\frac{d}{da} (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                                    "res": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) * (x ^ a * y ^ a * log(x) + x ^ a * y ^ a * log(y)) / (-(x * y) + 1)) = (D a. (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s))",
+                                    "rule": {
+                                        "loc": "0.0",
+                                        "name": "FullSimplify",
+                                        "str": "full simplify at 0.0"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a} (\\log{x} + \\log{y}))}{-x y + 1} \\,dy \\,dx = \\frac{d}{da} (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                                    "res": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) * (x ^ a * y ^ a * (log(x) + log(y))) / (-(x * y) + 1)) = (D a. (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s))",
+                                    "rule": {
+                                        "latex_str": "rewriting \\(x ^ {a} y ^ {a} \\log{x} + x ^ {a} y ^ {a} \\log{y}\\) to \\(x ^ {a} y ^ {a} (\\log{x} + \\log{y})\\)",
+                                        "name": "Equation",
+                                        "new_expr": "x ^ a * y ^ a * (log(x) + log(y))",
+                                        "old_expr": "x ^ a * y ^ a * log(x) + x ^ a * y ^ a * log(y)",
+                                        "str": "rewriting x ^ a * y ^ a * log(x) + x ^ a * y ^ a * log(y) to x ^ a * y ^ a * (log(x) + log(y))"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a} \\log{(x y)})}{-x y + 1} \\,dy \\,dx = \\frac{d}{da} (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                                    "res": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) * (x ^ a * y ^ a * log(x * y)) / (-(x * y) + 1)) = (D a. (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s))",
+                                    "rule": {
+                                        "latex_str": "rewriting \\(\\log{x} + \\log{y}\\) to \\(\\log{(x y)}\\)",
+                                        "name": "Equation",
+                                        "new_expr": "log(x * y)",
+                                        "old_expr": "log(x) + log(y)",
+                                        "str": "rewriting log(x) + log(y) to log(x * y)"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a} \\log^{s - 1}(x y)}{-x y + 1} \\,dy \\,dx = \\frac{d}{da} (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                                    "res": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a * log(x * y) ^ (s - 1) / (-(x * y) + 1)) = (D a. (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s))",
+                                    "rule": {
+                                        "latex_str": "rewriting \\(\\log^{s - 2}(x y) (x ^ {a} y ^ {a} \\log{(x y)})\\) to \\(x ^ {a} y ^ {a} \\log^{s - 1}(x y)\\)",
+                                        "name": "Equation",
+                                        "new_expr": "x ^ a * y ^ a * log(x * y) ^ (s - 1)",
+                                        "old_expr": "log(x * y) ^ (s - 2) * (x ^ a * y ^ a * log(x * y))",
+                                        "str": "rewriting log(x * y) ^ (s - 2) * (x ^ a * y ^ a * log(x * y)) to x ^ a * y ^ a * log(x * y) ^ (s - 1)"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a} \\log^{s - 1}(x y)}{1 - x y} \\,dy \\,dx = \\frac{d}{da} (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                                    "res": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a * log(x * y) ^ (s - 1) / (1 - x * y)) = (D a. (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s))",
+                                    "rule": {
+                                        "latex_str": "rewriting \\(-x y + 1\\) to \\(1 - x y\\)",
+                                        "name": "Equation",
+                                        "new_expr": "1 - x * y",
+                                        "old_expr": "-(x * y) + 1",
+                                        "str": "rewriting -(x * y) + 1 to 1 - x * y"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a} \\log^{s - 1}(x y)}{1 - x y} \\,dy \\,dx = -s (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{(a + n + 1) ^ {-s - 1}}",
+                                    "res": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a * log(x * y) ^ (s - 1) / (1 - x * y)) = -(s * (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1)))",
+                                    "rule": {
+                                        "loc": "1",
+                                        "name": "FullSimplify",
+                                        "str": "full simplify at 1"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a} \\log^{s - 1}(x y)}{1 - x y} \\,dy \\,dx = (-1) ^ {s + 1} (s (s - 1)!) \\sum_{n=0}^{\\infty}{(a + n + 1) ^ {-s - 1}}",
+                                    "res": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a * log(x * y) ^ (s - 1) / (1 - x * y)) = (-1) ^ (s + 1) * (s * factorial(s - 1)) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1))",
+                                    "rule": {
+                                        "latex_str": "rewriting \\(-s (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{(a + n + 1) ^ {-s - 1}}\\) to \\((-1) ^ {s + 1} (s (s - 1)!) \\sum_{n=0}^{\\infty}{(a + n + 1) ^ {-s - 1}}\\)",
+                                        "name": "Equation",
+                                        "new_expr": "(-1) ^ (s + 1) * (s * factorial(s - 1)) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1))",
+                                        "old_expr": "-(s * (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1)))",
+                                        "str": "rewriting -(s * (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1))) to (-1) ^ (s + 1) * (s * factorial(s - 1)) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1))"
+                                    },
+                                    "type": "CalculationStep"
+                                },
+                                {
+                                    "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a} \\log^{s - 1}(x y)}{1 - x y} \\,dy \\,dx = (-1) ^ {s + 1} s! \\sum_{n=0}^{\\infty}{(a + n + 1) ^ {-s - 1}}",
+                                    "res": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a * log(x * y) ^ (s - 1) / (1 - x * y)) = (-1) ^ (s + 1) * factorial(s) * SUM(n, 0, oo, (a + n + 1) ^ (-s - 1))",
+                                    "rule": {
+                                        "latex_str": "rewrite \\(s (s - 1)!\\) to \\(s!\\) using identity at 1.0.1",
+                                        "loc": "1.0.1",
+                                        "name": "ApplyIdentity",
+                                        "source": "s * factorial(s - 1)",
+                                        "str": "rewrite s * factorial(s - 1) to factorial(s) using identity at 1.0.1",
+                                        "target": "factorial(s)"
+                                    },
+                                    "type": "CalculationStep"
+                                }
+                            ],
+                            "type": "Calculation"
+                        },
+                        "type": "RewriteGoalProof"
+                    },
+                    "type": "Goal"
+                },
+                "induct_var": "s",
+                "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a})}{1 - x y} \\,dy \\,dx = (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                "type": "InductionProof"
+            },
+            "type": "Goal"
+        },
+        {
+            "finished": true,
+            "goal": "zeta(s) = (-1) ^ s / factorial(s - 1) * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (1 - x * y))",
+            "latex_goal": "zeta{(s)} = \\frac{(-1) ^ {s}}{(s - 1)!} (\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{1 - x y} \\,dy \\,dx)",
+            "proof": {
+                "finished": true,
+                "goal": "zeta(s) = (-1) ^ s / factorial(s - 1) * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (1 - x * y))",
+                "latex_goal": "zeta{(s)} = \\frac{(-1) ^ {s}}{(s - 1)!} (\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{1 - x y} \\,dy \\,dx)",
+                "start": {
+                    "conds": [
+                        {
+                            "cond": "a > -1",
+                            "latex_cond": "a > -1"
+                        },
+                        {
+                            "cond": "s >= 2",
+                            "latex_cond": "s \\ge 2"
+                        }
+                    ],
+                    "latex_start": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a})}{1 - x y} \\,dy \\,dx = (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",
+                    "start": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) * (x ^ a * y ^ a) / (1 - x * y)) = (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + a + 1) ^ s)",
+                    "steps": [
+                        {
+                            "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {0} y ^ {0})}{1 - x y} \\,dy \\,dx = (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + 0 + 1) ^ {s}}}",
+                            "res": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) * (x ^ 0 * y ^ 0) / (1 - x * y)) = (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + 0 + 1) ^ s)",
+                            "rule": {
+                                "latex_str": "substitute \\(a\\) for \\(0\\) in equation",
+                                "name": "VarSubsOfEquation",
+                                "str": "substitute a for 0 in equation",
+                                "subst": [
+                                    {
+                                        "expr": "0",
+                                        "var": "a"
+                                    }
+                                ]
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{-x y + 1} \\,dy \\,dx = (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{(n + 1) ^ {-s}}",
+                            "res": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) = (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, (n + 1) ^ -s)",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{-x y + 1} \\,dy \\,dx = (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + 1) ^ {s}}}",
+                            "res": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) = (-1) ^ s * factorial(s - 1) * SUM(n, 0, oo, 1 / (n + 1) ^ s)",
+                            "rule": {
+                                "latex_str": "rewriting \\((n + 1) ^ {-s}\\) to \\(\\frac{1}{(n + 1) ^ {s}}\\)",
+                                "name": "Equation",
+                                "new_expr": "1 / (n + 1) ^ s",
+                                "old_expr": "(n + 1) ^ -s",
+                                "str": "rewriting (n + 1) ^ -s to 1 / (n + 1) ^ s"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{-x y + 1} \\,dy \\,dx = (-1) ^ {s} (s - 1)! zeta{(s)}",
+                            "res": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) = (-1) ^ s * factorial(s - 1) * zeta(s)",
+                            "rule": {
+                                "func_name": "zeta",
+                                "loc": "1.1",
+                                "name": "FoldDefinition",
+                                "str": "fold definition at 1.1"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{1 - x y} \\,dy \\,dx = (-1) ^ {s} (s - 1)! zeta{(s)}",
+                            "res": "(INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (1 - x * y)) = (-1) ^ s * factorial(s - 1) * zeta(s)",
+                            "rule": {
+                                "latex_str": "rewriting \\(-x y + 1\\) to \\(1 - x y\\)",
+                                "name": "Equation",
+                                "new_expr": "1 - x * y",
+                                "old_expr": "-(x * y) + 1",
+                                "str": "rewriting -(x * y) + 1 to 1 - x * y"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "zeta{(s)} = \\frac{(-1) ^ {-s} (\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{-x y + 1} \\,dy \\,dx)}{(s - 1)!}",
+                            "res": "zeta(s) = (-1) ^ -s * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) / factorial(s - 1)",
+                            "rule": {
+                                "latex_str": "solve equation for \\(zeta{(s)}\\)",
+                                "name": "SolveEquation",
+                                "solve_for": "zeta(s)",
+                                "str": "solve equation for zeta(s)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "zeta{(s)} = \\frac{(-1) ^ {-1 s} (\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{-x y + 1} \\,dy \\,dx)}{(s - 1)!}",
+                            "res": "zeta(s) = (-1) ^ (-1 * s) * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) / factorial(s - 1)",
+                            "rule": {
+                                "latex_str": "rewriting \\(-s\\) to \\(-1 s\\)",
+                                "name": "Equation",
+                                "new_expr": "-1 * s",
+                                "old_expr": "-s",
+                                "str": "rewriting -s to -1 * s"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "zeta{(s)} = \\frac{((-1) ^ {-1}) ^ {s} (\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{-x y + 1} \\,dy \\,dx)}{(s - 1)!}",
+                            "res": "zeta(s) = (-1) ^ (-1) ^ s * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) / factorial(s - 1)",
+                            "rule": {
+                                "latex_str": "rewrite \\((-1) ^ {-1 s}\\) to \\(((-1) ^ {-1}) ^ {s}\\) using identity at 1.0.0",
+                                "loc": "1.0.0",
+                                "name": "ApplyIdentity",
+                                "source": "(-1) ^ (-1 * s)",
+                                "str": "rewrite (-1) ^ (-1 * s) to (-1) ^ (-1) ^ s using identity at 1.0.0",
+                                "target": "(-1) ^ (-1) ^ s"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "zeta{(s)} = \\frac{(-1) ^ {s} (\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{-x y + 1} \\,dy \\,dx)}{(s - 1)!}",
+                            "res": "zeta(s) = (-1) ^ s * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) / factorial(s - 1)",
+                            "rule": {
+                                "latex_str": "rewriting \\((-1) ^ {-1}\\) to \\(-1\\)",
+                                "name": "Equation",
+                                "new_expr": "-1",
+                                "old_expr": "(-1) ^ (-1)",
+                                "str": "rewriting (-1) ^ (-1) to -1"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "zeta{(s)} = \\frac{(-1) ^ {s}}{(s - 1)!} (\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{1 - x y} \\,dy \\,dx)",
+                            "res": "zeta(s) = (-1) ^ s / factorial(s - 1) * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (1 - x * y))",
+                            "rule": {
+                                "latex_str": "rewriting \\(\\frac{(-1) ^ {s} (\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{-x y + 1} \\,dy \\,dx)}{(s - 1)!}\\) to \\(\\frac{(-1) ^ {s}}{(s - 1)!} (\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{1 - x y} \\,dy \\,dx)\\)",
+                                "name": "Equation",
+                                "new_expr": "(-1) ^ s / factorial(s - 1) * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (1 - x * y))",
+                                "old_expr": "(-1) ^ s * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) / factorial(s - 1)",
+                                "str": "rewriting (-1) ^ s * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) / factorial(s - 1) to (-1) ^ s / factorial(s - 1) * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (1 - x * y))"
+                            },
+                            "type": "CalculationStep"
+                        }
+                    ],
+                    "type": "Calculation"
+                },
+                "type": "RewriteGoalProof"
+            },
+            "type": "Goal"
         }
     ],
     "name": "zeta_function"

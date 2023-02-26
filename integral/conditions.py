@@ -140,13 +140,15 @@ class Conditions:
             elif e.is_power():
                 if self.is_positive(e.args[0]):
                     return True
+                elif self.is_negative(e.args[0]) and self.is_positive(e.args[1]):
+                    return True
         elif e.is_fun():
             if e.func_name == 'sqrt':
                 if self.is_positive(e.args[0]):
                     return True
                 else:
                     return False
-            elif e.func_name in ['cosh', 'exp', 'pi', 'G']:
+            elif e.func_name in ['cosh', 'exp', 'pi', 'G', 'factorial']:
                 return True
             elif e.func_name == 'abs':
                 if self.is_nonzero(e.args[0]):
