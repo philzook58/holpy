@@ -9,7 +9,7 @@ import operator
 from integral import expr
 from integral.expr import Var, Const, Fun, EvalAt, Op, Integral, Symbol, Expr, \
     OP, CONST, VAR, sin, cos, FUN, decompose_expr_factor, \
-    Deriv, Inf, Limit, NEG_INF, POS_INF, IndefiniteIntegral, Summation
+    Deriv, Inf, Limit, NEG_INF, POS_INF, IndefiniteIntegral, Summation, SUMMATION
 from integral import parser
 from integral.solve import solve_equation, solve_for_term
 from integral import latex
@@ -185,7 +185,7 @@ def check_wellformed(e: Expr, conds: Conditions) -> bool:
                 flag = conds.is_nonzero(e.args[1])
                 if flag and len(bad_parts) == 0:
                     return (True, set())
-                elif not flag:
+                if not flag:
                     if e.args[1].is_fun():
                         if e.args[1].func_name == 'sqrt':
                             bad_parts.remove(BadPart(Op('>=', e.args[1].args[0], Const(0)), conds))
@@ -248,6 +248,7 @@ def check_wellformed(e: Expr, conds: Conditions) -> bool:
             f, tmp = check_wellformed(e.body, conds2)
             if f and len(bad_parts) == 0:
                 return (True, set())
+            bad_parts = bad_parts.union(tmp)
         else:
             if len(bad_parts) == 0:
                 return (True, set())
@@ -1521,6 +1522,18 @@ class Equation(Rule):
 
         if norm.simp_definite_integral(e, conds) == normalize(self.new_expr, conds):
             return self.new_expr
+
+        # x * sum(k,l,u,body) => sum(k, l, u, x* body)
+        x = Symbol('x', [VAR, CONST, OP, FUN])
+        y = Symbol('y', [SUMMATION])
+        p = x * y
+        mapping = expr.match(e, p)
+        if mapping!=None:
+            sum = mapping[y.name]
+            idx = sum.index_var
+            out = mapping[x.name]
+            if idx not in out.get_vars():
+                e = Summation(idx, sum.lower, sum.upper, out * sum.body)
 
         if normalize(norm.normalize_exp(e), conds) == normalize(self.new_expr, conds):
             return self.new_expr

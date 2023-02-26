@@ -1,0 +1,268 @@
+{
+    "content": [
+        {
+            "eq": "zeta(s) = SUM(k, 0, oo, 1 / (k + 1) ^ s)",
+            "latex_eq": "zeta{(s)} = \\sum_{k=0}^{\\infty}{\\frac{1}{(k + 1) ^ {s}}}",
+            "latex_lhs": "zeta{(s)}",
+            "type": "FuncDef"
+        },
+        {
+            "conds": [
+                {
+                    "cond": "a > -1",
+                    "latex_cond": "a > -1"
+                }
+            ],
+            "finished": true,
+            "goal": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a / (1 - x * y)) = SUM(n, 0, oo, 1 / (n + 1 + a) ^ 2)",
+            "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{1 - x y} \\,dy \\,dx = \\sum_{n=0}^{\\infty}{\\frac{1}{(n + 1 + a) ^ {2}}}",
+            "proof": {
+                "finished": true,
+                "goal": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a / (1 - x * y)) = SUM(n, 0, oo, 1 / (n + 1 + a) ^ 2)",
+                "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{1 - x y} \\,dy \\,dx = \\sum_{n=0}^{\\infty}{\\frac{1}{(n + 1 + a) ^ {2}}}",
+                "lhs_calc": {
+                    "latex_start": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{1 - x y} \\,dy \\,dx",
+                    "start": "INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a / (1 - x * y)",
+                    "steps": [
+                        {
+                            "latex_res": "\\int_{0}^{1} x ^ {a} (\\int_{0}^{1} \\frac{y ^ {a}}{-x y + 1} \\,dy) \\,dx",
+                            "res": "INT x:[0,1]. x ^ a * (INT y:[0,1]. y ^ a / (-(x * y) + 1))",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} x ^ {a} (\\int_{0}^{1} y ^ {a} (1 - x y) ^ {-1} \\,dy) \\,dx",
+                            "res": "INT x:[0,1]. x ^ a * (INT y:[0,1]. y ^ a * (1 - x * y) ^ (-1))",
+                            "rule": {
+                                "latex_str": "rewriting \\(\\frac{y ^ {a}}{-x y + 1}\\) to \\(y ^ {a} (1 - x y) ^ {-1}\\)",
+                                "name": "Equation",
+                                "new_expr": "y ^ a * (1 - x * y) ^ (-1)",
+                                "old_expr": "y ^ a / (-(x * y) + 1)",
+                                "str": "rewriting y ^ a / (-(x * y) + 1) to y ^ a * (1 - x * y) ^ (-1)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} x ^ {a} (\\int_{0}^{1} y ^ {a} \\sum_{k=0}^{\\infty}{(x y) ^ {k}} \\,dy) \\,dx",
+                            "res": "INT x:[0,1]. x ^ a * (INT y:[0,1]. y ^ a * SUM(k, 0, oo, (x * y) ^ k))",
+                            "rule": {
+                                "index_var": "k",
+                                "name": "SeriesExpansionIdentity",
+                                "old_expr": "(1 - x * y) ^ (-1)",
+                                "str": "apply series expansion"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} x ^ {a} (\\int_{0}^{1} \\sum_{k=0}^{\\infty}{y ^ {a} (x y) ^ {k}} \\,dy) \\,dx",
+                            "res": "INT x:[0,1]. x ^ a * (INT y:[0,1]. SUM(k, 0, oo, y ^ a * (x * y) ^ k))",
+                            "rule": {
+                                "latex_str": "rewriting \\(y ^ {a} \\sum_{k=0}^{\\infty}{(x y) ^ {k}}\\) to \\(\\sum_{k=0}^{\\infty}{y ^ {a} (x y) ^ {k}}\\)",
+                                "name": "Equation",
+                                "new_expr": "SUM(k, 0, oo, y ^ a * (x * y) ^ k)",
+                                "old_expr": "y ^ a * SUM(k, 0, oo, (x * y) ^ k)",
+                                "str": "rewriting y ^ a * SUM(k, 0, oo, (x * y) ^ k) to SUM(k, 0, oo, y ^ a * (x * y) ^ k)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} x ^ {a} \\sum_{k=0}^{\\infty}{\\int_{0}^{1} y ^ {a} (x y) ^ {k} \\,dy} \\,dx",
+                            "res": "INT x:[0,1]. x ^ a * SUM(k, 0, oo, INT y:[0,1]. y ^ a * (x * y) ^ k)",
+                            "rule": {
+                                "loc": "0.1",
+                                "name": "IntSumExchange",
+                                "str": "exchange integral and sum at 0.1"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} x ^ {a} \\sum_{k=0}^{\\infty}{\\int_{0}^{1} y ^ {a} (x ^ {k} y ^ {k}) \\,dy} \\,dx",
+                            "res": "INT x:[0,1]. x ^ a * SUM(k, 0, oo, INT y:[0,1]. y ^ a * (x ^ k * y ^ k))",
+                            "rule": {
+                                "latex_str": "rewrite \\((x y) ^ {k}\\) to \\(x ^ {k} y ^ {k}\\) using identity at 0.1.0.0.1",
+                                "loc": "0.1.0.0.1",
+                                "name": "ApplyIdentity",
+                                "source": "(x * y) ^ k",
+                                "str": "rewrite (x * y) ^ k to x ^ k * y ^ k using identity at 0.1.0.0.1",
+                                "target": "x ^ k * y ^ k"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} x ^ {a} \\sum_{k=0}^{\\infty}{x ^ {k} (\\int_{0}^{1} y ^ {a + k} \\,dy)} \\,dx",
+                            "res": "INT x:[0,1]. x ^ a * SUM(k, 0, oo, x ^ k * (INT y:[0,1]. y ^ (a + k)))",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} x ^ {a} \\sum_{k=0}^{\\infty}{x ^ {k} (\\left. \\frac{y ^ {a + k + 1}}{a + k + 1} \\right\\vert_{y=0}^{1})} \\,dx",
+                            "res": "INT x:[0,1]. x ^ a * SUM(k, 0, oo, x ^ k * ([y ^ (a + k + 1) / (a + k + 1)]_y=0,1))",
+                            "rule": {
+                                "loc": "0",
+                                "name": "DefiniteIntegralIdentity",
+                                "str": "apply definite integral at 0"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} x ^ {a} \\sum_{k=0}^{\\infty}{\\frac{x ^ {k}}{a + k + 1}} \\,dx",
+                            "res": "INT x:[0,1]. x ^ a * SUM(k, 0, oo, x ^ k / (a + k + 1))",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} \\sum_{k=0}^{\\infty}{x ^ {a} (\\frac{x ^ {k}}{a + k + 1})} \\,dx",
+                            "res": "INT x:[0,1]. SUM(k, 0, oo, x ^ a * (x ^ k / (a + k + 1)))",
+                            "rule": {
+                                "latex_str": "rewriting \\(x ^ {a} \\sum_{k=0}^{\\infty}{\\frac{x ^ {k}}{a + k + 1}}\\) to \\(\\sum_{k=0}^{\\infty}{x ^ {a} (\\frac{x ^ {k}}{a + k + 1})}\\)",
+                                "name": "Equation",
+                                "new_expr": "SUM(k, 0, oo, x ^ a * (x ^ k / (a + k + 1)))",
+                                "old_expr": "x ^ a * SUM(k, 0, oo, x ^ k / (a + k + 1))",
+                                "str": "rewriting x ^ a * SUM(k, 0, oo, x ^ k / (a + k + 1)) to SUM(k, 0, oo, x ^ a * (x ^ k / (a + k + 1)))"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\sum_{k=0}^{\\infty}{\\int_{0}^{1} x ^ {a} (\\frac{x ^ {k}}{a + k + 1}) \\,dx}",
+                            "res": "SUM(k, 0, oo, INT x:[0,1]. x ^ a * (x ^ k / (a + k + 1)))",
+                            "rule": {
+                                "name": "IntSumExchange",
+                                "str": "exchange integral and sum"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{\\int_{0}^{1} x ^ {a + k} \\,dx}{a + k + 1}}",
+                            "res": "SUM(k, 0, oo, (INT x:[0,1]. x ^ (a + k)) / (a + k + 1))",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{\\left. \\frac{x ^ {a + k + 1}}{a + k + 1} \\right\\vert_{x=0}^{1}}{a + k + 1}}",
+                            "res": "SUM(k, 0, oo, ([x ^ (a + k + 1) / (a + k + 1)]_x=0,1) / (a + k + 1))",
+                            "rule": {
+                                "name": "DefiniteIntegralIdentity",
+                                "str": "apply definite integral"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{1}{(a + k + 1) ^ {2}}}",
+                            "res": "SUM(k, 0, oo, 1 / (a + k + 1) ^ 2)",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        }
+                    ],
+                    "type": "Calculation"
+                },
+                "rhs_calc": {
+                    "latex_start": "\\sum_{n=0}^{\\infty}{\\frac{1}{(n + 1 + a) ^ {2}}}",
+                    "start": "SUM(n, 0, oo, 1 / (n + 1 + a) ^ 2)",
+                    "steps": [
+                        {
+                            "latex_res": "\\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
+                            "res": "SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        }
+                    ],
+                    "type": "Calculation"
+                },
+                "type": "CalculationProof"
+            },
+            "type": "Goal"
+        },
+        {
+            "finished": true,
+            "goal": "(INT x:[0,1]. INT y:[0,1]. 1 / (1 - x * y)) = zeta(2)",
+            "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{1}{1 - x y} \\,dy \\,dx = zeta{(2)}",
+            "proof": {
+                "finished": true,
+                "goal": "(INT x:[0,1]. INT y:[0,1]. 1 / (1 - x * y)) = zeta(2)",
+                "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{1}{1 - x y} \\,dy \\,dx = zeta{(2)}",
+                "start": {
+                    "conds": [
+                        {
+                            "cond": "a > -1",
+                            "latex_cond": "a > -1"
+                        }
+                    ],
+                    "latex_start": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{1 - x y} \\,dy \\,dx = \\sum_{n=0}^{\\infty}{\\frac{1}{(n + 1 + a) ^ {2}}}",
+                    "start": "(INT x:[0,1]. INT y:[0,1]. x ^ a * y ^ a / (1 - x * y)) = SUM(n, 0, oo, 1 / (n + 1 + a) ^ 2)",
+                    "steps": [
+                        {
+                            "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {0} y ^ {0}}{1 - x y} \\,dy \\,dx = \\sum_{n=0}^{\\infty}{\\frac{1}{(n + 1 + 0) ^ {2}}}",
+                            "res": "(INT x:[0,1]. INT y:[0,1]. x ^ 0 * y ^ 0 / (1 - x * y)) = SUM(n, 0, oo, 1 / (n + 1 + 0) ^ 2)",
+                            "rule": {
+                                "latex_str": "substitute \\(a\\) for \\(0\\) in equation",
+                                "name": "VarSubsOfEquation",
+                                "str": "substitute a for 0 in equation",
+                                "subst": [
+                                    {
+                                        "expr": "0",
+                                        "var": "a"
+                                    }
+                                ]
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{1}{-x y + 1} \\,dy \\,dx = \\sum_{n=0}^{\\infty}{\\frac{1}{(n + 1) ^ {2}}}",
+                            "res": "(INT x:[0,1]. INT y:[0,1]. 1 / (-(x * y) + 1)) = SUM(n, 0, oo, 1 / (n + 1) ^ 2)",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{1}{1 - x y} \\,dy \\,dx = \\sum_{n=0}^{\\infty}{\\frac{1}{(n + 1) ^ {2}}}",
+                            "res": "(INT x:[0,1]. INT y:[0,1]. 1 / (1 - x * y)) = SUM(n, 0, oo, 1 / (n + 1) ^ 2)",
+                            "rule": {
+                                "latex_str": "rewriting \\(-x y + 1\\) to \\(1 - x y\\)",
+                                "name": "Equation",
+                                "new_expr": "1 - x * y",
+                                "old_expr": "-(x * y) + 1",
+                                "str": "rewriting -(x * y) + 1 to 1 - x * y"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{1} \\int_{0}^{1} \\frac{1}{1 - x y} \\,dy \\,dx = zeta{(2)}",
+                            "res": "(INT x:[0,1]. INT y:[0,1]. 1 / (1 - x * y)) = zeta(2)",
+                            "rule": {
+                                "func_name": "zeta",
+                                "loc": "1",
+                                "name": "FoldDefinition",
+                                "str": "fold definition at 1"
+                            },
+                            "type": "CalculationStep"
+                        }
+                    ],
+                    "type": "Calculation"
+                },
+                "type": "RewriteGoalProof"
+            },
+            "type": "Goal"
+        }
+    ],
+    "name": "zeta_function"
+}
