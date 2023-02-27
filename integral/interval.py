@@ -330,6 +330,41 @@ class Interval:
             end = normalize_constant(expr.Fun('exp', self.end))
         return Interval(start, end, self.left_open, self.right_open)
 
+    def abs(self) -> "Interval":
+        from integral.poly import normalize_constant
+        if self.start == expr.NEG_INF or self.end == expr.POS_INF:
+            if self.start != expr.NEG_INF:
+                start = -expr.start
+                left = self.left_open
+            if self.end != expr.POS_INF:
+                start = self.end
+                left = self.right_open
+            if self.start == expr.NEG_INF and self.end == expr.POS_INF:
+                start = expr.Const(0)
+                left = False
+            end = expr.POS_INF
+            right = True
+        else:
+            t1, t2 = expr.eval_expr(expr.Fun("abs",self.start)), \
+                     expr.eval_expr(expr.Fun("abs",self.end))
+            if t1 > t2:
+                start = expr.Const(t2)
+                left = self.right_open
+                end = expr.Const(t1)
+                right = self.left_open
+            elif t1 < t2:
+                start = expr.Const(t1)
+                left = self.left_open
+                end = expr.Const(t2)
+                right = self.right_open
+            else:
+                start = expr.Const(t1)
+                end = expr.Const(t1)
+                right = self.left_open and self.right_open
+                left = self.left_open and self.right_open
+
+        return Interval(start, end, left, right)
+
     def log(self) -> "Interval":
         """Log function of an interval."""
         from integral.poly import normalize_constant
@@ -413,6 +448,8 @@ def get_bounds_for_expr(e: Expr, bounds: Dict[Expr, Interval]) -> Interval:
                 return rec(e.args[0]).sqrt()
             elif e.func_name == 'exp':
                 return rec(e.args[0]).exp()
+            elif e.func_name == 'abs':
+                return rec(e.args[0]).abs()
             elif e.func_name == 'log':
                 return rec(e.args[0]).log()
             elif e.func_name == 'sin':

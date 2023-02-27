@@ -827,6 +827,14 @@ def parse_rule(item) -> Rule:
         return rules.SeriesEvaluationIdentity()
     elif item['name'] == 'ReplaceSubstitution':
         return rules.ReplaceSubstitution()
+    elif item['name'] == 'ChangeSummationIndex':
+        e = parser.parse_expr(item['new_lower'])
+        return rules.ChangeSummationIndex(e)
+    elif item['name'] == 'SummationEquation':
+        idx_v = item['index_var']
+        lower = parser.parse_expr(item['lower'])
+        upper = parser.parse_expr(item['upper'])
+        return rules.SummationEquation(idx_v, lower, upper)
     else:
         print(item['name'], flush=True)
         raise NotImplementedError
