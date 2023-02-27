@@ -633,6 +633,250 @@
                 "type": "RewriteGoalProof"
             },
             "type": "Goal"
+        },
+        {
+            "conds": [
+                {
+                    "cond": "k > 0",
+                    "latex_cond": "k > 0"
+                }
+            ],
+            "finished": true,
+            "goal": "(INT x:[0,oo]. exp(-k * x) * x ^ (s - 1)) = Gamma(s) / k ^ s",
+            "latex_goal": "\\int_{0}^{\\infty} e^{(-k) x} x ^ {s - 1} \\,dx = \\frac{\\Gamma{(s)}}{k ^ {s}}",
+            "proof": {
+                "finished": true,
+                "goal": "(INT x:[0,oo]. exp(-k * x) * x ^ (s - 1)) = Gamma(s) / k ^ s",
+                "latex_goal": "\\int_{0}^{\\infty} e^{(-k) x} x ^ {s - 1} \\,dx = \\frac{\\Gamma{(s)}}{k ^ {s}}",
+                "lhs_calc": {
+                    "latex_start": "\\int_{0}^{\\infty} e^{(-k) x} x ^ {s - 1} \\,dx",
+                    "start": "INT x:[0,oo]. exp(-k * x) * x ^ (s - 1)",
+                    "steps": [
+                        {
+                            "latex_res": "\\int_{0}^{\\infty} \\frac{e^{-u} (\\frac{u}{k}) ^ {s - 1}}{k} \\,du",
+                            "res": "INT u:[0,oo]. exp(-u) * (u / k) ^ (s - 1) / k",
+                            "rule": {
+                                "latex_str": "substitute \\(u\\) for \\(k x\\)",
+                                "name": "Substitution",
+                                "str": "substitute u for k * x",
+                                "var_name": "u",
+                                "var_subst": "k * x"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{\\infty} \\frac{e^{-u} (\\frac{u ^ {s - 1}}{k ^ {s - 1}})}{k} \\,du",
+                            "res": "INT u:[0,oo]. exp(-u) * (u ^ (s - 1) / k ^ (s - 1)) / k",
+                            "rule": {
+                                "latex_str": "rewrite \\((\\frac{u}{k}) ^ {s - 1}\\) to \\(\\frac{u ^ {s - 1}}{k ^ {s - 1}}\\) using identity at 0.0.1",
+                                "loc": "0.0.1",
+                                "name": "ApplyIdentity",
+                                "source": "(u / k) ^ (s - 1)",
+                                "str": "rewrite (u / k) ^ (s - 1) to u ^ (s - 1) / k ^ (s - 1) using identity at 0.0.1",
+                                "target": "u ^ (s - 1) / k ^ (s - 1)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "k ^ {-s} (\\int_{0}^{\\infty} u ^ {s - 1} e^{-u} \\,du)",
+                            "res": "k ^ -s * (INT u:[0,oo]. u ^ (s - 1) * exp(-u))",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "k ^ {-s} (\\int_{0}^{\\infty} e^{-u} u ^ {s - 1} \\,du)",
+                            "res": "k ^ -s * (INT u:[0,oo]. exp(-u) * u ^ (s - 1))",
+                            "rule": {
+                                "latex_str": "rewriting \\(u ^ {s - 1} e^{-u}\\) to \\(e^{-u} u ^ {s - 1}\\)",
+                                "name": "Equation",
+                                "new_expr": "exp(-u) * u ^ (s - 1)",
+                                "old_expr": "u ^ (s - 1) * exp(-u)",
+                                "str": "rewriting u ^ (s - 1) * exp(-u) to exp(-u) * u ^ (s - 1)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "k ^ {-s} \\Gamma{(s)}",
+                            "res": "k ^ -s * Gamma(s)",
+                            "rule": {
+                                "func_name": "Gamma",
+                                "loc": "1",
+                                "name": "FoldDefinition",
+                                "str": "fold definition at 1"
+                            },
+                            "type": "CalculationStep"
+                        }
+                    ],
+                    "type": "Calculation"
+                },
+                "rhs_calc": {
+                    "latex_start": "\\frac{\\Gamma{(s)}}{k ^ {s}}",
+                    "start": "Gamma(s) / k ^ s",
+                    "steps": [
+                        {
+                            "latex_res": "k ^ {-s} \\Gamma{(s)}",
+                            "res": "k ^ -s * Gamma(s)",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        }
+                    ],
+                    "type": "Calculation"
+                },
+                "type": "CalculationProof"
+            },
+            "type": "Goal"
+        },
+        {
+            "finished": true,
+            "goal": "(INT x:[0,oo]. x ^ (s - 1) / (exp(x) - 1)) = Gamma(s) * zeta(s)",
+            "latex_goal": "\\int_{0}^{\\infty} \\frac{x ^ {s - 1}}{e^{x} - 1} \\,dx = \\Gamma{(s)} zeta{(s)}",
+            "proof": {
+                "finished": true,
+                "goal": "(INT x:[0,oo]. x ^ (s - 1) / (exp(x) - 1)) = Gamma(s) * zeta(s)",
+                "latex_goal": "\\int_{0}^{\\infty} \\frac{x ^ {s - 1}}{e^{x} - 1} \\,dx = \\Gamma{(s)} zeta{(s)}",
+                "start": {
+                    "conds": [
+                        {
+                            "cond": "k > 0",
+                            "latex_cond": "k > 0"
+                        }
+                    ],
+                    "latex_start": "\\int_{0}^{\\infty} e^{(-k) x} x ^ {s - 1} \\,dx = \\frac{\\Gamma{(s)}}{k ^ {s}}",
+                    "start": "(INT x:[0,oo]. exp(-k * x) * x ^ (s - 1)) = Gamma(s) / k ^ s",
+                    "steps": [
+                        {
+                            "latex_res": "\\sum_{k=1}^{\\infty}{\\int_{0}^{\\infty} e^{(-k) x} x ^ {s - 1} \\,dx} = \\sum_{k=1}^{\\infty}{\\frac{\\Gamma{(s)}}{k ^ {s}}}",
+                            "res": "SUM(k, 1, oo, INT x:[0,oo]. exp(-k * x) * x ^ (s - 1)) = SUM(k, 1, oo, Gamma(s) / k ^ s)",
+                            "rule": {
+                                "index_var": "k",
+                                "lower": "1",
+                                "name": "SummationEquation",
+                                "str": "sum both side",
+                                "upper": "oo"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\sum_{k=1}^{\\infty}{\\int_{0}^{\\infty} x ^ {s - 1} e^{-k x} \\,dx} = \\Gamma{(s)} \\sum_{k=1}^{\\infty}{k ^ {-s}}",
+                            "res": "SUM(k, 1, oo, INT x:[0,oo]. x ^ (s - 1) * exp(-(k * x))) = Gamma(s) * SUM(k, 1, oo, k ^ -s)",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\sum_{k=1}^{\\infty}{\\int_{0}^{\\infty} x ^ {s - 1} e^{-k x} \\,dx} = \\Gamma{(s)} \\sum_{k=0}^{\\infty}{(k + 1) ^ {-s}}",
+                            "res": "SUM(k, 1, oo, INT x:[0,oo]. x ^ (s - 1) * exp(-(k * x))) = Gamma(s) * SUM(k, 0, oo, (k + 1) ^ -s)",
+                            "rule": {
+                                "loc": "1.1",
+                                "name": "ChangeSummationIndex",
+                                "new_lower": "0",
+                                "str": "change summation index at 1.1"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\sum_{k=1}^{\\infty}{\\int_{0}^{\\infty} x ^ {s - 1} e^{-k x} \\,dx} = \\Gamma{(s)} \\sum_{k=0}^{\\infty}{\\frac{1}{(k + 1) ^ {s}}}",
+                            "res": "SUM(k, 1, oo, INT x:[0,oo]. x ^ (s - 1) * exp(-(k * x))) = Gamma(s) * SUM(k, 0, oo, 1 / (k + 1) ^ s)",
+                            "rule": {
+                                "latex_str": "rewriting \\((k + 1) ^ {-s}\\) to \\(\\frac{1}{(k + 1) ^ {s}}\\)",
+                                "name": "Equation",
+                                "new_expr": "1 / (k + 1) ^ s",
+                                "old_expr": "(k + 1) ^ -s",
+                                "str": "rewriting (k + 1) ^ -s to 1 / (k + 1) ^ s"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\sum_{k=1}^{\\infty}{\\int_{0}^{\\infty} x ^ {s - 1} e^{-k x} \\,dx} = \\Gamma{(s)} zeta{(s)}",
+                            "res": "SUM(k, 1, oo, INT x:[0,oo]. x ^ (s - 1) * exp(-(k * x))) = Gamma(s) * zeta(s)",
+                            "rule": {
+                                "func_name": "zeta",
+                                "loc": "1.1",
+                                "name": "FoldDefinition",
+                                "str": "fold definition at 1.1"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{\\infty} \\sum_{k=1}^{\\infty}{x ^ {s - 1} e^{-k x}} \\,dx = \\Gamma{(s)} zeta{(s)}",
+                            "res": "(INT x:[0,oo]. SUM(k, 1, oo, x ^ (s - 1) * exp(-(k * x)))) = Gamma(s) * zeta(s)",
+                            "rule": {
+                                "loc": "0",
+                                "name": "IntSumExchange",
+                                "str": "exchange integral and sum at 0"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{\\infty} x ^ {s - 1} \\sum_{k=1}^{\\infty}{e^{-k x}} \\,dx = \\Gamma{(s)} zeta{(s)}",
+                            "res": "(INT x:[0,oo]. x ^ (s - 1) * SUM(k, 1, oo, exp(-(k * x)))) = Gamma(s) * zeta(s)",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{\\infty} x ^ {s - 1} \\sum_{k=1}^{\\infty}{e^{(-x) k}} \\,dx = \\Gamma{(s)} zeta{(s)}",
+                            "res": "(INT x:[0,oo]. x ^ (s - 1) * SUM(k, 1, oo, exp(-x * k))) = Gamma(s) * zeta(s)",
+                            "rule": {
+                                "latex_str": "rewriting \\(e^{-k x}\\) to \\(e^{(-x) k}\\)",
+                                "name": "Equation",
+                                "new_expr": "exp(-x * k)",
+                                "old_expr": "exp(-(k * x))",
+                                "str": "rewriting exp(-(k * x)) to exp(-x * k)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{\\infty} x ^ {s - 1} \\sum_{k=1}^{\\infty}{(e^{-x}) ^ {k}} \\,dx = \\Gamma{(s)} zeta{(s)}",
+                            "res": "(INT x:[0,oo]. x ^ (s - 1) * SUM(k, 1, oo, exp(-x) ^ k)) = Gamma(s) * zeta(s)",
+                            "rule": {
+                                "latex_str": "rewrite \\(e^{(-x) k}\\) to \\((e^{-x}) ^ {k}\\) using identity at 0.0.1.0",
+                                "loc": "0.0.1.0",
+                                "name": "ApplyIdentity",
+                                "source": "exp(-x * k)",
+                                "str": "rewrite exp(-x * k) to exp(-x) ^ k using identity at 0.0.1.0",
+                                "target": "exp(-x) ^ k"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{\\infty} x ^ {s - 1} (\\frac{(e^{-x}) ^ {1}}{1 - e^{-x}}) \\,dx = \\Gamma{(s)} zeta{(s)}",
+                            "res": "(INT x:[0,oo]. x ^ (s - 1) * (exp(-x) ^ 1 / (1 - exp(-x)))) = Gamma(s) * zeta(s)",
+                            "rule": {
+                                "loc": "0.0.1",
+                                "name": "SeriesEvaluationIdentity",
+                                "str": "apply series evaluation at 0.0.1"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{\\infty} \\frac{x ^ {s - 1}}{e^{x} - 1} \\,dx = \\Gamma{(s)} zeta{(s)}",
+                            "res": "(INT x:[0,oo]. x ^ (s - 1) / (exp(x) - 1)) = Gamma(s) * zeta(s)",
+                            "rule": {
+                                "latex_str": "rewriting \\(x ^ {s - 1} (\\frac{(e^{-x}) ^ {1}}{1 - e^{-x}})\\) to \\(\\frac{x ^ {s - 1}}{e^{x} - 1}\\)",
+                                "name": "Equation",
+                                "new_expr": "x ^ (s - 1) / (exp(x) - 1)",
+                                "old_expr": "x ^ (s - 1) * (exp(-x) ^ 1 / (1 - exp(-x)))",
+                                "str": "rewriting x ^ (s - 1) * (exp(-x) ^ 1 / (1 - exp(-x))) to x ^ (s - 1) / (exp(x) - 1)"
+                            },
+                            "type": "CalculationStep"
+                        }
+                    ],
+                    "type": "Calculation"
+                },
+                "type": "RewriteGoalProof"
+            },
+            "type": "Goal"
         }
     ],
     "name": "zeta_function"

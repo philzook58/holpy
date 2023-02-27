@@ -9,7 +9,7 @@ import operator
 from integral import expr
 from integral.expr import Var, Const, Fun, EvalAt, Op, Integral, Symbol, Expr, \
     OP, CONST, VAR, sin, cos, FUN, decompose_expr_factor, \
-    Deriv, Inf, Limit, NEG_INF, POS_INF, IndefiniteIntegral, Summation, SUMMATION
+    Deriv, Inf, Limit, NEG_INF, POS_INF, IndefiniteIntegral, Summation, SUMMATION, INF
 from integral import parser
 from integral.solve import solve_equation, solve_for_term
 from integral import latex
@@ -702,12 +702,25 @@ class SeriesEvaluationIdentity(Rule):
         }
 
     def eval(self, e: Expr, ctx: Context) -> Expr:
+        if not e.is_summation():
+            return e
         for identity in ctx.get_series_evaluations():
             inst = expr.match(e, identity.lhs)
             if inst is None:
                 continue
 
             return identity.rhs.inst_pat(inst)
+
+        # compute geometry series
+        idx = Var(e.index_var)
+        x = Symbol('x', [OP, FUN])
+        p = x ^ idx
+        mapping = expr.match(e.body, p)
+        if mapping!=None and \
+                ctx.get_conds().is_less(Fun('abs', mapping['x']), Const(1)) and e.upper == POS_INF:
+            t = mapping['x']
+            return (t**e.lower) / (Const(1)-t)
+
 
         # No matching identity found
         return e
@@ -2061,6 +2074,64 @@ class IntegralEquation(Rule):
         }
 
 
+class SummationEquation(Rule):
+    '''
+    a(n) = b(n) => Sum(n, lower, upper ,a(n)) = Sum(n, lower, upper, b(n))
+    '''
+    def __init__(self, index_var:str, lower:Union[Expr,str], upper:Union[Expr,str]):
+        if isinstance(lower, str):
+            lower = parser.parse_expr(lower)
+        if isinstance(upper, str):
+            upper = parser.parse_expr(upper)
+        self.name = "SummationEquation"
+        self.index_var = index_var
+        self.lower = lower
+        self.upper = upper
+
+    def eval(self, e: Expr, ctx: Context):
+        assert e.is_equals()
+        e1 = Summation(self.index_var, self.lower, self.upper, e.lhs)
+        e2 = Summation(self.index_var, self.lower, self.upper, e.rhs)
+        return Op("=", e1, e2)
+
+    def __str__(self):
+        return "sum both side"
+
+    def export(self):
+        return {
+            "name": self.name,
+            "str": str(self),
+            'index_var': self.index_var,
+            'lower': str(self.lower),
+            'upper': str(self.upper)
+        }
+
+
+class ChangeSummationIndex(Rule):
+    '''
+    sum(n, 1, oo, a(n)) => sum(n, 0, oo, a(n+1))
+    '''
+    def __init__(self, new_lower:Union[Expr, str]):
+        self.name = "ChangeSummationIndex"
+        self.new_lower = new_lower if isinstance(new_lower, Expr) else parser.parse_expr(new_lower)
+
+    def eval(self, e: Expr, ctx: Context):
+        assert e.is_summation()
+        tmp = normalize(Var(e.index_var) + e.lower - self.new_lower, ctx.get_conds())
+        new_upper = normalize(e.upper + self.new_lower - e.lower, ctx.get_conds()) \
+            if e.upper != POS_INF  else POS_INF
+        return Summation(e.index_var, self.new_lower, new_upper, e.body.replace(Var(e.index_var), tmp))
+    def __str__(self):
+        return "change summation index"
+
+    def export(self):
+        return {
+            "name": self.name,
+            "str": str(self),
+            "new_lower": str(self.new_lower)
+        }
+
+
 class LimitEquation(Rule):
     """Apply limit to both sides of the equation.
     
@@ -2106,6 +2177,9 @@ class IntSumExchange(Rule):
         if e.is_integral() and e.body.is_summation():
             s = e.body
             return Summation(s.index_var, s.lower, s.upper, Integral(e.var, e.lower, e.upper, e.body.body))
+        elif e.is_summation() and e.body.is_integral():
+            i = e.body
+            return Integral(i.var, i.lower, i.upper, Summation(e.index_var, e.lower, e.upper, i.body))
         else:
             return e
 

@@ -2852,6 +2852,47 @@ class IntegralTest(unittest.TestCase):
         s1 = "(-1)^s * (INT x:[0,1]. INT y:[0,1]. log(x * y) ^ (s - 2) / (-(x * y) + 1)) / factorial(s - 1) "
         s2 = "(-1)^s / factorial(s-1) * (INT x:[0,1]. (INT y:[0,1]. log(x*y)^(s-2)/ (1-x*y)))"
         calc.perform_rule(rules.Equation(s1, s2))
+
+        s1 = "(INT x:[0, oo]. exp(-k*x) * x^(s-1))"
+        s2 = "Gamma(s) / k^s"
+        goal05 = file.add_goal(s1+"="+s2, conds=["k>0"])
+        proof = goal05.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.Substitution("u", "k*x"))
+        s1 = "(u / k) ^ (s - 1)"
+        s2 = "u ^ (s - 1) / k ^ (s - 1)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "u ^ (s - 1) * exp(-u)"
+        s2 = "exp(-u) * u ^ (s - 1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("Gamma"), "1"))
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "(INT x:[0,oo]. x^(s-1)/(exp(x) - 1))"
+        s2 = "Gamma(s) * zeta(s)"
+        goal06 = file.add_goal(s1 + "=" + s2)
+        proof = goal06.proof_by_rewrite_goal(begin=goal05)
+        calc = proof.begin
+        calc.perform_rule(rules.SummationEquation('k', '1', 'oo'))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.ChangeSummationIndex('0'), "1.1"))
+        s1 = "(k + 1) ^ -s"
+        s2 = "1/(k+1)^s"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("zeta"),"1.1"))
+        calc.perform_rule(rules.OnLocation(rules.IntSumExchange(), "0"))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "exp(-(k * x))"
+        s2 = "exp(-x*k)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "exp(-x*k)"
+        s2 = "exp(-x)^k"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0.1.0"))
+        calc.perform_rule(rules.OnLocation(rules.SeriesEvaluationIdentity(), "0.0.1"))
+        s1 = "x ^ (s - 1) * (exp(-x) ^ 1 / (1 - exp(-x)))"
+        s2 = "x^(s-1) / (exp(x) - 1)"
+        calc.perform_rule(rules.Equation(s1, s2))
         self.checkAndOutput(file)
 
 if __name__ == "__main__":

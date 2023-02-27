@@ -226,6 +226,11 @@
         },
         {
             "type": "axiom",
+            "expr": "exp(x*y) = exp(x)^y",
+            "category": "exp-log"
+        },
+        {
+            "type": "axiom",
             "expr": "exp(a - b) = exp(a) * exp(-b)",
             "category": "exp-log"
         },
