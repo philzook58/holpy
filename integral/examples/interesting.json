@@ -546,6 +546,28 @@
         },
         {
             "type": "header",
+            "name": "4.5 Challenge Problems",
+            "level": 2
+        },
+        {
+            "type": "problem",
+            "expr": "(INT x:[0,1]. (1-sqrt(x))^n) = 2 / ((n+1)*(n+2))",
+            "conds": [
+                "n!=-1",
+                "n!=-2"
+            ],
+            "path": "chapter4_practice01"
+        },
+        {
+            "type": "problem",
+            "expr": "(INT x:[0,1].x^m * log(x)^n) = (-1)^n * factorial(n) / (m+1)^(n+1)",
+            "conds": [
+                "m + 1 > 0"
+            ],
+            "path": "chapter4_practice02"
+        },
+        {
+            "type": "header",
             "name": "5. Using Power Series to Evaluate Integrals",
             "level": 1
         },
@@ -588,6 +610,44 @@
             "type": "problem",
             "expr": "(INT x:[0, pi/2]. cos(x)/sin(x) * log(1/cos(x))) = pi^2/24",
             "path": "LogFunction02"
+        },
+        {
+            "type": "header",
+            "name": "5.3 Zeta Function Integrals",
+            "level": 2
+        },
+        {
+            "type": "definition",
+            "expr": "zeta(s) = SUM(k, 0, oo, 1/(k+1)^s)",
+            "path": "zeta_function"
+        },
+        {
+            "type": "problem",
+            "expr": "(INT y:[0,1]. (INT x:[0,1]. x^a * y^a / (1-x*y))) = SUM(n, 0, oo, 1/(n+1+a)^2)",
+            "conds": [
+                "a > -1"
+            ],
+            "path": "zeta_function"
+        },
+        {
+            "type": "problem",
+            "expr": "(INT y:[0,1]. (INT x:[0,1]. 1 / (1-x*y))) = zeta(2)",
+            "path": "zeta_function"
+        },
+        {
+            "type": "problem",
+            "expr": "(INT y:[0,1]. (INT x:[0,1]. log(x*y)^(s-2)*(x^a * y^a) / (1-x*y))) = (-1)^s * factorial(s-1) * SUM(n, 0, oo, 1/(n+a+1)^s)",
+            "path": "zeta_function"
+        },
+        {
+            "type": "problem",
+            "expr": "zeta(s) = (-1)^s / factorial(s-1) * (INT y:[0,1]. (INT x:[0,1]. log(x*y)^(s-2)/ (1-x*y)))",
+            "path": "zeta_function"
+        },
+        {
+            "type": "problem",
+            "expr": "(INT x:[0,oo]. x^(s-1)/(exp(x) - 1)) = Gamma(s) * zeta(s)",
+            "path": "zeta_function"
         },
         {
             "type": "header",
