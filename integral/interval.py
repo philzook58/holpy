@@ -334,10 +334,10 @@ class Interval:
         from integral.poly import normalize_constant
         if self.start == expr.NEG_INF or self.end == expr.POS_INF:
             if self.start != expr.NEG_INF:
-                start = -expr.start
+                start = normalize_constant(expr.Fun('abs', expr.start))
                 left = self.left_open
             if self.end != expr.POS_INF:
-                start = self.end
+                start = normalize_constant(expr.Fun('abs', expr.end))
                 left = self.right_open
             if self.start == expr.NEG_INF and self.end == expr.POS_INF:
                 start = expr.Const(0)
