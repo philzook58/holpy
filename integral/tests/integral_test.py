@@ -2895,5 +2895,6 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.Equation(s1, s2))
         self.checkAndOutput(file)
 
+
 if __name__ == "__main__":
     unittest.main()
