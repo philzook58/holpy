@@ -934,8 +934,8 @@
             "start": "INT x:[3/4,1]. 1 / (sqrt(1 - x) - 1)",
             "steps": [
                 {
-                    "latex_res": "\\int_{0}^{1/2} 2 (\\frac{u}{\\left| u \\right| - 1}) \\,du",
-                    "res": "INT u:[0,1/2]. 2 * (u / (abs(u) - 1))",
+                    "latex_res": "\\int_{0}^{1/2} 2 (\\frac{u}{u - 1}) \\,du",
+                    "res": "INT u:[0,1/2]. 2 * (u / (u - 1))",
                     "rule": {
                         "latex_str": "substitute \\(u\\) for \\(\\sqrt{1 - x}\\)",
                         "name": "Substitution",
@@ -946,8 +946,8 @@
                     "type": "CalculationStep"
                 },
                 {
-                    "latex_res": "\\int_{-1}^{-1/2} 2 (\\frac{v + 1}{\\left| v + 1 \\right| - 1}) \\,dv",
-                    "res": "INT v:[-1,-1/2]. 2 * ((v + 1) / (abs(v + 1) - 1))",
+                    "latex_res": "\\int_{-1}^{-1/2} 2 (\\frac{v + 1}{v}) \\,dv",
+                    "res": "INT v:[-1,-1/2]. 2 * ((v + 1) / v)",
                     "rule": {
                         "latex_str": "substitute \\(v\\) for \\(u - 1\\)",
                         "name": "Substitution",

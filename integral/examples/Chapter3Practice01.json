@@ -193,8 +193,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "I(a,b) = \\int \\pi (\\frac{1}{b (u - 1 + 1)}) \\,du",
-                            "res": "I(a,b) = (INT u [b]. pi * (1 / (b * (u - 1 + 1))))",
+                            "latex_res": "I(a,b) = \\int \\pi (\\frac{1}{b u}) \\,du",
+                            "res": "I(a,b) = (INT u [b]. pi * (1 / (b * u)))",
                             "rule": {
                                 "latex_str": "substitute \\(u\\) for \\(1 + a b\\)",
                                 "name": "Substitution",

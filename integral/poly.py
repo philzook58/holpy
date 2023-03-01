@@ -906,7 +906,8 @@ def to_poly(e: expr.Expr, conds: Conditions) -> Polynomial:
 
     elif e.is_fun() and e.func_name in ("asin", "acos", "atan", "acot", "acsc", "asec"):
         a, = e.args
-        if e.func_name in ("atan", "acot") and a.is_fun() and a.func_name == e.func_name[1:]:
+        if e.func_name in ("atan", "acot", "acos") and a.is_fun() and a.func_name == e.func_name[1:]:
+            # TODO: determine domain range of cos(x)
             # atan(tan(x)) = x
             return to_poly(a.args[0], conds)
         else:
@@ -959,6 +960,8 @@ def to_poly(e: expr.Expr, conds: Conditions) -> Polynomial:
         return to_poly(normalize(upper, conds) - normalize(lower, conds), conds)
 
     elif e.is_integral():
+        if e.diff != expr.Var(e.var):
+            e = expr.Integral(e.var, e.lower, e.upper, e.body * expr.Deriv(e.var, e.diff))
         if e.lower == e.upper:
             return constant(to_const_poly(expr.Const(0)), conds)
         conds2 = Conditions(conds)
@@ -966,6 +969,7 @@ def to_poly(e: expr.Expr, conds: Conditions) -> Polynomial:
         conds2.add_condition(expr.Op("<", expr.Var(e.var), e.upper))
         body = normalize(e.body, conds2)
         l, h = normalize(e.lower, conds), normalize(e.upper, conds)
+
         if l.is_evaluable() and h.is_evaluable() :
             ll, hh = expr.eval_expr(l), expr.eval_expr(h)
             if ll > hh:
