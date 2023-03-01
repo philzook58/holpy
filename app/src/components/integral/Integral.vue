@@ -32,6 +32,7 @@
           <b-dropdown-item href="#" v-on:click="applyRule('IntSumExchange')">Exchange sum and integral</b-dropdown-item>
           <b-dropdown-item href="#" v-on:click='splitRegion'>Splitting an Integral</b-dropdown-item>
           <b-dropdown-item href="#" v-on:click="solveEquation">Solve equation</b-dropdown-item>
+          <b-dropdown-item href="#" v-on:click="slagleAlgo">Try Slagle</b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown text="Rewrite" left>
           <b-dropdown-item href="#" v-on:click="rewriteEquation" id="rewriteEquation">Rewriting</b-dropdown-item>
@@ -1127,6 +1128,23 @@ export default {
         }
       }
       const response = await axios.post("http://127.0.0.1:5000/api/perform-step", JSON.stringify(data))
+      if (response.data.status == 'ok') {
+        this.$set(this.content, this.cur_id, response.data.item)
+        this.selected_item = response.data.selected_item
+        this.r_query_mode = undefined
+      }
+    },
+
+    // Slagle algorithm
+    slagleAlgo : async function () {
+      const data = {
+        book: this.book_name,
+        file: this.filename,
+        content: this.content,
+        cur_id: this.cur_id,
+        selected_item: this.selected_item
+      }
+      const response = await axios.post("http://127.0.0.1:5000/api/perform-slagle", JSON.stringify(data))
       if (response.data.status == 'ok') {
         this.$set(this.content, this.cur_id, response.data.item)
         this.selected_item = response.data.selected_item

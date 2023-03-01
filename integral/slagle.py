@@ -10,6 +10,7 @@ from integral import calc
 from integral import latex
 from integral import context
 from integral.poly import from_poly, to_poly
+from integral import compstate
 
 a = Symbol('a', [CONST])
 b = Symbol('b', [CONST])
@@ -1142,26 +1143,61 @@ def timeout(max_timeout):
     return timeout_decorator
 
 class Slagle(rules.Rule):
-    def __init__(self, time_out=None):
+    """Wrapper for slagle algorithm."""
+    def __init__(self, p : Integral, time_out:Optional[int]=None):
+        self.p = p
         if time_out is None:
-            self.timeout = 20
+            self.timeout = 5
         else:
             self.timeout = time_out
 
-    def compute_node(self, e):
+    def eval_node(self) -> Optional[OrNode]:
         try:
-            return bfs(OrNode(e))
+            return timeout(self.timeout)(bfs)(OrNode(self.p))
         except multiprocessing.context.TimeoutError:
             return None
 
-    def eval(self, e):
-        try:
-            node = timeout(self.timeout)(bfs)(OrNode(e))
-            result = node.compute_value()
-            return result
-        except multiprocessing.context.TimeoutError:
-            # print("Time out!")
+    def eval(self) -> Optional[Expr]:
+        node = self.eval_node()
+        if node is None:
             return None
+        else:
+            return node.compute_value()
+
+    def export_step(self) -> list[rules.Rule]:
+        node = self.eval_node()
+        if node is None:
+            return []
+        applied_rules : list[rules.Rule] = []
+        trace = node.trace()
+        for step in trace:
+            loc = step.loc
+            if step.reason == "Simplification":
+                rule = rules.FullSimplify()
+            elif step.reason == "DefiniteIntegralIdentity":
+                rule = rules.DefiniteIntegralIdentity()
+            elif step.reason == "Substitution":
+                rule = rules.Substitution(step.var_name, step.var_subst)
+            elif step.reason == "Substitution inverse":
+                rule = rules.SubstitutionInverse(step.var_name, step.var_subst)
+            else:
+                raise NotImplementedError(step.reason)
+            if not loc.is_empty:
+                applied_rules.append(rules.OnLocation(rule, loc))
+            else:
+                applied_rules.append(rule)
+        return applied_rules
+                
+
+def export_calc(p : Integral | str, 
+                s_rule : list[rules.Rule], 
+                book_name : str,
+                file_name : str):
+    file = compstate.CompFile(book_name, file_name)
+    calc = file.add_calculation(p)
+    for step in s_rule:
+        calc.perform_rule(step)
+    return file
 
 def perform_steps(node):
     """

@@ -282,6 +282,9 @@ class CalculationStep(StateItem):
 
     def perform_rule(self, rule: Rule):
         self.parent.perform_rule(rule, self.id)
+    
+    def perform_rules(self, calc_rules: tuple[Rule]):
+        self.parent.perform_rules(calc_rules, self.id)
 
 
 class Calculation(StateItem):
@@ -353,6 +356,10 @@ class Calculation(StateItem):
             ctx.extend_substs(step.rule.get_substs())
         new_e = rule.eval(e, ctx)
         self.add_step(CalculationStep(self, rule, new_e, id+1))
+
+    def perform_rules(self, calc_rules : tuple[Rule], id : Optional[int] = None):
+        for rule in calc_rules:
+            self.perform_rule(rule)
 
     def get_by_label(self, label: Label) -> "StateItem":
         if label.empty():

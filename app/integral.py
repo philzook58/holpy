@@ -9,6 +9,7 @@ import os
 
 import integral
 from integral import compstate
+from integral import slagle
 from app.app import app
 
 dirname = os.path.dirname(__file__)
@@ -485,6 +486,32 @@ def integral_perform_step():
             "status": "error",
             "msg": "Selected item is not part of a calculation."
         })
+    return jsonify({
+        "status": "ok",
+        "item": st.export(),
+        "selected_item": str(compstate.get_next_step_label(subitem, label))
+    })
+
+@app.route("/api/perform-slagle", methods=["POST"])
+def integral_perform_slagle():
+    data = json.loads(request.get_data().decode('UTF-8'))
+    book_name = data['book']
+    filename = data['file']
+    cur_id = data['cur_id']
+    file = compstate.CompFile(book_name, filename)
+    for item in data['content']:
+        file.add_item(compstate.parse_item(file, item))
+    label = compstate.Label(data['selected_item'])
+    st: compstate.StateItem = file.content[cur_id]
+    subitem = st.get_by_label(label)
+    if isinstance(subitem, compstate.Calculation):
+        e = subitem.last_expr
+    elif isinstance(subitem, compstate.CalculationStep):
+        e = subitem.parent.last_expr
+    else:
+        raise NotImplementedError
+    steps = slagle.Slagle(e).export_step()
+    subitem.perform_rules(steps)
     return jsonify({
         "status": "ok",
         "item": st.export(),

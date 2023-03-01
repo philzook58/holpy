@@ -88,7 +88,7 @@ class DefiniteIntegralIdentityStep(IntegrationStep):
         self.loc = Location(loc)
 
     def __str__(self):
-        return "Apply definite integral identity %s" % self.loc
+        return "Apply definite integral identity on %s" % self.loc
 
     def info(self):
         return {
