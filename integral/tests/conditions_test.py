@@ -23,22 +23,28 @@ class ConditionsTest(unittest.TestCase):
             # Power
             ("a ^ (1/2)", ["a > 0"], True),
             ("a ^ (-1/2)", ["a > 0"], True),
+            ("x ^ a", ["x > 0"], True),
+            ("x ^ a + 1", ["x > 0"], True),
 
             # Plus
             ("m + 1", ["m >= 0"], True),
             ("1 + x ^ 2", [], True),
+
+            # Polynomial
+            ("x * (4 - x)", ["x > 0", "4 - x > 0"], True),
 
             # Integrals
             ("INT x:[1,oo]. 1 / x ^ 2", [], True),
             ("INT x:[0,oo]. exp(-1/2 * x ^ 2)", [], True),
 
             # Trigonometric
-            ("sin(m * pi)", ["m>0", "m<1"], True),
+            ("sin(m * pi)", ["m > 0", "m < 1"], True),
 
-            ("x*(4-x)", ["x>0", "4-x>0"], True),
+            # Equality
+            ("1/3 * u - 1/3", ["u = 1 + 3 * exp(-x)"], True),
+
+            # Others
             ("x ^ 4 + 2 * x ^ 2 * cosh(2 * a) + 1", [], True),
-            ("x^a", ["x>0"], True),
-            ("x^a + 1", ["x>0"], True)
         ]
 
         for a, conds_str, res in test_data:
@@ -59,5 +65,7 @@ class ConditionsTest(unittest.TestCase):
             for s in conds_str:
                 conds.add_condition(parser.parse_expr(s))
             self.assertEqual(conds.is_nonzero(e), res, msg="Failed with %s" % e)
+
+            
 if __name__ == "__main__":
     unittest.main()

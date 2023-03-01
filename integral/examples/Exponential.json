@@ -247,20 +247,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "4 (\\int u ^ {-1/2} \\,du)",
-                            "res": "4 * (INT u. u ^ (-1/2))",
-                            "rule": {
-                                "latex_str": "rewriting \\(\\frac{1}{\\sqrt{u}}\\) to \\(u ^ {-1/2}\\)",
-                                "name": "Equation",
-                                "new_expr": "u ^ (-1/2)",
-                                "old_expr": "1 / sqrt(u)",
-                                "str": "rewriting 1 / sqrt(u) to u ^ (-1/2)"
-                            },
-                            "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "4 (\\frac{u ^ {-1/2 + 1}}{-\\frac{1}{2} + 1}) + C",
-                            "res": "4 * (u ^ (-1/2 + 1) / (-1/2 + 1)) + SKOLEM_CONST(C)",
+                            "latex_res": "4 (2 \\sqrt{u}) + C",
+                            "res": "4 * (2 * sqrt(u)) + SKOLEM_CONST(C)",
                             "rule": {
                                 "name": "IndefiniteIntegralIdentity",
                                 "str": "apply indefinite integral"
@@ -347,8 +335,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\int \\frac{1}{3} (\\frac{e^{\\log{(u - 27)}} (e^{\\log{(u - 27)}} + 27) ^ {1/3}}{u - 27}) \\,du",
-                            "res": "INT u. 1/3 * (exp(log(u - 27)) * (exp(log(u - 27)) + 27) ^ (1/3) / (u - 27))",
+                            "latex_res": "\\int \\frac{1}{3} u ^ {1/3} \\,du",
+                            "res": "INT u. 1/3 * u ^ (1/3)",
                             "rule": {
                                 "latex_str": "substitute \\(u\\) for \\(27 + e^{3 x}\\)",
                                 "name": "Substitution",

@@ -353,7 +353,9 @@ class Calculation(StateItem):
         e = self.last_expr
         ctx = Context(self.ctx)
         for step in self.steps:
-            ctx.extend_substs(step.rule.get_substs())
+            for var, subst_e in step.rule.get_substs().items():
+                ctx.add_subst(var, subst_e)
+                ctx.add_condition(expr.Op("=", expr.Var(var), subst_e))
         new_e = rule.eval(e, ctx)
         self.add_step(CalculationStep(self, rule, new_e, id+1))
 

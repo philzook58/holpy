@@ -52,11 +52,22 @@ class Conditions:
                 else:
                     bounds[x] = interval
         return bounds
+    
+    def get_substs(self) -> Dict[str, Expr]:
+        """Obtain substitutions from conditions"""
+        substs: Dict[str, Expr] = dict()
+        for cond in self.data:
+            if cond.is_equals() and cond.lhs.is_var():
+                substs[cond.lhs.name] = cond.rhs
+        return substs
 
     def get_bounds_for_expr(self, e: Expr) -> Optional[Interval]:
         bounds = self.get_bounds()
         res = interval.get_bounds_for_expr(e, bounds)
-        return res
+        for var, subst_e in self.get_substs().items():
+            e = e.subst(var, subst_e)
+        res2 = interval.get_bounds_for_expr(e, bounds)
+        return res.intersection(res2)
     
     def check_condition(self, cond: Expr) -> bool:
         res = Interval.from_condition(cond)

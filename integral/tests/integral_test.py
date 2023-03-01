@@ -18,14 +18,14 @@ class IntegralTest(unittest.TestCase):
         for i, item in enumerate(json_file['content']):
             self.assertEqual(compstate.parse_item(file.content[i].parent, item).export(), file.content[i].export())
 
+        # Output to file
+        with open('integral/examples/' + file.name + '.json', 'w', encoding='utf-8') as f:
+            json.dump(file.export(), f, indent=4, ensure_ascii=False, sort_keys=True)
+
         # Test goals are finished
         if not omit_finish:
             for content in file.content:
                 self.assertTrue(content.is_finished())
-
-        # Output to file
-        with open('integral/examples/' + file.name + '.json', 'w', encoding='utf-8') as f:
-            json.dump(file.export(), f, indent=4, ensure_ascii=False, sort_keys=True)
 
     def testStandard(self):
         file = compstate.CompFile("base", "standard")
@@ -507,7 +507,6 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.Equation("8*exp(x)*(3+exp(x))", "4*(2 * exp(2 * x) + 6 * exp(x))"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.Substitution("u", "exp(2*x) + 6*exp(x) + 1"))
-        calc.perform_rule(rules.Equation("1 / sqrt(u)", "u ^ (-1/2)"))
         calc.perform_rule(rules.IndefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.ReplaceSubstitution())
