@@ -2895,6 +2895,88 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.Equation(s1, s2))
         self.checkAndOutput(file)
 
+    def testCoxeterIntegral(self):
+        # TODO: find some problems about condtion inheritance
+        file = compstate.CompFile("interesting", "coxeter")
+        lemma = file.add_goal("cos(2*x) = 2*cos(x)^2 - 1", conds=["x>=0", "x<=pi/2"])
+        proof = lemma.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.ApplyIdentity("cos(2*x)", "2*cos(x)^2 - 1"))
+
+        goal01 = file.add_goal("acos(a) = 2*acos(sqrt((1+a) / 2))", conds=["abs(a) <= 1"])
+        proof = goal01.proof_by_rewrite_goal(begin = lemma)
+        calc = proof.begin
+        calc.perform_rule(rules.VarSubsOfEquation([{"var":"x", "expr":"acos(u)"}]))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.FunEquation("acos"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.VarSubsOfEquation([{"var": "u", "expr": "sqrt((1+a)/2)"}]))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.SolveEquation("acos(a)"))
+
+    def testPowerfulElementaryIntegral(self):
+        # Reference: Impossible, Integrals, Sums, and Series
+        # section 1.1
+        file = compstate.CompFile("interesting", "powerful_elementry_integral")
+        s1 = "(INT x:[0, 1]. 1/ ((1 + y*x)*sqrt(1-x^2)))"
+        s2 = "2 / sqrt(-(y ^ 2) + 1) * (atan((y + 1) / sqrt(-(y ^ 2) + 1)) - atan(y / sqrt(-(y ^ 2) + 1))) "
+        goal = file.add_goal(s1+"="+s2, conds=["abs(y) < 1"])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.SubstitutionInverse("t", "sin(t)"))
+        calc.perform_rule(rules.OnLocation(rules.Equation("1", "sin(t)^2 + cos(t)^2"), "0.0.1.1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.Equation("1", "sin(t/2)^2 + cos(t/2)^2"), "0.1"))
+        calc.perform_rule(rules.OnLocation(rules.Equation("t", "2*(t/2)"), "0.1.0"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity("sin(2*(t/2))","2*sin(t/2)*cos(t/2)"), "0.1.0.1"))
+        s1 = "1 / (y * (2 * sin(t / 2) * cos(t / 2)) + (sin(t / 2) ^ 2 + cos(t / 2) ^ 2))"
+        s2 = "(1/cos(t/2)^2) / ((y * (2 * sin(t / 2) * cos(t / 2)) + (sin(t / 2) ^ 2 + cos(t / 2) ^ 2))/cos(t/2)^2)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "1/cos(t/2)^2"
+        s2 = "(cos(t/2)^-1)^2"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "cos(t/2)^-1"
+        s2 = "sec(t/2)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0.0"))
+        calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0.1"))
+        s1 = "sin(1/2 * t) ^ 2 / cos(1/2 * t) ^ 2"
+        s2 = "(sin(1/2 * t) / cos(1/2*t)) ^ 2"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "sin(1/2 * t) / cos(1/2*t)"
+        s2 = "tan(1/2*t)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), '0.1.0.0.0'))
+        s1 = "y * sin(1/2 * t) / cos(1/2 * t)"
+        s2 = "y * (sin(1/2 * t) / cos(1/2 * t))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "sin(1/2 * t) / cos(1/2*t)"
+        s2 = "tan(1/2*t)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), '0.1.0.1.1.1'))
+        s1 = "INT t:[0,pi / 2]. (sec(t / 2) ^ 2 / (tan(1/2 * t) ^ 2 + 2 * (y * tan(1/2 * t)) + 1))"
+        s2 = "INT t:[0,pi / 2]. 2 / (tan(1/2 * t) ^ 2 + 2 * (y * tan(1/2 * t)) + 1) . tan(t/2)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.Substitution("u", "tan(t/2)"))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "2 * u * y + u ^ 2 + 1"
+        s2 = "(u+y)^2 + (sqrt(1-y^2)^2)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.Substitution("t", "u+y"))
+        s1 = "(t ^ 2 - y ^ 2 + 1)"
+        s2 = "t^2 + (sqrt(1-y^2)^2)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.Substitution("u", "t/sqrt(1-y^2)"))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "u ^ 2 * (-(y ^ 2) + 1) - y ^ 2 + 1"
+        s2 = "(u^2+1)*(1-y^2)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "1 / ((u ^ 2 + 1) * (1 - y ^ 2))"
+        s2 = "1/(u^2+1) * (1-y^2)^-1"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+        self.checkAndOutput(file)
 
 if __name__ == "__main__":
     unittest.main()

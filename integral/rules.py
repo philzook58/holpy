@@ -360,13 +360,13 @@ class Linearity(Rule):
         def rec(e: Expr):
             if e.is_integral():
                 if e.body.is_plus():
-                    return rec(expr.Integral(e.var, e.lower, e.upper, e.body.args[0])) + \
-                           rec(expr.Integral(e.var, e.lower, e.upper, e.body.args[1]))
+                    return rec(expr.Integral(e.var, e.lower, e.upper, e.body.args[0], e.diff)) + \
+                           rec(expr.Integral(e.var, e.lower, e.upper, e.body.args[1], e.diff))
                 elif e.body.is_uminus():
-                    return -rec(expr.Integral(e.var, e.lower, e.upper, e.body.args[0]))
+                    return -rec(expr.Integral(e.var, e.lower, e.upper, e.body.args[0], e.diff))
                 elif e.body.is_minus():
-                    return rec(expr.Integral(e.var, e.lower, e.upper, e.body.args[0])) - \
-                           rec(expr.Integral(e.var, e.lower, e.upper, e.body.args[1]))
+                    return rec(expr.Integral(e.var, e.lower, e.upper, e.body.args[0], e.diff)) - \
+                           rec(expr.Integral(e.var, e.lower, e.upper, e.body.args[1], e.diff))
                 elif e.body.is_times() or e.body.is_divides():
                     num_factors, denom_factors = decompose_expr_factor(e.body)
                     b = prod(f for f in num_factors if f.contains_var(e.var))
@@ -378,11 +378,11 @@ class Linearity(Rule):
                     if denom_c != Const(1):
                         c = c / denom_c
                     if c == expr.Const(1):
-                        return Integral(e.var, e.lower, e.upper, b)
+                        return Integral(e.var, e.lower, e.upper, b, e.diff)
                     else:
-                        return c * rec(Integral(e.var, e.lower, e.upper, b))
+                        return c * rec(Integral(e.var, e.lower, e.upper, b, e.diff))
                 elif e.body.is_constant() and e.body != Const(1):
-                    return e.body * expr.Integral(e.var, e.lower, e.upper, Const(1))
+                    return e.body * expr.Integral(e.var, e.lower, e.upper, Const(1), e.diff)
                 else:
                     return e
             elif e.is_indefinite_integral():
@@ -903,7 +903,7 @@ class OnSubterm(Rule):
             lower = self.eval(e.lower, ctx)
             upper = self.eval(e.upper, ctx)
             body = self.eval(e.body, ctx2)
-            return rule.eval(expr.Integral(e.var, lower, upper, body), ctx)
+            return rule.eval(expr.Integral(e.var, lower, upper, body, e.diff), ctx)
         elif e.is_evalat():
             return rule.eval(expr.EvalAt(
                 e.var, self.eval(e.lower, ctx), self.eval(e.upper, ctx),
@@ -1310,8 +1310,14 @@ class Substitution(Rule):
         if e.is_integral():
             ctx2.add_condition(expr.Op(">", Var(e.var), e.lower))
             ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
-        body = normalize(e.body / dfx, ctx2.get_conds())
-        body_subst = body.replace(var_subst, var_name)
+        flag = False
+        if e.is_integral():
+            flag = normalize(e.diff, ctx2.get_conds()) == normalize(self.var_subst, ctx2.get_conds())
+        if flag:
+            body = normalize(e.body, ctx2.get_conds())
+        else:
+            body = normalize(e.body / dfx, ctx2.get_conds())
+        body_subst = body.replace(normalize(var_subst, ctx2.get_conds()), var_name)
         if e.var not in body_subst.get_vars():
             # Substitution is able to clear all x in original integrand
             self.f = body_subst
@@ -1324,7 +1330,10 @@ class Substitution(Rule):
 
             gu = normalize(gu, ctx.get_conds())
             c = e.body.replace(parser.parse_expr(e.var), gu)
-            new_problem_body = c * deriv(str(var_name), gu, ctx)
+            if not flag:
+                new_problem_body = c * deriv(str(var_name), gu, ctx)
+            else:
+                new_problem_body = c
             self.f = new_problem_body
 
         if e.is_integral():
@@ -1459,7 +1468,7 @@ class ExpandPolynomial(Rule):
             else:
                 return from_poly(p1 / poly.singleton(from_poly(p2), conds))
         elif e.is_integral():
-            return expr.Integral(e.var, e.lower, e.upper, self.eval(e.body, ctx))
+            return expr.Integral(e.var, e.lower, e.upper, self.eval(e.body, ctx), e.diff)
         else:
             return e
 
@@ -1615,7 +1624,7 @@ class IntegrationByParts(Rule):
         if equal:
             if e.is_integral():
                 return expr.EvalAt(e.var, e.lower, e.upper, normalize(self.u * self.v, conds)) - \
-                       expr.Integral(e.var, e.lower, e.upper, normalize(self.v * du, conds))
+                       expr.Integral(e.var, e.lower, e.upper, normalize(self.v * du, conds), e.diff)
             elif e.is_indefinite_integral():
                 return normalize(self.u * self.v, conds) - \
                        expr.IndefiniteIntegral(e.var, normalize(self.v * du, conds), e.skolem_args)
@@ -1653,8 +1662,8 @@ class SplitRegion(Rule):
         is_cpv = limits.reduce_inf_limit(e.body.subst(e.var, self.c + 1 / x), x.name, ctx.get_conds()) in [POS_INF,
                                                                                                            NEG_INF]
         if not is_cpv:
-            return expr.Integral(e.var, e.lower, self.c, e.body) + \
-                   expr.Integral(e.var, self.c, e.upper, e.body)
+            return expr.Integral(e.var, e.lower, self.c, e.body, e.diff) + \
+                   expr.Integral(e.var, self.c, e.upper, e.body, e.diff)
         else:
             conds = ctx.get_conds()
             return Limit(x.name, POS_INF, Integral(e.var, e.lower, normalize(self.c - 1 / x, conds), e.body) +
@@ -1744,7 +1753,7 @@ class ElimInfInterval(Rule):
 
     def eval(self, e: Expr, ctx: Context) -> Expr:
         def gen_lim_expr(new_var, lim, lower, upper, drt=None):
-            return expr.Limit(new_var, lim, expr.Integral(e.var, lower, upper, e.body), drt)
+            return expr.Limit(new_var, lim, expr.Integral(e.var, lower, upper, e.body, e.diff), drt)
 
         if not e.is_integral():
             sep_ints = e.separate_integral()
@@ -2333,3 +2342,29 @@ class SolveEquation(Rule):
             "solve_for": str(self.solve_for),
             "latex_str": "solve equation for \\(%s\\)" % latex.convert_expr(self.solve_for)
         }
+
+
+class FunEquation(Rule):
+    """a = b => fun(a) = fun(b) if a,b belong to the domain of f"""
+
+    def __init__(self, func_name: str):
+        self.name = "FunEquation"
+        self.func_name: str = func_name
+
+    def __str__(self):
+        return "function on both sides"
+
+    def export(self):
+        return {
+            "name": self.name,
+            "str": str(self),
+            "func_name": self.func_name
+        }
+
+    def eval(self, e: Expr, ctx: Context) -> Expr:
+        if not e.is_equals():
+            return e
+        ne = Op('=', Fun(self.func_name, e.lhs), Fun(self.func_name, e.rhs))
+        if check_wellformed(ne, ctx.get_conds()):
+            return ne
+        return e

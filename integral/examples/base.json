@@ -482,6 +482,18 @@
         },
         {
             "type": "axiom",
+            "expr": "cos(x)^-1 = sec(x)",
+            "category": "trigonometric",
+            "conds": ["cos(x)!=0"]
+        },
+        {
+            "type": "axiom",
+            "expr": "sin(x) / cos(x) = tan(x)",
+            "category": "trigonometric",
+            "conds": ["cos(x)!=0"]
+        },
+        {
+            "type": "axiom",
             "expr": "tan(a - b) = (tan(a) - tan(b)) / (1 + tan(a) * tan(b))",
             "category": "trigonometric"
         },
