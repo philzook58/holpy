@@ -1459,6 +1459,8 @@ def eval_expr(e: Expr):
             return math.acos(eval_expr(e.args[0]))
         elif e.func_name == 'atan':
             return math.atan(eval_expr(e.args[0]))
+        elif e.func_name == 'log':
+            return math.log(eval_expr(e.args[0]))
 
     print(e)
     raise NotImplementedError
