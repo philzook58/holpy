@@ -1187,6 +1187,7 @@ class IntegralTest(unittest.TestCase):
         # Inside interesting integrals, Section 3.1, example #3
 
         # Overall goal: INT x:[0,oo]. cos(tx)*exp(-(x^2)/2) = sqrt(pi/2)*exp(-(t^2)/2)
+        # TODO: remove conditions I(t) > 0
 
         # Initial state
         file = compstate.CompFile("interesting", 'leibniz03')
@@ -1220,14 +1221,14 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.OnSubterm(rules.ExpandDefinition("I")))
         calc.perform_rule(rules.FullSimplify())
 
-        Eq2 = file.add_goal("(D t. log(I(t)) + t^2/2) = 0")
+        Eq2 = file.add_goal("(D t. log(I(t)) + t^2/2) = 0", conds=["I(t) > 0"])
         Eq2_proof = Eq2.proof_by_calculation()
         calc = Eq2_proof.lhs_calc
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation(Eq1.goal), '0.0'))
         calc.perform_rule(rules.FullSimplify())
 
-        Eq3 = file.add_goal("1/2 * t ^ 2 + log(I(t)) = SKOLEM_CONST(C)")
+        Eq3 = file.add_goal("1/2 * t ^ 2 + log(I(t)) = SKOLEM_CONST(C)", conds=["I(t) > 0"])
         Eq3_proof = Eq3.proof_by_rewrite_goal(begin=Eq2)
         calc = Eq3_proof.begin
         calc.perform_rule(rules.IntegralEquation())
@@ -1240,7 +1241,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation(Eq0.goal), '0.0'))
 
-        Eq5 = file.add_goal("log(I(t)) = -t ^ 2 / 2 + log(sqrt(pi / 2))")
+        Eq5 = file.add_goal("log(I(t)) = -t ^ 2 / 2 + log(sqrt(pi / 2))", conds=["I(t) > 0"])
         Eq5_proof = Eq5.proof_by_calculation()
         calc = Eq5_proof.lhs_calc
         calc.perform_rule(rules.ApplyEquation(Eq3.goal))

@@ -18,7 +18,7 @@
                     "expr": "x ^ 4 + 2 * x ^ 2 * cos(2 * a) + 1 != 0"
                 }
             ],
-            "finished": false,
+            "finished": true,
             "goal": "I(a) = (INT x:[0,oo]. x ^ 2 / (x ^ 4 + 2 * x ^ 2 * cos(2 * a) + 1))",
             "latex_goal": "I{(a)} = \\int_{0}^{\\infty} \\frac{x ^ {2}}{x ^ {4} + 2 x ^ {2} \\cos{(2 a)} + 1} \\,dx",
             "proof": {
@@ -122,7 +122,7 @@
                     "expr": "x ^ 4 + 2 * x ^ 2 * cos(2 * a) + 1 != 0"
                 }
             ],
-            "finished": false,
+            "finished": true,
             "goal": "2 * I(a) = (INT x:[0,oo]. (1 + x ^ 2) / (x ^ 4 + 2 * x ^ 2 * cos(2 * a) + 1))",
             "latex_goal": "2 I{(a)} = \\int_{0}^{\\infty} \\frac{1 + x ^ {2}}{x ^ {4} + 2 x ^ {2} \\cos{(2 a)} + 1} \\,dx",
             "proof": {
@@ -242,6 +242,10 @@
         {
             "bad_parts": [
                 {
+                    "conds": [],
+                    "expr": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0"
+                },
+                {
                     "conds": [
                         {
                             "cond": "x > 0",
@@ -249,13 +253,9 @@
                         }
                     ],
                     "expr": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0"
-                },
-                {
-                    "conds": [],
-                    "expr": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0"
                 }
             ],
-            "finished": false,
+            "finished": true,
             "goal": "(INT x:[-oo,oo]. (x ^ 2 + 1) / (2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1)) = 2 * (INT x:[0,oo]. (x ^ 2 + 1) / (2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1))",
             "latex_goal": "\\int_{-\\infty}^{\\infty} \\frac{x ^ {2} + 1}{2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1} \\,dx = 2 (\\int_{0}^{\\infty} \\frac{x ^ {2} + 1}{2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1} \\,dx)",
             "proof": {
@@ -310,18 +310,18 @@
             },
             "sub_goals": [
                 {
-                    "conds": [
-                        {
-                            "cond": "x > 0",
-                            "latex_cond": "x > 0"
-                        }
-                    ],
                     "finished": false,
                     "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
                     "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
                     "type": "Goal"
                 },
                 {
+                    "conds": [
+                        {
+                            "cond": "x > 0",
+                            "latex_cond": "x > 0"
+                        }
+                    ],
                     "finished": false,
                     "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
                     "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
@@ -338,7 +338,7 @@
                     "expr": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0"
                 }
             ],
-            "finished": false,
+            "finished": true,
             "goal": "(INT x:[-oo,oo]. -2 * x * sin(a) / ((x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1))) = 0",
             "latex_goal": "\\int_{-\\infty}^{\\infty} \\frac{-2 x \\sin{a}}{(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1)} \\,dx = 0",
             "proof": {
@@ -409,7 +409,7 @@
                     "expr": "cos(a) ^ 2 + x ^ 2 != 0"
                 }
             ],
-            "finished": false,
+            "finished": true,
             "goal": "I(a) = 1/4 * (INT x:[-oo,oo]. 1 / (cos(a) ^ 2 + x ^ 2))",
             "latex_goal": "I{(a)} = \\frac{1}{4} (\\int_{-\\infty}^{\\infty} \\frac{1}{\\cos^{2}(a) + x ^ {2}} \\,dx)",
             "proof": {

@@ -177,7 +177,7 @@ class Goal(StateItem):
             return self.proof is not None and self.proof.is_finished()
         else:
             self.wellformed = all(g.is_finished() for g in self.sub_goals)
-            return self.proof is not None and self.proof.is_finished() and self.wellformed
+            return self.proof is not None and self.proof.is_finished()
 
     def clear(self):
         self.proof = None

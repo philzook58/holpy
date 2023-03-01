@@ -178,17 +178,17 @@
             "type": "Goal"
         },
         {
-            "bad_parts": [
+            "conds": [
                 {
-                    "conds": [],
-                    "expr": "I(t) > 0"
+                    "cond": "I(t) > 0",
+                    "latex_cond": "I{(t)} > 0"
                 }
             ],
-            "finished": false,
+            "finished": true,
             "goal": "(D t. log(I(t)) + t ^ 2 / 2) = 0",
             "latex_goal": "\\frac{d}{dt} (\\log{(I{(t)})} + \\frac{t ^ {2}}{2}) = 0",
             "proof": {
-                "finished": false,
+                "finished": true,
                 "goal": "(D t. log(I(t)) + t ^ 2 / 2) = 0",
                 "latex_goal": "\\frac{d}{dt} (\\log{(I{(t)})} + \\frac{t ^ {2}}{2}) = 0",
                 "lhs_calc": {
@@ -217,8 +217,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{t I{(t)}}{I{(t)}} + t",
-                            "res": "-(t * I(t) / I(t)) + t",
+                            "latex_res": "0",
+                            "res": "0",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -236,25 +236,16 @@
                 },
                 "type": "CalculationProof"
             },
-            "sub_goals": [
-                {
-                    "finished": false,
-                    "goal": "I(t) > 0",
-                    "latex_goal": "I{(t)} > 0",
-                    "type": "Goal"
-                }
-            ],
-            "type": "Goal",
-            "wellformed": false
+            "type": "Goal"
         },
         {
-            "bad_parts": [
+            "conds": [
                 {
-                    "conds": [],
-                    "expr": "I(t) > 0"
+                    "cond": "I(t) > 0",
+                    "latex_cond": "I{(t)} > 0"
                 }
             ],
-            "finished": false,
+            "finished": true,
             "goal": "1/2 * t ^ 2 + log(I(t)) = SKOLEM_CONST(C)",
             "latex_goal": "\\frac{1}{2} t ^ {2} + \\log{(I{(t)})} = C",
             "proof": {
@@ -262,6 +253,12 @@
                 "goal": "1/2 * t ^ 2 + log(I(t)) = SKOLEM_CONST(C)",
                 "latex_goal": "\\frac{1}{2} t ^ {2} + \\log{(I{(t)})} = C",
                 "start": {
+                    "conds": [
+                        {
+                            "cond": "I(t) > 0",
+                            "latex_cond": "I{(t)} > 0"
+                        }
+                    ],
                     "latex_start": "\\frac{d}{dt} (\\log{(I{(t)})} + \\frac{t ^ {2}}{2}) = 0",
                     "start": "(D t. log(I(t)) + t ^ 2 / 2) = 0",
                     "steps": [
@@ -288,16 +285,7 @@
                 },
                 "type": "RewriteGoalProof"
             },
-            "sub_goals": [
-                {
-                    "finished": false,
-                    "goal": "I(t) > 0",
-                    "latex_goal": "I{(t)} > 0",
-                    "type": "Goal"
-                }
-            ],
-            "type": "Goal",
-            "wellformed": false
+            "type": "Goal"
         },
         {
             "finished": true,
@@ -308,6 +296,12 @@
                 "goal": "log(sqrt(pi / 2)) = SKOLEM_CONST(C)",
                 "latex_goal": "\\log{(\\sqrt{\\frac{\\pi}{2}})} = C",
                 "start": {
+                    "conds": [
+                        {
+                            "cond": "I(t) > 0",
+                            "latex_cond": "I{(t)} > 0"
+                        }
+                    ],
                     "latex_start": "\\frac{1}{2} t ^ {2} + \\log{(I{(t)})} = C",
                     "start": "1/2 * t ^ 2 + log(I(t)) = SKOLEM_CONST(C)",
                     "steps": [
@@ -352,13 +346,13 @@
             "type": "Goal"
         },
         {
-            "bad_parts": [
+            "conds": [
                 {
-                    "conds": [],
-                    "expr": "I(t) > 0"
+                    "cond": "I(t) > 0",
+                    "latex_cond": "I{(t)} > 0"
                 }
             ],
-            "finished": false,
+            "finished": true,
             "goal": "log(I(t)) = -(t ^ 2) / 2 + log(sqrt(pi / 2))",
             "latex_goal": "\\log{(I{(t)})} = \\frac{-t ^ {2}}{2} + \\log{(\\sqrt{\\frac{\\pi}{2}})}",
             "proof": {
@@ -422,16 +416,7 @@
                 },
                 "type": "CalculationProof"
             },
-            "sub_goals": [
-                {
-                    "finished": false,
-                    "goal": "I(t) > 0",
-                    "latex_goal": "I{(t)} > 0",
-                    "type": "Goal"
-                }
-            ],
-            "type": "Goal",
-            "wellformed": false
+            "type": "Goal"
         },
         {
             "finished": true,
@@ -442,6 +427,12 @@
                 "goal": "I(t) = sqrt(pi / 2) * exp(-(t ^ 2) / 2)",
                 "latex_goal": "I{(t)} = \\sqrt{\\frac{\\pi}{2}} e^{-t ^ {2}/2}",
                 "start": {
+                    "conds": [
+                        {
+                            "cond": "I(t) > 0",
+                            "latex_cond": "I{(t)} > 0"
+                        }
+                    ],
                     "latex_start": "\\log{(I{(t)})} = \\frac{-t ^ {2}}{2} + \\log{(\\sqrt{\\frac{\\pi}{2}})}",
                     "start": "log(I(t)) = -(t ^ 2) / 2 + log(sqrt(pi / 2))",
                     "steps": [

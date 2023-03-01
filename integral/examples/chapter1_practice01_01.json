@@ -16,7 +16,7 @@
                     "expr": "x - 2 != 0"
                 }
             ],
-            "finished": false,
+            "finished": true,
             "goal": "(INT x:[0,8]. 1 / (x - 2)) = log(3)",
             "latex_goal": "\\int_{0}^{8} \\frac{1}{x - 2} \\,dx = \\log{(3)}",
             "proof": {
