@@ -52,7 +52,7 @@ class Interval:
             return cond.args[0].args[0], Interval.open(-cond.args[1], cond.args[1])
         if cond.is_less_eq() and cond.args[0].is_fun() and cond.args[0].func_name == 'abs' and cond.args[1].is_constant():
             # |x| <= const  ==>  x in [-const, const]
-            return cond.args[0].args[0], Interval.close(-cond.args[1], cond.args[1])
+            return cond.args[0].args[0], Interval.closed(-cond.args[1], cond.args[1])
 
         # Then cases where one side is constant, and other side is arbitrary
         if cond.is_less() and cond.args[1].is_constant():
