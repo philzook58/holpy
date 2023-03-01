@@ -155,7 +155,7 @@ class Goal(StateItem):
         self.ctx = Context(ctx)
         self.ctx.extend_condition(self.conds)
         self.wellformed, self.bad_parts = check_wellformed(goal, self.ctx.get_conds())
-        self.sub_goals:List['Goal'] = list()
+        self.sub_goals: List['Goal'] = list()
         for p in self.bad_parts:
             self.sub_goals.append(Goal(self, self.ctx, p.e, p.conds))
 
@@ -165,7 +165,11 @@ class Goal(StateItem):
         else:
             res = "Goal\n"
         res += "  %s\n" % self.goal
-        res += str(self.proof)
+        if self.proof is not None:
+            res += str(self.proof)
+        if self.sub_goals:
+            for g in self.sub_goals:
+                res += "subgoal %s\n" % g.goal
         return res
 
     def __eq__(self, other):
@@ -173,7 +177,7 @@ class Goal(StateItem):
             self.proof == other.proof
 
     def is_finished(self):
-        if self.sub_goals == list():
+        if not self.sub_goals:
             return self.proof is not None and self.proof.is_finished()
         else:
             self.wellformed = all(g.is_finished() for g in self.sub_goals)
@@ -189,7 +193,7 @@ class Goal(StateItem):
             "latex_goal": latex.convert_expr(self.goal),
             "finished": self.is_finished(),
         }
-        if self.sub_goals != list():
+        if self.sub_goals:
             res['sub_goals'] = [g.export() for g in self.sub_goals]
         if self.proof:
             res['proof'] = self.proof.export()

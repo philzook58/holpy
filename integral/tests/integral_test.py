@@ -1368,20 +1368,21 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc = proof.rhs_calc
         calc.perform_rule(rules.FullSimplify())
-        goal02 = file.add_goal("(INT x:[0,oo]. log(x) / (x^2-b*x+1)) = 0",conds=["b>-2", "b<2"])
+
+        goal02 = file.add_goal("(INT x:[0,oo]. log(x) / (x^2-b*x+1)) = 0", conds=["b > -2", "b < 2"])
         proof = goal02.proof_by_rewrite_goal(begin=goal01)
         calc = proof.begin
         calc.perform_rule(rules.SolveEquation("INT x:[0,oo]. log(x) / (x^2-b*x+1)"))
+
         sub_goal1 = file.add_goal(goal01.sub_goals[0])
         proof = sub_goal1.proof_by_calculation()
         calc = proof.lhs_calc
-        calc.perform_rule(rules.Equation("x ^ 2 - b * x + 1","(x - 1/2 * b)^2 + 1 - 1/4 * b^2"))
-        calc.perform_rule(rules.Equation("(x - 1/2 * b)^2 + 1 - 1/4 * b^2", "(x - 1/2 * b)^2 + (1 - 1/4 * b^2)"))
+        calc.perform_rule(rules.Equation("x ^ 2 - b * x + 1", "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b^2"))
+
         sub_goal2 = file.add_goal(goal02.sub_goals[0])
         proof = sub_goal2.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.Equation("x ^ 2 - b * x + 1", "(x - 1/2 * b)^2 + 1 - 1/4 * b^2"))
-        calc.perform_rule(rules.Equation("(x - 1/2 * b)^2 + 1 - 1/4 * b^2", "(x - 1/2 * b)^2 + (1 - 1/4 * b^2)"))
         self.checkAndOutput(file)
 
     def testEulerLogSineIntegral06(self):

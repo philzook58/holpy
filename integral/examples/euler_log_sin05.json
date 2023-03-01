@@ -198,18 +198,6 @@
                                         "str": "rewriting x ^ 2 - b * x + 1 to (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2"
                                     },
                                     "type": "CalculationStep"
-                                },
-                                {
-                                    "latex_res": "(x - \\frac{1}{2} b) ^ {2} + (1 - \\frac{1}{4} b ^ {2})",
-                                    "res": "(x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)",
-                                    "rule": {
-                                        "latex_str": "rewriting \\((x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}\\) to \\((x - \\frac{1}{2} b) ^ {2} + (1 - \\frac{1}{4} b ^ {2})\\)",
-                                        "name": "Equation",
-                                        "new_expr": "(x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)",
-                                        "old_expr": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                                        "str": "rewriting (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2 to (x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)"
-                                    },
-                                    "type": "CalculationStep"
                                 }
                             ],
                             "type": "Calculation"
@@ -317,18 +305,6 @@
                                         "str": "rewriting x ^ 2 - b * x + 1 to (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2"
                                     },
                                     "type": "CalculationStep"
-                                },
-                                {
-                                    "latex_res": "(x - \\frac{1}{2} b) ^ {2} + (1 - \\frac{1}{4} b ^ {2})",
-                                    "res": "(x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)",
-                                    "rule": {
-                                        "latex_str": "rewriting \\((x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}\\) to \\((x - \\frac{1}{2} b) ^ {2} + (1 - \\frac{1}{4} b ^ {2})\\)",
-                                        "name": "Equation",
-                                        "new_expr": "(x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)",
-                                        "old_expr": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                                        "str": "rewriting (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2 to (x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)"
-                                    },
-                                    "type": "CalculationStep"
                                 }
                             ],
                             "type": "Calculation"
@@ -387,18 +363,6 @@
                                 "str": "rewriting x ^ 2 - b * x + 1 to (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2"
                             },
                             "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "(x - \\frac{1}{2} b) ^ {2} + (1 - \\frac{1}{4} b ^ {2})",
-                            "res": "(x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)",
-                            "rule": {
-                                "latex_str": "rewriting \\((x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}\\) to \\((x - \\frac{1}{2} b) ^ {2} + (1 - \\frac{1}{4} b ^ {2})\\)",
-                                "name": "Equation",
-                                "new_expr": "(x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)",
-                                "old_expr": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                                "str": "rewriting (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2 to (x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)"
-                            },
-                            "type": "CalculationStep"
                         }
                     ],
                     "type": "Calculation"
@@ -448,18 +412,6 @@
                                 "new_expr": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
                                 "old_expr": "x ^ 2 - b * x + 1",
                                 "str": "rewriting x ^ 2 - b * x + 1 to (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2"
-                            },
-                            "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "(x - \\frac{1}{2} b) ^ {2} + (1 - \\frac{1}{4} b ^ {2})",
-                            "res": "(x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)",
-                            "rule": {
-                                "latex_str": "rewriting \\((x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}\\) to \\((x - \\frac{1}{2} b) ^ {2} + (1 - \\frac{1}{4} b ^ {2})\\)",
-                                "name": "Equation",
-                                "new_expr": "(x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)",
-                                "old_expr": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                                "str": "rewriting (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2 to (x - 1/2 * b) ^ 2 + (1 - 1/4 * b ^ 2)"
                             },
                             "type": "CalculationStep"
                         }

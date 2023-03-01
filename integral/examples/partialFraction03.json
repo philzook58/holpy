@@ -242,16 +242,16 @@
         {
             "bad_parts": [
                 {
-                    "conds": [],
-                    "expr": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0"
-                },
-                {
                     "conds": [
                         {
                             "cond": "x > 0",
                             "latex_cond": "x > 0"
                         }
                     ],
+                    "expr": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0"
+                },
+                {
+                    "conds": [],
                     "expr": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0"
                 }
             ],
@@ -310,18 +310,18 @@
             },
             "sub_goals": [
                 {
-                    "finished": false,
-                    "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
-                    "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
-                    "type": "Goal"
-                },
-                {
                     "conds": [
                         {
                             "cond": "x > 0",
                             "latex_cond": "x > 0"
                         }
                     ],
+                    "finished": false,
+                    "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
+                    "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
+                    "type": "Goal"
+                },
+                {
                     "finished": false,
                     "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
                     "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
