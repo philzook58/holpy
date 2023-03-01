@@ -2976,8 +2976,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc = proof.rhs_calc
         calc.perform_rule(rules.FullSimplify())
-        print(file)
-        # self.checkAndOutput(file)
+        self.checkAndOutput(file)
 
 if __name__ == "__main__":
     unittest.main()
