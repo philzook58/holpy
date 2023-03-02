@@ -4,26 +4,38 @@ from typing import Optional, List, Dict, Union
 import os
 import json
 
-from integral.expr import Expr, expr_to_pattern
+from integral.expr import Expr, Eq, expr_to_pattern
 from integral import parser
 from integral.conditions import Conditions
 
 dirname = os.path.dirname(__file__)
 
 class Identity:
-    def __init__(self, lhs: Expr, rhs: Expr, *,
+    def __init__(self, expr: Expr, *,
                  conds: Optional[Conditions] = None, simp_level: int = 1, category: str = ""):
-        self.lhs = lhs
-        self.rhs = rhs
+        self.expr = expr
+        if conds is None:
+            conds = Conditions()
         self.conds = conds
         self.simp_level = simp_level
         self.category = category
 
+    @property
+    def lhs(self):
+        return self.expr.lhs
+
+    @property
+    def rhs(self):
+        return self.expr.rhs
+
     def __str__(self):
         if self.category != "":
-            return "%s => %s  (%s)" % (self.lhs, self.rhs, self.category)
+            return "%s  [%s] (%s)" % (self.expr, self.conds, self.category)
         else:
-            return "%s => %s" % (self.lhs, self.rhs)
+            return "%s  [%s]" % (self.expr, self.conds)
+        
+    def __repr__(self):
+        return str(self)
 
 
 class Context:
@@ -186,7 +198,7 @@ class Context:
 
         symb_lhs = expr_to_pattern(eq.lhs)
         symb_rhs = expr_to_pattern(eq.rhs)
-        self.definitions.append(Identity(symb_lhs, symb_rhs))
+        self.definitions.append(Identity(Eq(symb_lhs, symb_rhs)))
 
     def add_indefinite_integral(self, eq: Expr):
         if not (eq.is_equals() and eq.lhs.is_indefinite_integral()):
@@ -194,7 +206,7 @@ class Context:
         
         symb_lhs = expr_to_pattern(eq.lhs)
         symb_rhs = expr_to_pattern(eq.rhs)
-        self.indefinite_integrals.append(Identity(symb_lhs, symb_rhs))
+        self.indefinite_integrals.append(Identity(Eq(symb_lhs, symb_rhs)))
 
     def add_definite_integral(self, eq: Expr, conds: Conditions):
         if not (eq.is_equals() and eq.lhs.is_integral()):
@@ -202,7 +214,7 @@ class Context:
         
         symb_lhs = expr_to_pattern(eq.lhs)
         symb_rhs = expr_to_pattern(eq.rhs)
-        self.definite_integrals.append(Identity(symb_lhs, symb_rhs, conds=conds))
+        self.definite_integrals.append(Identity(Eq(symb_lhs, symb_rhs), conds=conds))
 
     def add_series_expansion(self, eq: Expr):
         if not (eq.is_equals() and not eq.lhs.is_summation() and eq.rhs.is_summation()):
@@ -210,7 +222,7 @@ class Context:
         
         symb_lhs = expr_to_pattern(eq.lhs)
         symb_rhs = expr_to_pattern(eq.rhs)
-        self.series_expansions.append(Identity(symb_lhs, symb_rhs))
+        self.series_expansions.append(Identity(Eq(symb_lhs, symb_rhs)))
 
     def add_series_evaluation(self, eq: Expr):
         if not (eq.is_equals() and eq.lhs.is_summation() and not eq.rhs.is_summation()):
@@ -218,7 +230,7 @@ class Context:
         
         symb_lhs = expr_to_pattern(eq.lhs)
         symb_rhs = expr_to_pattern(eq.rhs)
-        self.series_evaluations.append(Identity(symb_lhs, symb_rhs))
+        self.series_evaluations.append(Identity(Eq(symb_lhs, symb_rhs)))
 
     def add_other_identities(self, eq: Expr, category: str, attributes: Optional[List[str]] = None):
         if not eq.is_equals():
@@ -226,9 +238,9 @@ class Context:
         
         symb_lhs = expr_to_pattern(eq.lhs)
         symb_rhs = expr_to_pattern(eq.rhs)
-        self.other_identities.append(Identity(symb_lhs, symb_rhs, category=category))
+        self.other_identities.append(Identity(Eq(symb_lhs, symb_rhs), category=category))
         if attributes is not None and 'bidirectional' in attributes:
-            self.other_identities.append(Identity(symb_rhs, symb_lhs, category=category))
+            self.other_identities.append(Identity(Eq(symb_rhs, symb_lhs), category=category))
 
     def add_simp_identity(self, eq: Expr, conds: Conditions):
         if not eq.is_equals():
@@ -236,7 +248,7 @@ class Context:
         
         symb_lhs = expr_to_pattern(eq.lhs)
         symb_rhs = expr_to_pattern(eq.rhs)
-        self.simp_identities.append(Identity(symb_lhs, symb_rhs, conds=conds))
+        self.simp_identities.append(Identity(Eq(symb_lhs, symb_rhs), conds=conds))
 
     def add_function_table(self, funcname: str, table: Dict[str, str]):
         self.function_tables[funcname] = dict()
@@ -245,22 +257,19 @@ class Context:
             output = parser.parse_expr(output)
             self.function_tables[funcname][input] = output
 
-    def add_lemma(self, eq: Union[Expr, str]):
-        if isinstance(eq, str):
-            eq = parser.parse_expr(eq)
-        if not eq.is_equals():
-            # raise TypeError
-            pass
-        else:
-            # Note: no conversion to symbols for lemmas within a file.
-            self.lemmas.append(Identity(eq.lhs, eq.rhs))
+    def add_lemma(self, e: Union[Expr, str], conds: Conditions):
+        if isinstance(e, str):
+            e = parser.parse_expr(e)
 
-    def add_induct_hyp(self, eq: Expr):
-        if not eq.is_equals():
-            raise TypeError
+        # Note: no conversion to symbols for lemmas within a file.
+        self.lemmas.append(Identity(e, conds=conds))
+
+    def add_induct_hyp(self, e: Union[Expr, str]):
+        if isinstance(e, str):
+            e = parser.parse_expr(e)
 
         # Note: no conversion to symbols for inductive hypothesis        
-        self.induct_hyps.append(Identity(eq.lhs, eq.rhs))
+        self.induct_hyps.append(Identity(e))
 
     def add_condition(self, cond: Union[Expr, str]):
         if isinstance(cond, str):

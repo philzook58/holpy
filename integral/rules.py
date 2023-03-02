@@ -181,16 +181,23 @@ class ProofObligation:
         return res
 
 
-def check_wellformed(e: Expr, conds: Conditions) -> List[ProofObligation]:
+def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
     """Check whether an expression e is wellformed, and return
     a set of wellformed-ness conditions if otherwise.
     
     """
     obligations: List[ProofObligation] = list()
+    conds = ctx.get_conds()
+
     def add_obligation(e: Expr, conds: Conditions):
-        obligation = ProofObligation(e, conds)
-        if obligation not in obligations:
-            obligations.append(ProofObligation(e, conds))
+        found = False
+        for lemma in ctx.get_lemmas():
+            if lemma.expr == e and set(lemma.conds.data).issubset(set(conds.data)):
+                found = True
+        if not found:
+            obligation = ProofObligation(e, conds)
+            if obligation not in obligations:
+                obligations.append(ProofObligation(e, conds))
 
     def rec(e: Expr, conds: Conditions):
         if e.is_var() or e.is_const():
@@ -1130,7 +1137,7 @@ class ApplyEquation(Rule):
     def eval(self, e: Expr, ctx: Context) -> Expr:
         found = False
         for identity in ctx.get_lemmas():
-            if self.eq == Op("=", identity.lhs, identity.rhs):
+            if self.eq == identity.expr:
                 found = True
         assert found, "ApplyEquation: lemma %s not found" % self.eq
 
@@ -2284,6 +2291,6 @@ class FunEquation(Rule):
         if not e.is_equals():
             return e
         ne = Op('=', Fun(self.func_name, e.lhs), Fun(self.func_name, e.rhs))
-        if len(check_wellformed(ne, ctx.get_conds())) == 0:
+        if len(check_wellformed(ne, ctx)) == 0:
             return ne
         return e

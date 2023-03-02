@@ -27,8 +27,8 @@ class RulesTest(unittest.TestCase):
                 conds = conditions.Conditions([parse_expr(c) for c in conds])
                 expected_res.append(rules.ProofObligation(cond_e, conds))
             e = parse_expr(e)
-            conds = conditions.Conditions()
-            self.assertEqual(rules.check_wellformed(e, conds), expected_res)
+            ctx = context.Context()
+            self.assertEqual(rules.check_wellformed(e, ctx), expected_res)
 
     def testIndefiniteIntegralIdentity(self):
         test_data = [

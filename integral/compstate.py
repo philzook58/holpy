@@ -154,7 +154,7 @@ class Goal(StateItem):
         self.proof = None
         self.ctx = Context(ctx)
         self.ctx.extend_condition(self.conds)
-        self.proof_obligations = check_wellformed(goal, self.ctx.get_conds())
+        self.proof_obligations = check_wellformed(goal, self.ctx)
         self.wellformed = (len(self.proof_obligations) == 0)
         self.sub_goals: List["Goal"] = list()
         for p in self.proof_obligations:
@@ -178,11 +178,7 @@ class Goal(StateItem):
             self.proof == other.proof
 
     def is_finished(self):
-        if not self.sub_goals:
-            return self.proof is not None and self.proof.is_finished()
-        else:
-            self.wellformed = all(g.is_finished() for g in self.sub_goals)
-            return self.proof is not None and self.proof.is_finished()
+        return self.proof is not None and self.proof.is_finished()
 
     def clear(self):
         self.proof = None
@@ -661,9 +657,9 @@ class CompFile:
         for item in (self.content if index == -1 else self.content[:index]):
             if isinstance(item, FuncDef):
                 ctx.add_definition(item.eq)
-                ctx.add_lemma(item.eq)
+                ctx.add_lemma(item.eq, item.conds)
             elif isinstance(item, Goal):
-                ctx.add_lemma(item.goal)
+                ctx.add_lemma(item.goal, item.conds)
                 ctx.extend_by_item(item.export_book())
         return ctx
 
@@ -882,11 +878,11 @@ def parse_item(parent, item) -> StateItem:
         if 'wellformed' in item:
             res.wellformed = item['wellformed']
             if not res.wellformed and 'obligations' in item:
-                res.proof_obligations = set()
+                res.proof_obligations = list()
                 for obligation in item['obligations']:
                     e = parser.parse_expr(obligation['expr'])
                     c = parse_conds(obligation)
-                    res.proof_obligations.add(rules.ProofObligation(e, c))
+                    res.proof_obligations.append(rules.ProofObligation(e, c))
         if 'sub_goals' in item:
             res.sub_goals = list()
             for g in item['sub_goals']:

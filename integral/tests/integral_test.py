@@ -850,17 +850,18 @@ class IntegralTest(unittest.TestCase):
         # Reference:
         # Inside interesting integrals, Section 2.2, example 4
         file = compstate.CompFile("interesting", "Trick2d")
+
+        sub_goal = file.add_goal("tan(x) + 1 > 0", conds=["x > 0", "x < pi / 4"])
+        proof = sub_goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity("tan(x)", "sin(x) / cos(x)"), "0"))
+
         goal01 = file.add_goal("(INT x:[0,1]. log(x+1) / (x^2 + 1)) = (INT x:[0,pi / 4]. log(tan(x) + 1))")
         proof = goal01.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.SubstitutionInverse("u", "tan(u)"))
         calc.perform_rule(rules.ApplyIdentity("sec(u) ^ 2" , "tan(u)^2 + 1"))
         calc.perform_rule(rules.FullSimplify())
-
-        sub_goal = file.add_goal(goal01.sub_goals[0])
-        proof = sub_goal.proof_by_calculation()
-        calc = proof.lhs_calc
-        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity("tan(x)", "sin(x) / cos(x)"), "0"))
 
         goal02 = file.add_goal("(INT x:[0,1]. log(x+1) / (x^2 + 1)) "\
                                 +"= (pi / 4 * log(2) - (INT x:[0,1]. log(x+1) / (x^2 + 1)))")
@@ -1365,6 +1366,12 @@ class IntegralTest(unittest.TestCase):
         # Reference:
         # Inside interesting integrals, Section 2.4 (2.4.5)
         file = compstate.CompFile("interesting", "euler_log_sin05")
+
+        sub_goal = file.add_goal("x ^ 2 - b * x + 1 != 0", conds=["b > -2", "b < 2"])
+        proof = sub_goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.Equation("x ^ 2 - b * x + 1", "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b^2"))
+
         goal01 = file.add_goal("(INT x:[0, oo]. log(x^a+1) / (x^2 - b*x + 1)) = \
         (INT x:[0, oo]. log(x^a+1) / (x^2 - b*x + 1)) - a * INT x:[0,oo]. log(x) / (x^2-b*x+1)", \
                                conds=["a > 0", "b>-2", "b<2"])
@@ -1388,15 +1395,6 @@ class IntegralTest(unittest.TestCase):
         calc = proof.begin
         calc.perform_rule(rules.SolveEquation("INT x:[0,oo]. log(x) / (x^2-b*x+1)"))
 
-        sub_goal1 = file.add_goal(goal01.sub_goals[0])
-        proof = sub_goal1.proof_by_calculation()
-        calc = proof.lhs_calc
-        calc.perform_rule(rules.Equation("x ^ 2 - b * x + 1", "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b^2"))
-
-        sub_goal2 = file.add_goal(goal02.sub_goals[0])
-        proof = sub_goal2.proof_by_calculation()
-        calc = proof.lhs_calc
-        calc.perform_rule(rules.Equation("x ^ 2 - b * x + 1", "(x - 1/2 * b)^2 + 1 - 1/4 * b^2"))
         self.checkAndOutput(file)
 
     def testEulerLogSineIntegral06(self):
@@ -2584,6 +2582,16 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
 
+        sub_goal = file.add_goal("4 * x - x ^ 2 >= 0", conds=["x > 0", "x < 4"])
+        proof = sub_goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.Equation("4 * x - x ^ 2", "x*(4 - x)"))
+
+        sub_goal = file.add_goal("sqrt(4 * x - x ^ 2) != 0", conds=["x > 0", "x < 4"])
+        proof = sub_goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.Equation("4 * x - x ^ 2", "x*(4 - x)"))
+
         goal03 = file.add_goal("(INT x:[0,4]. log(x)/sqrt(4*x-x^2)) = 0")
         proof = goal03.proof_by_calculation()
         calc = proof.lhs_calc
@@ -2598,11 +2606,6 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal01.goal), "0.1"))
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal02.goal), "1"))
         calc.perform_rule(rules.FullSimplify())
-
-        sub_goal = file.add_goal(goal03.sub_goals[0])
-        proof = sub_goal.proof_by_calculation()
-        calc = proof.lhs_calc
-        calc.perform_rule(rules.Equation("4 * x - x ^ 2", "x*(4 - x)"))
 
         self.checkAndOutput(file)
 
@@ -2740,7 +2743,14 @@ class IntegralTest(unittest.TestCase):
 
     def testExpSinh(self):
         file = compstate.CompFile("interesting", "exp_sinh")
-        goal = file.add_goal("(INT t:[0, oo]. exp(-p*t) * sinh(t)^3) = 6 / (9 - 10 * p ^ 2 + p ^ 4)", conds=["p>3"])
+
+        sub_goal = file.add_goal("9 - 10 * p ^ 2 + p ^ 4 != 0", conds=["p > 3"])
+        proof = sub_goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.Equation("9 - 10 * p ^ 2 + p ^ 4", "(p ^ 2 - 5) ^ 2 - 16"))
+        self.assertTrue(proof.is_finished())
+
+        goal = file.add_goal("(INT t:[0, oo]. exp(-p*t) * sinh(t)^3) = 6 / (9 - 10 * p ^ 2 + p ^ 4)", conds=["p > 3"])
         proof = goal.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.OnSubterm(rules.ExpandDefinition("sinh")))
@@ -2751,12 +2761,8 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.Equation("-(p * t) + t", "(1-p)*t"))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.Equation("3/8 * (1 / (-p + 1)) - 1/8 * (1 / (-p + 3)) - 3/8 * (1 / (-p - 1)) + 1/8 * (1 / (-p - 3)) ",
-                                         "6/(9-10*p^2+p^4)"))
-        sub_goal = file.add_goal(goal.sub_goals[0])
-        proof = sub_goal.proof_by_calculation()
-        calc = proof.lhs_calc
-        calc.perform_rule(rules.Equation("9 - 10 * p ^ 2 + p ^ 4", "(p^2-5)^2-16"))
+        calc.perform_rule(rules.Equation("3/8 * (1 / (-p + 1)) - 1/8 * (1 / (-p + 3)) - 3/8 * (1 / (-p - 1)) + 1/8 * (1 / (-p - 3))",
+                                         "6 / (9 - 10 * p^2 + p^4)"))
         self.checkAndOutput(file)
 
     def testZetaFunction(self):

@@ -3,6 +3,53 @@
         {
             "conds": [
                 {
+                    "cond": "b > -2",
+                    "latex_cond": "b > -2"
+                },
+                {
+                    "cond": "b < 2",
+                    "latex_cond": "b < 2"
+                }
+            ],
+            "finished": true,
+            "goal": "x ^ 2 - b * x + 1 != 0",
+            "latex_goal": "x ^ {2} - b x + 1 \\neq 0",
+            "proof": {
+                "finished": true,
+                "goal": "x ^ 2 - b * x + 1 != 0",
+                "latex_goal": "x ^ {2} - b x + 1 \\neq 0",
+                "lhs_calc": {
+                    "latex_start": "x ^ {2} - b x + 1",
+                    "start": "x ^ 2 - b * x + 1",
+                    "steps": [
+                        {
+                            "latex_res": "(x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}",
+                            "res": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
+                            "rule": {
+                                "latex_str": "rewriting \\(x ^ {2} - b x + 1\\) to \\((x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}\\)",
+                                "name": "Equation",
+                                "new_expr": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
+                                "old_expr": "x ^ 2 - b * x + 1",
+                                "str": "rewriting x ^ 2 - b * x + 1 to (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2"
+                            },
+                            "type": "CalculationStep"
+                        }
+                    ],
+                    "type": "Calculation"
+                },
+                "rhs_calc": {
+                    "latex_start": "0",
+                    "start": "0",
+                    "steps": [],
+                    "type": "Calculation"
+                },
+                "type": "CalculationProof"
+            },
+            "type": "Goal"
+        },
+        {
+            "conds": [
+                {
                     "cond": "a > 0",
                     "latex_cond": "a > 0"
                 },
@@ -156,63 +203,6 @@
                 },
                 "type": "CalculationProof"
             },
-            "sub_goals": [
-                {
-                    "conds": [
-                        {
-                            "cond": "a > 0",
-                            "latex_cond": "a > 0"
-                        },
-                        {
-                            "cond": "b > -2",
-                            "latex_cond": "b > -2"
-                        },
-                        {
-                            "cond": "b < 2",
-                            "latex_cond": "b < 2"
-                        },
-                        {
-                            "cond": "x > 0",
-                            "latex_cond": "x > 0"
-                        }
-                    ],
-                    "finished": true,
-                    "goal": "x ^ 2 - b * x + 1 != 0",
-                    "latex_goal": "x ^ {2} - b x + 1 \\neq 0",
-                    "proof": {
-                        "finished": true,
-                        "goal": "x ^ 2 - b * x + 1 != 0",
-                        "latex_goal": "x ^ {2} - b x + 1 \\neq 0",
-                        "lhs_calc": {
-                            "latex_start": "x ^ {2} - b x + 1",
-                            "start": "x ^ 2 - b * x + 1",
-                            "steps": [
-                                {
-                                    "latex_res": "(x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}",
-                                    "res": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                                    "rule": {
-                                        "latex_str": "rewriting \\(x ^ {2} - b x + 1\\) to \\((x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}\\)",
-                                        "name": "Equation",
-                                        "new_expr": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                                        "old_expr": "x ^ 2 - b * x + 1",
-                                        "str": "rewriting x ^ 2 - b * x + 1 to (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2"
-                                    },
-                                    "type": "CalculationStep"
-                                }
-                            ],
-                            "type": "Calculation"
-                        },
-                        "rhs_calc": {
-                            "latex_start": "0",
-                            "start": "0",
-                            "steps": [],
-                            "type": "Calculation"
-                        },
-                        "type": "CalculationProof"
-                    },
-                    "type": "Goal"
-                }
-            ],
             "type": "Goal"
         },
         {
@@ -266,165 +256,6 @@
                     "type": "Calculation"
                 },
                 "type": "RewriteGoalProof"
-            },
-            "sub_goals": [
-                {
-                    "conds": [
-                        {
-                            "cond": "b > -2",
-                            "latex_cond": "b > -2"
-                        },
-                        {
-                            "cond": "b < 2",
-                            "latex_cond": "b < 2"
-                        },
-                        {
-                            "cond": "x > 0",
-                            "latex_cond": "x > 0"
-                        }
-                    ],
-                    "finished": true,
-                    "goal": "x ^ 2 - b * x + 1 != 0",
-                    "latex_goal": "x ^ {2} - b x + 1 \\neq 0",
-                    "proof": {
-                        "finished": true,
-                        "goal": "x ^ 2 - b * x + 1 != 0",
-                        "latex_goal": "x ^ {2} - b x + 1 \\neq 0",
-                        "lhs_calc": {
-                            "latex_start": "x ^ {2} - b x + 1",
-                            "start": "x ^ 2 - b * x + 1",
-                            "steps": [
-                                {
-                                    "latex_res": "(x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}",
-                                    "res": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                                    "rule": {
-                                        "latex_str": "rewriting \\(x ^ {2} - b x + 1\\) to \\((x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}\\)",
-                                        "name": "Equation",
-                                        "new_expr": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                                        "old_expr": "x ^ 2 - b * x + 1",
-                                        "str": "rewriting x ^ 2 - b * x + 1 to (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2"
-                                    },
-                                    "type": "CalculationStep"
-                                }
-                            ],
-                            "type": "Calculation"
-                        },
-                        "rhs_calc": {
-                            "latex_start": "0",
-                            "start": "0",
-                            "steps": [],
-                            "type": "Calculation"
-                        },
-                        "type": "CalculationProof"
-                    },
-                    "type": "Goal"
-                }
-            ],
-            "type": "Goal"
-        },
-        {
-            "conds": [
-                {
-                    "cond": "a > 0",
-                    "latex_cond": "a > 0"
-                },
-                {
-                    "cond": "b > -2",
-                    "latex_cond": "b > -2"
-                },
-                {
-                    "cond": "b < 2",
-                    "latex_cond": "b < 2"
-                },
-                {
-                    "cond": "x > 0",
-                    "latex_cond": "x > 0"
-                }
-            ],
-            "finished": true,
-            "goal": "x ^ 2 - b * x + 1 != 0",
-            "latex_goal": "x ^ {2} - b x + 1 \\neq 0",
-            "proof": {
-                "finished": true,
-                "goal": "x ^ 2 - b * x + 1 != 0",
-                "latex_goal": "x ^ {2} - b x + 1 \\neq 0",
-                "lhs_calc": {
-                    "latex_start": "x ^ {2} - b x + 1",
-                    "start": "x ^ 2 - b * x + 1",
-                    "steps": [
-                        {
-                            "latex_res": "(x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}",
-                            "res": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                            "rule": {
-                                "latex_str": "rewriting \\(x ^ {2} - b x + 1\\) to \\((x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}\\)",
-                                "name": "Equation",
-                                "new_expr": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                                "old_expr": "x ^ 2 - b * x + 1",
-                                "str": "rewriting x ^ 2 - b * x + 1 to (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
-                    "type": "Calculation"
-                },
-                "rhs_calc": {
-                    "latex_start": "0",
-                    "start": "0",
-                    "steps": [],
-                    "type": "Calculation"
-                },
-                "type": "CalculationProof"
-            },
-            "type": "Goal"
-        },
-        {
-            "conds": [
-                {
-                    "cond": "b > -2",
-                    "latex_cond": "b > -2"
-                },
-                {
-                    "cond": "b < 2",
-                    "latex_cond": "b < 2"
-                },
-                {
-                    "cond": "x > 0",
-                    "latex_cond": "x > 0"
-                }
-            ],
-            "finished": true,
-            "goal": "x ^ 2 - b * x + 1 != 0",
-            "latex_goal": "x ^ {2} - b x + 1 \\neq 0",
-            "proof": {
-                "finished": true,
-                "goal": "x ^ 2 - b * x + 1 != 0",
-                "latex_goal": "x ^ {2} - b x + 1 \\neq 0",
-                "lhs_calc": {
-                    "latex_start": "x ^ {2} - b x + 1",
-                    "start": "x ^ 2 - b * x + 1",
-                    "steps": [
-                        {
-                            "latex_res": "(x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}",
-                            "res": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                            "rule": {
-                                "latex_str": "rewriting \\(x ^ {2} - b x + 1\\) to \\((x - \\frac{1}{2} b) ^ {2} + 1 - \\frac{1}{4} b ^ {2}\\)",
-                                "name": "Equation",
-                                "new_expr": "(x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2",
-                                "old_expr": "x ^ 2 - b * x + 1",
-                                "str": "rewriting x ^ 2 - b * x + 1 to (x - 1/2 * b) ^ 2 + 1 - 1/4 * b ^ 2"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
-                    "type": "Calculation"
-                },
-                "rhs_calc": {
-                    "latex_start": "0",
-                    "start": "0",
-                    "steps": [],
-                    "type": "Calculation"
-                },
-                "type": "CalculationProof"
             },
             "type": "Goal"
         }
