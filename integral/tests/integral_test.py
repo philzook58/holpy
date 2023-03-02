@@ -968,8 +968,8 @@ class IntegralTest(unittest.TestCase):
 
         file.add_definition("I(a) = (INT x:[0,oo]. 1 / (x^4 + 2*x^2*cos(2*a) + 1))")
 
-        goala = file.add_goal("x^4 + 2*x^2*cos(2*a) + 1 > 0", conds=["cos(a) != 0"])
-        proof = goala.proof_by_case("x != 0")
+        goal = file.add_goal("x^4 + 2*x^2*cos(2*a) + 1 > 0", conds=["cos(a) != 0"])
+        proof = goal.proof_by_case("x != 0")
         proofa = proof.case_1.proof_by_calculation()
         calc = proofa.lhs_calc
         calc.perform_rule(rules.Equation(None, "(x^2 - 1) ^ 2 + 2*x^2*(1+cos(2*a))"))
@@ -980,7 +980,44 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         self.assertTrue(proof.is_finished())
 
-        goal01 = file.add_goal("I(a) = (INT x:[0,oo]. x^2 / (x^4 + 2*x^2*cos(2*a) + 1))")
+        goal = file.add_goal("x^4 + 2*x^2*cos(2*a) + 1 != 0", conds=["cos(a) != 0"])
+        proof = goal.proof_by_case("x != 0")
+        proofa = proof.case_1.proof_by_calculation()
+        calc = proofa.lhs_calc
+        calc.perform_rule(rules.Equation(None, "(x^2 - 1) ^ 2 + 2*x^2*(1+cos(2*a))"))
+        calc.perform_rule(rules.ApplyIdentity("cos(2*a)", "2 * cos(a)^2 - 1"))
+        calc.perform_rule(rules.FullSimplify())
+        proofb = proof.case_2.proof_by_calculation()
+        calc = proofb.lhs_calc
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
+
+        goal = file.add_goal("2*x^2*cos(2*a) + x^4 + 1 != 0", conds=["cos(a) != 0"])
+        proof = goal.proof_by_case("x != 0")
+        proofa = proof.case_1.proof_by_calculation()
+        calc = proofa.lhs_calc
+        calc.perform_rule(rules.Equation(None, "(x^2 - 1) ^ 2 + 2*x^2*(1+cos(2*a))"))
+        calc.perform_rule(rules.ApplyIdentity("cos(2*a)", "2 * cos(a)^2 - 1"))
+        calc.perform_rule(rules.FullSimplify())
+        proofb = proof.case_2.proof_by_calculation()
+        calc = proofb.lhs_calc
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
+
+        goal = file.add_goal("(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0", conds=["cos(a) != 0"])
+        proof = goal.proof_by_case("x != 0")
+        proofa = proof.case_1.proof_by_calculation()
+        calc = proofa.lhs_calc
+        calc.perform_rule(rules.ExpandPolynomial())
+        calc.perform_rule(rules.ApplyIdentity("sin(a)^2", "1 - cos(a)^2"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Equation(None, "(x^2 - 1) ^ 2 + 4*x^2*(cos(a)^2)"))
+        proofb = proof.case_2.proof_by_calculation()
+        calc = proofb.lhs_calc
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
+
+        goal01 = file.add_goal("I(a) = (INT x:[0,oo]. x^2 / (x^4 + 2*x^2*cos(2*a) + 1))", conds=["cos(a) != 0"])
         proof = goal01.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.ExpandDefinition("I"))
@@ -991,7 +1028,7 @@ class IntegralTest(unittest.TestCase):
         calc = proof.rhs_calc
         calc.perform_rule(rules.FullSimplify())
 
-        goal02 = file.add_goal("2*I(a) = (INT x:[0,oo]. (1+x^2) / (x^4 + 2*x^2*cos(2*a) + 1))")
+        goal02 = file.add_goal("2*I(a) = (INT x:[0,oo]. (1+x^2) / (x^4 + 2*x^2*cos(2*a) + 1))", conds=["cos(a) != 0"])
         proof = goal02.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.Equation("2*I(a)", "I(a) + I(a)"))
@@ -1007,21 +1044,21 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
 
         goal03a = file.add_goal("(INT x:[-oo,oo]. (x ^ 2 + 1) / (2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1)) = " \
-                                "2 * (INT x:[0,oo]. (x ^ 2 + 1) / (2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1))")
+                                "2 * (INT x:[0,oo]. (x ^ 2 + 1) / (2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1))", conds=["cos(a) != 0"])
         proof = goal03a.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.SplitRegion("0"))
         calc.perform_rule(rules.Substitution("x", "-x"))
         calc.perform_rule(rules.FullSimplify())
 
-        goal03b = file.add_goal("(INT x:[-oo,oo]. (-2*x*sin(a)) / ((x^2-2*x*sin(a)+1)*(x^2+2*x*sin(a)+1))) = 0")
+        goal03b = file.add_goal("(INT x:[-oo,oo]. (-2*x*sin(a)) / ((x^2-2*x*sin(a)+1)*(x^2+2*x*sin(a)+1))) = 0", conds=["cos(a) != 0"])
         proof = goal03b.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.SplitRegion("0"))
         calc.perform_rule(rules.Substitution("x", "-x"))
         calc.perform_rule(rules.FullSimplify())
 
-        goal03 = file.add_goal("I(a) = (1/4 * (INT x:[-oo,oo]. 1 / (cos(a) ^ 2 + x ^ 2)))")
+        goal03 = file.add_goal("I(a) = (1/4 * (INT x:[-oo,oo]. 1 / (cos(a) ^ 2 + x ^ 2)))", conds=["cos(a) != 0"])
         proof = goal03.proof_by_rewrite_goal(begin=goal02)
         calc = proof.begin
         calc.perform_rule(rules.SolveEquation("I(a)"))

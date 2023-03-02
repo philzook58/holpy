@@ -189,16 +189,28 @@ class Conditions:
             return self.is_positive(e1 - e2)
 
     def is_less(self, e1: Expr, e2:Expr) -> bool:
-        return self.is_negative(e1 - e2)
+        if e2 == expr.Const(0):
+            return self.is_negative(e1)
+        else:
+            return self.is_negative(e1 - e2)
 
     def is_not_less(self, e1:Expr, e2:Expr):
-        return self.is_not_negative(e1 - e2)
+        if e2 == expr.Const(0):
+            return self.is_not_negative(e1)
+        else:
+            return self.is_not_negative(e1 - e2)
 
     def is_not_greater(self, e1:Expr, e2:Expr):
-        return self.is_not_positive(e1 - e2)
+        if e2 == expr.Const(0):
+            return self.is_not_positive(e1)
+        else:
+            return self.is_not_positive(e1 - e2)
 
     def is_not_equal(self, e1: Expr, e2: Expr):
-        return self.is_nonzero(e1 - e2)
+        if e2 == expr.Const(0):
+            return self.is_nonzero(e1)
+        else:
+            return self.is_nonzero(e1 - e2)
 
     def is_integer(self, e: Expr):
         """Return whether conditions imply e is an integer."""
