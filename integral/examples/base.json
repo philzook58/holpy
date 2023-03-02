@@ -132,6 +132,11 @@
         },
         {
             "type": "axiom",
+            "expr": "(SUM(n, a, oo, (x)^n)) = (x^a)/(1-x)",
+            "conds": ["abs(x) < 1"]
+        },
+        {
+            "type": "axiom",
             "expr": "SUM(n, 0, oo, (-1)^n / (n+1)^2) = (pi^2) / 12"
         },
         {
