@@ -1501,7 +1501,8 @@ class Equation(Rule):
         assert self.old_expr is None or self.old_expr == e
 
         r = FullSimplify()
-        if r.eval(e, ctx) == r.eval(self.new_expr, ctx):
+        r1, r2 = r.eval(e, ctx), r.eval(self.new_expr, ctx)
+        if r1 == r2:
             return self.new_expr
 
         # Rewriting 1 to sin(x)^2 + cos(x)^2
@@ -2322,4 +2323,28 @@ class FunEquation(Rule):
         ne = Op('=', Fun(self.func_name, e.lhs), Fun(self.func_name, e.rhs))
         if check_wellformed(ne, ctx.get_conds()):
             return ne
+        return e
+
+
+class ExchangeIntegrationOrder(Rule):
+    """INT x:[a,b]. INT y:[c,d]. body => INT y:[c,d]. INT x:[a,b]. body"""
+
+    def __init__(self):
+        self.name = "ExchangeIntegrationOrder"
+
+    def __str__(self):
+        return "interchange of the order of integration"
+
+    def export(self):
+        return {
+            "name": self.name,
+            "str": str(self)
+        }
+
+    def eval(self, e: Expr, ctx: Context) -> Expr:
+        if not (e.is_integral() and e.body.is_integral):
+            return e
+        a,b,c,d = e.lower,e.upper,e.body.lower,e.upper
+        if a.is_constant() and b.is_constant() and c.is_constant() and d.is_constant():
+            return Integral(e.body.var, c, d, Integral(e.var, a, b, e.body.body, e.diff), e.body.diff)
         return e

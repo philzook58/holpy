@@ -471,6 +471,16 @@
         },
         {
             "type": "axiom",
+            "expr": "atan(A) - atan(B) = atan((A-B)/(1+A*B))",
+            "category": "trigonometric"
+        },
+        {
+            "type": "axiom",
+            "expr": "atan(sqrt((1-x)/(1+x))) = acos(x) / 2",
+            "category": "trigonometric"
+        },
+        {
+            "type": "axiom",
             "expr": "sin(-u) = -sin(u)",
             "category": "trigonometric"
         },
