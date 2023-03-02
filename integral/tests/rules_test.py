@@ -1,16 +1,35 @@
 """Unit test for rules."""
 
 import unittest
+from typing import List
 from fractions import Fraction
 
 from integral import parser, context
 from integral.expr import Const
 from integral.parser import parse_expr
 from integral import rules
+from integral import conditions
 from integral.context import Context
 
 
 class RulesTest(unittest.TestCase):
+    def testCheckWellformed(self):
+        test_data = [
+            ("1 / x", [("x != 0", [])]),
+            ("sqrt(x)", [("x >= 0", [])]),
+            ("log(x)", [("x > 0", [])]),
+        ]
+
+        for e, exp_list in test_data:
+            expected_res: List[rules.ProofObligation] = list()
+            for cond_e, conds in exp_list:
+                cond_e = parse_expr(cond_e)
+                conds = conditions.Conditions([parse_expr(c) for c in conds])
+                expected_res.append(rules.ProofObligation(cond_e, conds))
+            e = parse_expr(e)
+            conds = conditions.Conditions()
+            self.assertEqual(rules.check_wellformed(e, conds), expected_res)
+
     def testIndefiniteIntegralIdentity(self):
         test_data = [
             ("INT x. x ^ -1", 'log(abs(x)) + SKOLEM_CONST(C)'),

@@ -154,9 +154,10 @@ class Goal(StateItem):
         self.proof = None
         self.ctx = Context(ctx)
         self.ctx.extend_condition(self.conds)
-        self.wellformed, self.bad_parts = check_wellformed(goal, self.ctx.get_conds())
-        self.sub_goals: List['Goal'] = list()
-        for p in self.bad_parts:
+        self.proof_obligations = check_wellformed(goal, self.ctx.get_conds())
+        self.wellformed = (len(self.proof_obligations) == 0)
+        self.sub_goals: List["Goal"] = list()
+        for p in self.proof_obligations:
             self.sub_goals.append(Goal(self, self.ctx, p.e, p.conds))
 
     def __str__(self):
@@ -201,7 +202,7 @@ class Goal(StateItem):
             res['conds'] = self.conds.export()
         if not self.wellformed:
             res['wellformed'] = False
-            res['bad_parts'] = [p.export() for p in self.bad_parts]
+            res['obligations'] = [p.export() for p in self.proof_obligations]
         return res
 
     def export_book(self):
@@ -880,12 +881,12 @@ def parse_item(parent, item) -> StateItem:
             res.proof = parse_item(res, item['proof'])
         if 'wellformed' in item:
             res.wellformed = item['wellformed']
-            if not res.wellformed and 'bad_parts' in item:
-                res.bad_parts = set()
-                for bad_part in item['bad_parts']:
-                    e = parser.parse_expr(bad_part['expr'])
-                    c = parse_conds(bad_part)
-                    res.bad_parts.add(rules.BadPart(e, c))
+            if not res.wellformed and 'obligations' in item:
+                res.proof_obligations = set()
+                for obligation in item['obligations']:
+                    e = parser.parse_expr(obligation['expr'])
+                    c = parse_conds(obligation)
+                    res.proof_obligations.add(rules.ProofObligation(e, c))
         if 'sub_goals' in item:
             res.sub_goals = list()
             for g in item['sub_goals']:

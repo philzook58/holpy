@@ -149,16 +149,26 @@ def deriv(var: str, e: Expr, ctx: Context) -> Expr:
 
     return rec(e)
 
-class BadPart:
-    def __init__(self, e:Expr, conds:Conditions):
+class ProofObligation:
+    """Represents a proof obligation to prove e using the conditions
+    in conds.
+    
+    """
+    def __init__(self, e: Expr, conds: Conditions):
         self.e = e
         self.conds = conds
 
-    def __eq__(self, other:'BadPart'):
+    def __eq__(self, other: "ProofObligation"):
         return self.e == other.e and self.conds == other.conds
 
-    def __le__(self, other:'BadPart'):
+    def __le__(self, other: "ProofObligation"):
         return self.e <= other.e and self.conds <= other.conds
+
+    def __str__(self):
+        return "%s  [%s]" % (self.e, self.conds)
+
+    def __repr__(self):
+        return str(self)
 
     def __hash__(self):
         return hash((self.e, self.conds))
@@ -170,117 +180,71 @@ class BadPart:
         }
         return res
 
-def check_wellformed(e: Expr, conds: Conditions) -> bool:
-    bad_parts: Set['BadPart'] = set()
-    def rec(e:Expr, conds:Conditions):
-        nonlocal bad_parts
+
+def check_wellformed(e: Expr, conds: Conditions) -> List[ProofObligation]:
+    """Check whether an expression e is wellformed, and return
+    a set of wellformed-ness conditions if otherwise.
+    
+    """
+    obligations: List[ProofObligation] = list()
+    def add_obligation(e: Expr, conds: Conditions):
+        obligation = ProofObligation(e, conds)
+        if obligation not in obligations:
+            obligations.append(ProofObligation(e, conds))
+
+    def rec(e: Expr, conds: Conditions):
         if e.is_var() or e.is_const():
-            return (True, set())
+            pass
         elif e.is_op():
             for arg in e.args:
-                flag, tmp = rec(arg, conds)
-                if not flag:
-                    bad_parts.union(tmp)
+                rec(arg, conds)
             if e.is_divides():
-                flag = conds.is_nonzero(e.args[1])
-                if flag and len(bad_parts) == 0:
-                    return (True, set())
-                if not flag:
-                    if e.args[1].is_fun():
-                        if e.args[1].func_name == 'sqrt':
-                            bad_parts.remove(BadPart(Op('>=', e.args[1].args[0], Const(0)), conds))
-                            bad_parts.add(BadPart(Op('>', e.args[1].args[0], Const(0)), conds))
-                        elif e.args[1].func_name == 'log':
-                            bad_parts.remove(BadPart(Op('>', e.args[1].args[0], Const(0)), conds))
-                            bad_parts.add(BadPart(Op('>', e.args[1].args[0], Const(1)), conds))
-                        else:
-                            bad_parts.add(BadPart(Op("!=", e.args[1], Const(0)), conds))
-                    else:
-                        bad_parts.add(BadPart(Op("!=", e.args[1], Const(0)), conds))
-            else:
-                # TODO: add checks for power
-                if len(bad_parts) == 0:
-                    return (True, set())
+                if conds.is_nonzero(e.args[1]):
+                    pass
+                else:
+                    add_obligation(Op("!=", e.args[1], Const(0)), conds)
+            # TODO: add checks for power
         elif e.is_fun():
             for arg in e.args:
-                flag, tmp = check_wellformed(arg, conds)
-                if not flag:
-                    bad_parts.union(tmp)
+                rec(arg, conds)
             if e.func_name == 'log':
                 if conds.is_positive(e.args[0]):
-                    return (True, set())
+                    pass
                 else:
-                    bad_parts.add(BadPart(Op(">", e.args[0], Const(0)),conds))
-            elif e.func_name == 'sqrt':
+                    add_obligation(Op(">", e.args[0], Const(0)), conds)
+            if e.func_name == 'sqrt':
                 if conds.is_not_negative(e.args[0]):
-                    return (True, set())
+                    pass
                 else:
-                    bad_parts.add(BadPart(Op(">=", e.args[0], Const(0)), conds))
-            if len(bad_parts) == 0:
-                return (True,set())
+                    add_obligation(Op(">=", e.args[0], Const(0)), conds)
+            # TODO: add checks for other functions
         elif e.is_integral():
             conds2 = Conditions(conds)
             if e.lower != NEG_INF:
                 conds2.add_condition(expr.Op(">", Var(e.var), e.lower))
             if e.upper != POS_INF:
                 conds2.add_condition(expr.Op("<", Var(e.var), e.upper))
-            f1, tmp1 = check_wellformed(e.lower, conds)
-            f2, tmp2 = check_wellformed(e.upper, conds)
-            f3, tmp3 = check_wellformed(e.body, conds2)
-            if f1 and f2 and f3 and len(bad_parts) == 0:
-                return (True, set())
-            bad_parts = bad_parts.union(tmp1)
-            bad_parts = bad_parts.union(tmp2)
-            bad_parts = bad_parts.union(tmp3)
+            rec(e.lower, conds)
+            rec(e.upper, conds)
+            rec(e.body, conds2)
         elif e.is_deriv():
-            f, tmp = check_wellformed(e.body, conds)
-            if f:
-                return (True, set())
-            else:
-                bad_parts = bad_parts.union(tmp)
+            rec(e.body, conds)
         elif e.is_summation():
             conds2 = Conditions(conds)
-            # TODO: add integer constraint to index variable
             if e.lower != NEG_INF:
                 conds2.add_condition(expr.Op(">=", Var(e.index_var), e.lower))
             if e.upper != POS_INF:
                 conds2.add_condition(expr.Op("<=", Var(e.index_var), e.upper))
             conds2.add_condition(expr.Fun("isInt", Var(e.index_var)))
-            f, tmp = check_wellformed(e.body, conds2)
-            if f and len(bad_parts) == 0:
-                return (True, set())
-            bad_parts = bad_parts.union(tmp)
+            rec(e.lower, conds)
+            rec(e.upper, conds)
+            rec(e.body, conds2)
         else:
-            if len(bad_parts) == 0:
-                return (True, set())
-        return (False, bad_parts)
-    return rec(e, conds)
-    # if e.is_var() or e.is_const():
-    #     return True
-    # elif e.is_op():
-    #     for arg in e.args:
-    #         if not check_wellformed(arg, conds):
-    #             return False
-    #     if e.is_divides():
-    #         if conds.is_nonzero(e.args[1]):
-    #             return True
-    #         return False
-    #     else:
-    #         # TODO: add checks for power
-    #         return True
-    # elif e.is_fun():
-    #     for arg in e.args:
-    #         if not check_wellformed(arg, conds):
-    #             return False
-    #     return True
-    # elif e.is_integral():
-    #     conds2 = Conditions(conds)
-    #     conds2.add_condition(expr.Op(">", Var(e.var), e.lower))
-    #     conds2.add_condition(expr.Op("<", Var(e.var), e.upper))
-    #     return check_wellformed(e.lower, conds) and check_wellformed(e.upper, conds) and \
-    #            check_wellformed(e.body, conds2)
-    # else:
-    #     return True
+            pass
+
+    rec(e, conds)
+    return obligations
+
 
 class Rule:
     """
@@ -571,8 +535,7 @@ class ApplyIdentity(Rule):
             if inst is not None:
                 expected_rhs = identity.rhs.inst_pat(inst)
                 if full_normalize(expected_rhs, ctx) == full_normalize(self.target, ctx):
-                    if check_wellformed(self.target, ctx.get_conds()):
-                        return self.target
+                    return self.target
 
         raise AssertionError("ApplyIdentity: no matching identity for %s" % e)
 
@@ -2320,6 +2283,6 @@ class FunEquation(Rule):
         if not e.is_equals():
             return e
         ne = Op('=', Fun(self.func_name, e.lhs), Fun(self.func_name, e.rhs))
-        if check_wellformed(ne, ctx.get_conds()):
+        if len(check_wellformed(ne, ctx.get_conds())) == 0:
             return ne
         return e

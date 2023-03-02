@@ -182,6 +182,34 @@
             "finished": true,
             "goal": "(INT x:[0,4]. log(x) / sqrt(4 * x - x ^ 2)) = 0",
             "latex_goal": "\\int_{0}^{4} \\frac{\\log{x}}{\\sqrt{4 x - x ^ {2}}} \\,dx = 0",
+            "obligations": [
+                {
+                    "conds": [
+                        {
+                            "cond": "x > 0",
+                            "latex_cond": "x > 0"
+                        },
+                        {
+                            "cond": "x < 4",
+                            "latex_cond": "x < 4"
+                        }
+                    ],
+                    "expr": "4 * x - x ^ 2 >= 0"
+                },
+                {
+                    "conds": [
+                        {
+                            "cond": "x > 0",
+                            "latex_cond": "x > 0"
+                        },
+                        {
+                            "cond": "x < 4",
+                            "latex_cond": "x < 4"
+                        }
+                    ],
+                    "expr": "sqrt(4 * x - x ^ 2) != 0"
+                }
+            ],
             "proof": {
                 "finished": true,
                 "goal": "(INT x:[0,4]. log(x) / sqrt(4 * x - x ^ 2)) = 0",
@@ -338,12 +366,12 @@
                         }
                     ],
                     "finished": true,
-                    "goal": "4 * x - x ^ 2 > 0",
-                    "latex_goal": "4 x - x ^ {2} > 0",
+                    "goal": "4 * x - x ^ 2 >= 0",
+                    "latex_goal": "4 x - x ^ {2} \\ge 0",
                     "proof": {
                         "finished": true,
-                        "goal": "4 * x - x ^ 2 > 0",
-                        "latex_goal": "4 x - x ^ {2} > 0",
+                        "goal": "4 * x - x ^ 2 >= 0",
+                        "latex_goal": "4 x - x ^ {2} \\ge 0",
                         "lhs_calc": {
                             "latex_start": "4 x - x ^ {2}",
                             "start": "4 * x - x ^ 2",
@@ -372,9 +400,60 @@
                         "type": "CalculationProof"
                     },
                     "type": "Goal"
+                },
+                {
+                    "conds": [
+                        {
+                            "cond": "x > 0",
+                            "latex_cond": "x > 0"
+                        },
+                        {
+                            "cond": "x < 4",
+                            "latex_cond": "x < 4"
+                        }
+                    ],
+                    "finished": false,
+                    "goal": "sqrt(4 * x - x ^ 2) != 0",
+                    "latex_goal": "\\sqrt{4 x - x ^ {2}} \\neq 0",
+                    "obligations": [
+                        {
+                            "conds": [
+                                {
+                                    "cond": "x > 0",
+                                    "latex_cond": "x > 0"
+                                },
+                                {
+                                    "cond": "x < 4",
+                                    "latex_cond": "x < 4"
+                                }
+                            ],
+                            "expr": "4 * x - x ^ 2 >= 0"
+                        }
+                    ],
+                    "sub_goals": [
+                        {
+                            "conds": [
+                                {
+                                    "cond": "x > 0",
+                                    "latex_cond": "x > 0"
+                                },
+                                {
+                                    "cond": "x < 4",
+                                    "latex_cond": "x < 4"
+                                }
+                            ],
+                            "finished": false,
+                            "goal": "4 * x - x ^ 2 >= 0",
+                            "latex_goal": "4 x - x ^ {2} \\ge 0",
+                            "type": "Goal"
+                        }
+                    ],
+                    "type": "Goal",
+                    "wellformed": false
                 }
             ],
-            "type": "Goal"
+            "type": "Goal",
+            "wellformed": false
         },
         {
             "conds": [
@@ -388,12 +467,12 @@
                 }
             ],
             "finished": true,
-            "goal": "4 * x - x ^ 2 > 0",
-            "latex_goal": "4 x - x ^ {2} > 0",
+            "goal": "4 * x - x ^ 2 >= 0",
+            "latex_goal": "4 x - x ^ {2} \\ge 0",
             "proof": {
                 "finished": true,
-                "goal": "4 * x - x ^ 2 > 0",
-                "latex_goal": "4 x - x ^ {2} > 0",
+                "goal": "4 * x - x ^ 2 >= 0",
+                "latex_goal": "4 x - x ^ {2} \\ge 0",
                 "lhs_calc": {
                     "latex_start": "4 x - x ^ {2}",
                     "start": "4 * x - x ^ 2",
