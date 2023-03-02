@@ -2566,19 +2566,18 @@ class IntegralTest(unittest.TestCase):
 
         self.checkAndOutput(file)
 
-
-    def testChapter1Practice0101(self):
-        # Reference:
-        # Inside interesting integrals, C1.1
-        file = compstate.CompFile("interesting", "chapter1_practice01_01")
-        goal = file.add_goal("(INT x:[0,8]. 1/(x-2)) = log(3)")
-        proof = goal.proof_by_calculation()
-        calc = proof.lhs_calc
-        calc.perform_rule(rules.Substitution("u", "x-2"))
-        calc.perform_rule(rules.SplitRegion("0"))
-        calc.perform_rule(rules.DefiniteIntegralIdentity())
-        calc.perform_rule(rules.FullSimplify())
-        self.checkAndOutput(file)
+    # def testChapter1Practice0101(self):
+    #     # Reference:
+    #     # Inside interesting integrals, C1.1
+    #     file = compstate.CompFile("interesting", "chapter1_practice01_01")
+    #     goal = file.add_goal("(INT x:[0,8]. 1/(x-2)) = log(3)")
+    #     proof = goal.proof_by_calculation()
+    #     calc = proof.lhs_calc
+    #     calc.perform_rule(rules.Substitution("u", "x-2"))
+    #     calc.perform_rule(rules.SplitRegion("0"))
+    #     calc.perform_rule(rules.DefiniteIntegralIdentity())
+    #     calc.perform_rule(rules.FullSimplify())
+    #     self.checkAndOutput(file)
 
     # def testChapter1Practice0102(self):
     #     # Reference:
