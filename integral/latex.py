@@ -169,6 +169,8 @@ def convert_expr(e: expr.Expr, mode: str = "large") -> str:
                 return "\\Gamma{(%s)}" % sx
             elif e.func_name == 'zeta':
                 return "\\zeta{(%s)}" % sx
+            elif e.func_name == 'isInt':
+                return "%s \\in\\mathbb{Z}" % sx
             else:
                 return "%s{(%s)}" % (e.func_name, sx)
         elif len(e.args) == 2:

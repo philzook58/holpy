@@ -75,7 +75,13 @@ class Conditions:
             e, interval = res
             interval2 = self.get_bounds_for_expr(e)
             return interval2.contained_in(interval)
-        return False
+        elif cond.is_not_equals():
+            return self.is_not_equal(cond.args[0], cond.args[1])
+        elif cond.is_fun() and cond.func_name == "isInt":
+            return self.is_integer(cond.args[0])
+        else:
+            print("Warning: unable to check condition %s" % cond)
+            return False
 
     def is_positive(self, e: Expr) -> bool:
         """Return whether conditions imply e is positive."""
@@ -190,3 +196,10 @@ class Conditions:
 
     def is_not_equal(self, e1: Expr, e2: Expr):
         return self.is_nonzero(e1 - e2)
+
+    def is_integer(self, e: Expr):
+        """Return whether conditions imply e is an integer."""
+        for cond in self.data:
+            if cond.is_fun() and cond.func_name == "isInt" and cond.args[0] == e:
+                return True
+        return False

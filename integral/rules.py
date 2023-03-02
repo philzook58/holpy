@@ -245,6 +245,7 @@ def check_wellformed(e: Expr, conds: Conditions) -> bool:
                 conds2.add_condition(expr.Op(">=", Var(e.index_var), e.lower))
             if e.upper != POS_INF:
                 conds2.add_condition(expr.Op("<=", Var(e.index_var), e.upper))
+            conds2.add_condition(expr.Fun("isInt", Var(e.index_var)))
             f, tmp = check_wellformed(e.body, conds2)
             if f and len(bad_parts) == 0:
                 return (True, set())
@@ -918,9 +919,15 @@ class OnSubterm(Rule):
         elif e.is_indefinite_integral():
             return rule.eval(expr.IndefiniteIntegral(e.var, self.eval(e.body, ctx), e.skolem_args), ctx)
         elif e.is_summation():
+            # When evaluating the body, add interval and integer constraint to context
+            ctx2 = Context(ctx)
+            ctx2.add_condition(expr.Op(">=", Var(e.index_var), e.lower))
+            if e.upper != expr.POS_INF:
+                ctx2.add_condition(expr.Op("<=", Var(e.index_var), e.upper))
+            ctx2.add_condition(expr.Fun("isInt", Var(e.index_var)))
             return rule.eval(
                 expr.Summation(e.index_var, self.eval(e.lower, ctx), self.eval(e.upper, ctx),
-                               self.eval(e.body, ctx)), ctx)
+                               self.eval(e.body, ctx2)), ctx)
         else:
             raise NotImplementedError
 
@@ -1149,7 +1156,6 @@ class FullSimplify(Rule):
             s = OnSubterm(DerivativeSimplify()).eval(s, ctx)
             s = OnSubterm(SimplifyPower()).eval(s, ctx)
             s = OnSubterm(ReduceLimit()).eval(s, ctx)
-            s = OnSubterm(SummationSimplify()).eval(s, ctx)
             s = OnSubterm(SimplifyIdentity()).eval(s, ctx)
             if s == current:
                 break
@@ -2265,32 +2271,6 @@ class MergeSummation(Rule):
         if a.index_var != b.index_var:
             b = b.alpha_convert(a.index_var)
         return Summation(a.index_var, a.lower, a.upper, Op(e.op, a.body, b.body))
-
-
-class SummationSimplify(Rule):
-    """Replace (-1)^(2x) by 1 in the body of summation.
-    
-    TODO: replace with more robust tactic.
-    
-    """
-
-    def __init__(self):
-        self.name = "SummationSimplify"
-
-    def __str__(self):
-        return "summation simplify"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self)
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        if not e.is_summation():
-            return e
-        e = e.replace((Const(-1)) ^ (Const(2) * Var(e.index_var)), Const(1))
-        return e
 
 
 class DerivEquation(Rule):
