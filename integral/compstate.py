@@ -156,9 +156,6 @@ class Goal(StateItem):
         self.ctx.extend_condition(self.conds)
         self.proof_obligations = check_wellformed(goal, self.ctx)
         self.wellformed = (len(self.proof_obligations) == 0)
-        self.sub_goals: List["Goal"] = list()
-        for p in self.proof_obligations:
-            self.sub_goals.append(Goal(self, self.ctx, p.e, p.conds))
 
     def __str__(self):
         if self.is_finished():
@@ -168,9 +165,6 @@ class Goal(StateItem):
         res += "  %s\n" % self.goal
         if self.proof is not None:
             res += str(self.proof)
-        if self.sub_goals:
-            for g in self.sub_goals:
-                res += "subgoal %s\n" % g.goal
         return res
 
     def __eq__(self, other):
@@ -190,8 +184,6 @@ class Goal(StateItem):
             "latex_goal": latex.convert_expr(self.goal),
             "finished": self.is_finished(),
         }
-        if self.sub_goals:
-            res['sub_goals'] = [g.export() for g in self.sub_goals]
         if self.proof:
             res['proof'] = self.proof.export()
         if self.conds.data:
@@ -883,10 +875,6 @@ def parse_item(parent, item) -> StateItem:
                     e = parser.parse_expr(obligation['expr'])
                     c = parse_conds(obligation)
                     res.proof_obligations.append(rules.ProofObligation(e, c))
-        if 'sub_goals' in item:
-            res.sub_goals = list()
-            for g in item['sub_goals']:
-                res.sub_goals.append(parse_item(res, g))
         return res
     elif item['type'] == 'CalculationProof':
         goal = parser.parse_expr(item['goal'])

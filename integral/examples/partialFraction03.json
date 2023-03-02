@@ -216,20 +216,6 @@
                 },
                 "type": "CalculationProof"
             },
-            "sub_goals": [
-                {
-                    "conds": [
-                        {
-                            "cond": "x > 0",
-                            "latex_cond": "x > 0"
-                        }
-                    ],
-                    "finished": false,
-                    "goal": "x ^ 4 + 2 * x ^ 2 * cos(2 * a) + 1 != 0",
-                    "latex_goal": "x ^ {4} + 2 x ^ {2} \\cos{(2 a)} + 1 \\neq 0",
-                    "type": "Goal"
-                }
-            ],
             "type": "Goal",
             "wellformed": false
         },
@@ -345,20 +331,6 @@
                 },
                 "type": "CalculationProof"
             },
-            "sub_goals": [
-                {
-                    "conds": [
-                        {
-                            "cond": "x > 0",
-                            "latex_cond": "x > 0"
-                        }
-                    ],
-                    "finished": false,
-                    "goal": "x ^ 4 + 2 * x ^ 2 * cos(2 * a) + 1 != 0",
-                    "latex_goal": "x ^ {4} + 2 x ^ {2} \\cos{(2 a)} + 1 \\neq 0",
-                    "type": "Goal"
-                }
-            ],
             "type": "Goal",
             "wellformed": false
         },
@@ -431,26 +403,6 @@
                 },
                 "type": "CalculationProof"
             },
-            "sub_goals": [
-                {
-                    "finished": false,
-                    "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
-                    "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
-                    "type": "Goal"
-                },
-                {
-                    "conds": [
-                        {
-                            "cond": "x > 0",
-                            "latex_cond": "x > 0"
-                        }
-                    ],
-                    "finished": false,
-                    "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
-                    "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
-                    "type": "Goal"
-                }
-            ],
             "type": "Goal",
             "wellformed": false
         },
@@ -514,14 +466,6 @@
                 },
                 "type": "CalculationProof"
             },
-            "sub_goals": [
-                {
-                    "finished": false,
-                    "goal": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0",
-                    "latex_goal": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1) \\neq 0",
-                    "type": "Goal"
-                }
-            ],
             "type": "Goal",
             "wellformed": false
         },
@@ -718,14 +662,6 @@
                 },
                 "type": "RewriteGoalProof"
             },
-            "sub_goals": [
-                {
-                    "finished": false,
-                    "goal": "cos(a) ^ 2 + x ^ 2 != 0",
-                    "latex_goal": "\\cos^{2}(a) + x ^ {2} \\neq 0",
-                    "type": "Goal"
-                }
-            ],
             "type": "Goal",
             "wellformed": false
         },

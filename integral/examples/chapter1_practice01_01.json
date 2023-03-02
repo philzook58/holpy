@@ -78,24 +78,6 @@
                 },
                 "type": "CalculationProof"
             },
-            "sub_goals": [
-                {
-                    "conds": [
-                        {
-                            "cond": "x > 0",
-                            "latex_cond": "x > 0"
-                        },
-                        {
-                            "cond": "x < 8",
-                            "latex_cond": "x < 8"
-                        }
-                    ],
-                    "finished": false,
-                    "goal": "x - 2 != 0",
-                    "latex_goal": "x - 2 \\neq 0",
-                    "type": "Goal"
-                }
-            ],
             "type": "Goal",
             "wellformed": false
         }
