@@ -351,6 +351,213 @@
                 "type": "CalculationProof"
             },
             "type": "Goal"
+        },
+        {
+            "finished": true,
+            "goal": "(INT y:[-1,1]. INT x:[0,1]. 1 / ((1 + y * x) * sqrt(1 - x ^ 2))) = pi ^ 2 / 2",
+            "latex_goal": "\\int_{-1}^{1} \\int_{0}^{1} \\frac{1}{(1 + y x) \\sqrt{1 - x ^ {2}}} \\,dx \\,dy = \\frac{\\pi ^ {2}}{2}",
+            "proof": {
+                "finished": true,
+                "goal": "(INT y:[-1,1]. INT x:[0,1]. 1 / ((1 + y * x) * sqrt(1 - x ^ 2))) = pi ^ 2 / 2",
+                "latex_goal": "\\int_{-1}^{1} \\int_{0}^{1} \\frac{1}{(1 + y x) \\sqrt{1 - x ^ {2}}} \\,dx \\,dy = \\frac{\\pi ^ {2}}{2}",
+                "lhs_calc": {
+                    "latex_start": "\\int_{-1}^{1} \\int_{0}^{1} \\frac{1}{(1 + y x) \\sqrt{1 - x ^ {2}}} \\,dx \\,dy",
+                    "start": "INT y:[-1,1]. INT x:[0,1]. 1 / ((1 + y * x) * sqrt(1 - x ^ 2))",
+                    "steps": [
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{2}{\\sqrt{-y ^ {2} + 1}} (\\tan^{-1}{(\\frac{y + 1}{\\sqrt{-y ^ {2} + 1}})} - \\tan^{-1}{(\\frac{y}{\\sqrt{-y ^ {2} + 1}})}) \\,dy",
+                            "res": "INT y:[-1,1]. 2 / sqrt(-(y ^ 2) + 1) * (atan((y + 1) / sqrt(-(y ^ 2) + 1)) - atan(y / sqrt(-(y ^ 2) + 1)))",
+                            "rule": {
+                                "eq": "(INT x:[0,1]. 1 / ((1 + y * x) * sqrt(1 - x ^ 2))) = 2 / sqrt(-(y ^ 2) + 1) * (atan((y + 1) / sqrt(-(y ^ 2) + 1)) - atan(y / sqrt(-(y ^ 2) + 1)))",
+                                "latex_str": "apply equation \\(\\int_{0}^{1} \\frac{1}{(1 + y x) \\sqrt{1 - x ^ {2}}} \\,dx = \\frac{2}{\\sqrt{-y ^ {2} + 1}} (\\tan^{-1}{(\\frac{y + 1}{\\sqrt{-y ^ {2} + 1}})} - \\tan^{-1}{(\\frac{y}{\\sqrt{-y ^ {2} + 1}})})\\) at 0",
+                                "loc": "0",
+                                "name": "ApplyEquation",
+                                "str": "apply equation: (INT x:[0,1]. 1 / ((1 + y * x) * sqrt(1 - x ^ 2))) = 2 / sqrt(-(y ^ 2) + 1) * (atan((y + 1) / sqrt(-(y ^ 2) + 1)) - atan(y / sqrt(-(y ^ 2) + 1))) at 0"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{2}{\\sqrt{-y ^ {2} + 1}} \\tan^{-1}{(\\frac{\\frac{y + 1}{\\sqrt{-y ^ {2} + 1}} - \\frac{y}{\\sqrt{-y ^ {2} + 1}}}{1 + \\frac{y + 1}{\\sqrt{-y ^ {2} + 1}} (\\frac{y}{\\sqrt{-y ^ {2} + 1}})})} \\,dy",
+                            "res": "INT y:[-1,1]. 2 / sqrt(-(y ^ 2) + 1) * atan(((y + 1) / sqrt(-(y ^ 2) + 1) - y / sqrt(-(y ^ 2) + 1)) / (1 + (y + 1) / sqrt(-(y ^ 2) + 1) * (y / sqrt(-(y ^ 2) + 1))))",
+                            "rule": {
+                                "latex_str": "rewrite \\(\\tan^{-1}{(\\frac{y + 1}{\\sqrt{-y ^ {2} + 1}})} - \\tan^{-1}{(\\frac{y}{\\sqrt{-y ^ {2} + 1}})}\\) to \\(\\tan^{-1}{(\\frac{\\frac{y + 1}{\\sqrt{-y ^ {2} + 1}} - \\frac{y}{\\sqrt{-y ^ {2} + 1}}}{1 + \\frac{y + 1}{\\sqrt{-y ^ {2} + 1}} (\\frac{y}{\\sqrt{-y ^ {2} + 1}})})}\\) using identity at 0.1",
+                                "loc": "0.1",
+                                "name": "ApplyIdentity",
+                                "source": "atan((y + 1) / sqrt(-(y ^ 2) + 1)) - atan(y / sqrt(-(y ^ 2) + 1))",
+                                "str": "rewrite atan((y + 1) / sqrt(-(y ^ 2) + 1)) - atan(y / sqrt(-(y ^ 2) + 1)) to atan(((y + 1) / sqrt(-(y ^ 2) + 1) - y / sqrt(-(y ^ 2) + 1)) / (1 + (y + 1) / sqrt(-(y ^ 2) + 1) * (y / sqrt(-(y ^ 2) + 1)))) using identity at 0.1",
+                                "target": "atan(((y + 1) / sqrt(-(y ^ 2) + 1) - y / sqrt(-(y ^ 2) + 1)) / (1 + (y + 1) / sqrt(-(y ^ 2) + 1) * (y / sqrt(-(y ^ 2) + 1))))"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{2}{\\sqrt{-y ^ {2} + 1}} \\tan^{-1}{(\\frac{\\frac{1}{\\sqrt{-y ^ {2} + 1}}}{1 + \\frac{y + 1}{\\sqrt{-y ^ {2} + 1}} (\\frac{y}{\\sqrt{-y ^ {2} + 1}})})} \\,dy",
+                            "res": "INT y:[-1,1]. 2 / sqrt(-(y ^ 2) + 1) * atan(1 / sqrt(-(y ^ 2) + 1) / (1 + (y + 1) / sqrt(-(y ^ 2) + 1) * (y / sqrt(-(y ^ 2) + 1))))",
+                            "rule": {
+                                "latex_str": "rewriting \\(\\frac{y + 1}{\\sqrt{-y ^ {2} + 1}} - \\frac{y}{\\sqrt{-y ^ {2} + 1}}\\) to \\(\\frac{1}{\\sqrt{-y ^ {2} + 1}}\\)",
+                                "name": "Equation",
+                                "new_expr": "1 / sqrt(-(y ^ 2) + 1)",
+                                "old_expr": "(y + 1) / sqrt(-(y ^ 2) + 1) - y / sqrt(-(y ^ 2) + 1)",
+                                "str": "rewriting (y + 1) / sqrt(-(y ^ 2) + 1) - y / sqrt(-(y ^ 2) + 1) to 1 / sqrt(-(y ^ 2) + 1)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{2}{\\sqrt{-y ^ {2} + 1}} \\tan^{-1}{(\\frac{\\frac{1}{\\sqrt{-y ^ {2} + 1}}}{1 + \\frac{y (y + 1)}{1 - y ^ {2}}})} \\,dy",
+                            "res": "INT y:[-1,1]. 2 / sqrt(-(y ^ 2) + 1) * atan(1 / sqrt(-(y ^ 2) + 1) / (1 + y * (y + 1) / (1 - y ^ 2)))",
+                            "rule": {
+                                "latex_str": "rewriting \\(\\frac{y + 1}{\\sqrt{-y ^ {2} + 1}} (\\frac{y}{\\sqrt{-y ^ {2} + 1}})\\) to \\(\\frac{y (y + 1)}{1 - y ^ {2}}\\)",
+                                "name": "Equation",
+                                "new_expr": "y * (y + 1) / (1 - y ^ 2)",
+                                "old_expr": "(y + 1) / sqrt(-(y ^ 2) + 1) * (y / sqrt(-(y ^ 2) + 1))",
+                                "str": "rewriting (y + 1) / sqrt(-(y ^ 2) + 1) * (y / sqrt(-(y ^ 2) + 1)) to y * (y + 1) / (1 - y ^ 2)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{2}{\\sqrt{-y ^ {2} + 1}} \\tan^{-1}{(\\frac{\\frac{1}{\\sqrt{-y ^ {2} + 1}}}{1 + \\frac{y}{1 - y}})} \\,dy",
+                            "res": "INT y:[-1,1]. 2 / sqrt(-(y ^ 2) + 1) * atan(1 / sqrt(-(y ^ 2) + 1) / (1 + y / (1 - y)))",
+                            "rule": {
+                                "latex_str": "rewriting \\(\\frac{y (y + 1)}{1 - y ^ {2}}\\) to \\(\\frac{y}{1 - y}\\)",
+                                "name": "Equation",
+                                "new_expr": "y / (1 - y)",
+                                "old_expr": "y * (y + 1) / (1 - y ^ 2)",
+                                "str": "rewriting y * (y + 1) / (1 - y ^ 2) to y / (1 - y)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{2}{\\sqrt{-y ^ {2} + 1}} \\tan^{-1}{(\\frac{\\frac{1}{\\sqrt{-y ^ {2} + 1}}}{\\frac{1}{1 - y}})} \\,dy",
+                            "res": "INT y:[-1,1]. 2 / sqrt(-(y ^ 2) + 1) * atan(1 / sqrt(-(y ^ 2) + 1) / (1 / (1 - y)))",
+                            "rule": {
+                                "latex_str": "rewriting \\(1 + \\frac{y}{1 - y}\\) to \\(\\frac{1}{1 - y}\\)",
+                                "name": "Equation",
+                                "new_expr": "1 / (1 - y)",
+                                "old_expr": "1 + y / (1 - y)",
+                                "str": "rewriting 1 + y / (1 - y) to 1 / (1 - y)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{2}{\\sqrt{-y ^ {2} + 1}} \\tan^{-1}{(\\frac{1 - y}{\\sqrt{(1 - y) (1 + y)}})} \\,dy",
+                            "res": "INT y:[-1,1]. 2 / sqrt(-(y ^ 2) + 1) * atan((1 - y) / sqrt((1 - y) * (1 + y)))",
+                            "rule": {
+                                "latex_str": "rewriting \\(\\frac{\\frac{1}{\\sqrt{-y ^ {2} + 1}}}{\\frac{1}{1 - y}}\\) to \\(\\frac{1 - y}{\\sqrt{(1 - y) (1 + y)}}\\)",
+                                "name": "Equation",
+                                "new_expr": "(1 - y) / sqrt((1 - y) * (1 + y))",
+                                "old_expr": "1 / sqrt(-(y ^ 2) + 1) / (1 / (1 - y))",
+                                "str": "rewriting 1 / sqrt(-(y ^ 2) + 1) / (1 / (1 - y)) to (1 - y) / sqrt((1 - y) * (1 + y))"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{2}{\\sqrt{-y ^ {2} + 1}} \\tan^{-1}{(\\sqrt{\\frac{(1 - y) ^ {2}}{(1 - y) (1 + y)}})} \\,dy",
+                            "res": "INT y:[-1,1]. 2 / sqrt(-(y ^ 2) + 1) * atan(sqrt((1 - y) ^ 2 / ((1 - y) * (1 + y))))",
+                            "rule": {
+                                "latex_str": "rewriting \\(\\frac{1 - y}{\\sqrt{(1 - y) (1 + y)}}\\) to \\(\\sqrt{\\frac{(1 - y) ^ {2}}{(1 - y) (1 + y)}}\\)",
+                                "name": "Equation",
+                                "new_expr": "sqrt((1 - y) ^ 2 / ((1 - y) * (1 + y)))",
+                                "old_expr": "(1 - y) / sqrt((1 - y) * (1 + y))",
+                                "str": "rewriting (1 - y) / sqrt((1 - y) * (1 + y)) to sqrt((1 - y) ^ 2 / ((1 - y) * (1 + y)))"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{2}{\\sqrt{-y ^ {2} + 1}} \\tan^{-1}{(\\sqrt{\\frac{1 - y}{1 + y}})} \\,dy",
+                            "res": "INT y:[-1,1]. 2 / sqrt(-(y ^ 2) + 1) * atan(sqrt((1 - y) / (1 + y)))",
+                            "rule": {
+                                "latex_str": "rewriting \\(\\frac{(1 - y) ^ {2}}{(1 - y) (1 + y)}\\) to \\(\\frac{1 - y}{1 + y}\\)",
+                                "name": "Equation",
+                                "new_expr": "(1 - y) / (1 + y)",
+                                "old_expr": "(1 - y) ^ 2 / ((1 - y) * (1 + y))",
+                                "str": "rewriting (1 - y) ^ 2 / ((1 - y) * (1 + y)) to (1 - y) / (1 + y)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{2}{\\sqrt{-y ^ {2} + 1}} (\\frac{\\cos^{-1}{y}}{2}) \\,dy",
+                            "res": "INT y:[-1,1]. 2 / sqrt(-(y ^ 2) + 1) * (acos(y) / 2)",
+                            "rule": {
+                                "latex_str": "rewrite \\(\\tan^{-1}{(\\sqrt{\\frac{1 - y}{1 + y}})}\\) to \\(\\frac{\\cos^{-1}{y}}{2}\\) using identity at 0.1",
+                                "loc": "0.1",
+                                "name": "ApplyIdentity",
+                                "source": "atan(sqrt((1 - y) / (1 + y)))",
+                                "str": "rewrite atan(sqrt((1 - y) / (1 + y))) to acos(y) / 2 using identity at 0.1",
+                                "target": "acos(y) / 2"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{-1}^{1} \\frac{\\cos^{-1}{y}}{\\sqrt{-y ^ {2} + 1}} \\,dy",
+                            "res": "INT y:[-1,1]. acos(y) / sqrt(-(y ^ 2) + 1)",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "-(\\int_{-1}^{1} \\cos^{-1}{y} \\,dy)",
+                            "res": "-(INT y:[-1,1]. acos(y))",
+                            "rule": {
+                                "latex_str": "rewriting \\(\\int_{-1}^{1} \\frac{\\cos^{-1}{y}}{\\sqrt{-y ^ {2} + 1}} \\,dy\\) to \\(-(\\int_{-1}^{1} \\cos^{-1}{y} \\,dy)\\)",
+                                "name": "Equation",
+                                "new_expr": "-(INT y:[-1,1]. acos(y))",
+                                "old_expr": "INT y:[-1,1]. acos(y) / sqrt(-(y ^ 2) + 1)",
+                                "str": "rewriting INT y:[-1,1]. acos(y) / sqrt(-(y ^ 2) + 1) to -(INT y:[-1,1]. acos(y))"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "-(\\int_{0}^{\\pi} -x \\,dx)",
+                            "res": "-(INT x:[0,pi]. -x)",
+                            "rule": {
+                                "latex_str": "substitute \\(x\\) for \\(\\cos^{-1}{y}\\)",
+                                "name": "Substitution",
+                                "str": "substitute x for acos(y)",
+                                "var_name": "x",
+                                "var_subst": "acos(y)"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\int_{0}^{\\pi} x \\,dx",
+                            "res": "INT x:[0,pi]. x",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\left. \\frac{1}{2} x ^ {2} \\right\\vert_{x=0}^{\\pi}",
+                            "res": "[1/2 * x ^ 2]_x=0,pi",
+                            "rule": {
+                                "name": "DefiniteIntegralIdentity",
+                                "str": "apply definite integral"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "\\frac{\\pi ^ {2}}{2}",
+                            "res": "pi ^ 2 / 2",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        }
+                    ],
+                    "type": "Calculation"
+                },
+                "rhs_calc": {
+                    "latex_start": "\\frac{\\pi ^ {2}}{2}",
+                    "start": "pi ^ 2 / 2",
+                    "steps": [],
+                    "type": "Calculation"
+                },
+                "type": "CalculationProof"
+            },
+            "type": "Goal"
         }
     ],
     "name": "powerful_elementry_integral"

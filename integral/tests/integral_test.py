@@ -2935,8 +2935,8 @@ class IntegralTest(unittest.TestCase):
         file = compstate.CompFile("interesting", "powerful_elementry_integral")
         s1 = "(INT x:[0, 1]. 1/ ((1 + y*x)*sqrt(1-x^2)))"
         s2 = "2 / sqrt(-(y ^ 2) + 1) * (atan((y + 1) / sqrt(-(y ^ 2) + 1)) - atan(y / sqrt(-(y ^ 2) + 1))) "
-        goal = file.add_goal(s1+"="+s2, conds=["abs(y) < 1"])
-        proof = goal.proof_by_calculation()
+        goal01 = file.add_goal(s1+"="+s2, conds=["abs(y) < 1"])
+        proof = goal01.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.SubstitutionInverse("t", "sin(t)"))
         calc.perform_rule(rules.OnLocation(rules.Equation("1", "sin(t)^2 + cos(t)^2"), "0.0.1.1"))
@@ -2990,6 +2990,50 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
         calc = proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+
+        # application
+        s1 = "(INT y:[-1, 1]. INT x:[0,1]. 1/((1+y*x)*sqrt(1-x^2)))"
+        s2 = "pi^2 / 2"
+        goal02 = file.add_goal(s1+"="+s2)
+        proof = goal02.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal01.goal), "0"))
+        s1 = "atan((y + 1) / sqrt(-(y ^ 2) + 1)) - atan(y / sqrt(-(y ^ 2) + 1))"
+        s2 = "atan(((y + 1) / sqrt(-(y ^ 2) + 1) - (y / sqrt(-(y ^ 2) + 1))) / \
+        (1 + (y + 1) / sqrt(-(y ^ 2) + 1) * (y / sqrt(-(y ^ 2) + 1))))"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1,s2), "0.1"))
+        s1 = "(y + 1) / sqrt(-(y ^ 2) + 1) - y / sqrt(-(y ^ 2) + 1)"
+        s2 = "1 / sqrt(-(y ^ 2) + 1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "(y + 1) / sqrt(-(y ^ 2) + 1) * (y / sqrt(-(y ^ 2) + 1))"
+        s2 = "y*(y+1) / (1-y^2)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "y * (y + 1) / (1 - y ^ 2)"
+        s2 = "y / (1-y)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "1 + y / (1 - y)"
+        s2 = "1 / (1-y)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "1 / sqrt(-(y ^ 2) + 1) / (1 / (1 - y))"
+        s2 = "(1-y) / sqrt((1-y)*(1+y))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "(1-y) / sqrt((1-y)*(1+y))"
+        s2 = "sqrt((1-y)^2/((1-y)*(1+y)))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "(1-y)^2/((1-y)*(1+y))"
+        s2 = "(1-y) / (1+y)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "atan(sqrt((1 - y) / (1 + y)))"
+        s2 = "acos(y) / 2"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "INT y:[-1,1]. acos(y) / sqrt(-(y ^ 2) + 1)"
+        s2 = "- INT y:[-1,1]. acos(y) .acos(y)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.Substitution("x", "acos(y)"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
         self.checkAndOutput(file)
 
