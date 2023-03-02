@@ -1,7 +1,7 @@
 <template>
     <div>
       <span class="math-text">split by &nbsp;&nbsp;</span>
-      <MathEquation v-bind:data="'\\(' + item.split_cond + '\\)'"/><br/>
+      <MathEquation v-bind:data="'\\(' + item.latex_split_cond + '\\)'"/><br/>
       <span class="math-text">{{label}}1. Case 1: </span>
       <span @click="$emit('select', label + '1.')"
             :class="{selected: selected_item == label + '1.'}">

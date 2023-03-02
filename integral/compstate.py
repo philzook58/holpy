@@ -410,7 +410,7 @@ class CalculationProof(StateItem):
         if self.predicate == '=':
             return self.lhs_calc.last_expr == self.rhs_calc.last_expr
         elif self.predicate == '>':
-            return self.ctx.get_conds().is_greater(self.lhs_calc.last_expr,self.rhs_calc.last_expr)
+            return self.ctx.get_conds().is_greater(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
         elif self.predicate == '<':
             return self.ctx.get_conds().is_less(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
         elif self.predicate == '<=':
@@ -525,10 +525,6 @@ class CaseProof(StateItem):
     
     """
     def __init__(self, parent, goal: Expr, *, split_cond: Expr):
-        if not goal.is_equals():
-            print(str(goal))
-            raise AssertionError("CaseProof: currently only support equation goals.")
-
         self.parent = parent
         self.goal = goal
         self.ctx = parent.ctx
@@ -565,7 +561,8 @@ class CaseProof(StateItem):
             "latex_goal": latex.convert_expr(self.goal),
             "case_1": self.case_1.export(),
             "case_2": self.case_2.export(),
-            "split_cond": latex.convert_expr(self.split_cond),
+            "split_cond": str(self.split_cond),
+            "latex_split_cond": latex.convert_expr(self.split_cond),
             "finished": self.is_finished()
         }
 

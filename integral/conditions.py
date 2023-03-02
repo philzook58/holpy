@@ -183,7 +183,10 @@ class Conditions:
         return False
 
     def is_greater(self, e1: Expr, e2: Expr) -> bool:
-        return self.is_positive(e1 - e2)
+        if e2 == expr.Const(0):
+            return self.is_positive(e1)
+        else:
+            return self.is_positive(e1 - e2)
 
     def is_less(self, e1: Expr, e2:Expr) -> bool:
         return self.is_negative(e1 - e2)

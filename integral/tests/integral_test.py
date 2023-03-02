@@ -964,7 +964,21 @@ class IntegralTest(unittest.TestCase):
         # Reference
         # Inside interesting integrals, Section 2.3, example 3
         file = compstate.CompFile("interesting", 'partialFraction03')
+
         file.add_definition("I(a) = (INT x:[0,oo]. 1 / (x^4 + 2*x^2*cos(2*a) + 1))")
+
+        goala = file.add_goal("x^4 + 2*x^2*cos(2*a) + 1 > 0", conds=["cos(a) != 0"])
+        proof = goala.proof_by_case("x != 0")
+        proofa = proof.case_1.proof_by_calculation()
+        calc = proofa.lhs_calc
+        calc.perform_rule(rules.Equation(None, "(x^2 - 1) ^ 2 + 2*x^2*(1+cos(2*a))"))
+        calc.perform_rule(rules.ApplyIdentity("cos(2*a)", "2 * cos(a)^2 - 1"))
+        calc.perform_rule(rules.FullSimplify())
+        proofb = proof.case_2.proof_by_calculation()
+        calc = proofb.lhs_calc
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
+
         goal01 = file.add_goal("I(a) = (INT x:[0,oo]. x^2 / (x^4 + 2*x^2*cos(2*a) + 1))")
         proof = goal01.proof_by_calculation()
         calc = proof.lhs_calc

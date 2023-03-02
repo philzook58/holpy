@@ -1468,7 +1468,20 @@ def eval_expr(e: Expr):
 
 
 def neg_expr(ex: Expr):
-    if ex.is_op() and ex.op == '=':
-        return Op('!=', *ex.args)
+    if ex.is_op():
+        if ex.op == "=":
+            return Op("!=", ex.args[0], ex.args[1])
+        elif ex.op == "!=":
+            return Op("=", ex.args[0], ex.args[1])
+        elif ex.op == ">":
+            return Op("<=", ex.args[0], ex.args[1])
+        elif ex.op == "<":
+            return Op(">=", ex.args[0], ex.args[1])
+        elif ex.op == ">=":
+            return Op("<", ex.args[0], ex.args[1])
+        elif ex.op == "<=":
+            return Op(">", ex.args[0], ex.args[1])
+        else:
+            raise NotImplementedError
     else:
         raise NotImplementedError

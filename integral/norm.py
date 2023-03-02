@@ -384,7 +384,7 @@ def add_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefiniteI
 
 def minus_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefiniteIntegral):
     tmp = from_poly(t2.body)
-    tmp = to_poly(tmp.subst(t2.var, expr.Var(t1.var)))
+    tmp = to_poly(tmp.subst(t2.var, expr.Var(t1.var)), t1.body.conds)
     return NormalDefiniteIntegral(t1.var, t1.lower, t1.upper, t1.body - tmp)
 
 def normalize_definite_integral(e: Expr, conds: Conditions):

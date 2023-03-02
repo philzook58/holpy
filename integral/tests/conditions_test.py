@@ -25,6 +25,9 @@ class ConditionsTest(unittest.TestCase):
             ("a ^ (-1/2)", ["a > 0"], True),
             ("x ^ a", ["x > 0"], True),
             ("x ^ a + 1", ["x > 0"], True),
+            ("x ^ 2", ["x != 0"], True),
+            ("cos(a) ^ 2", ["cos(a) != 0"], True),
+            ("4 * x ^ 2 * cos(a) ^ 2 + (x ^ 2 - 1) ^ 2", ["cos(a) != 0", "x != 0"], True),
 
             # Plus
             ("m + 1", ["m >= 0"], True),
@@ -43,7 +46,7 @@ class ConditionsTest(unittest.TestCase):
             # Equality
             ("1/3 * u - 1/3", ["u = 1 + 3 * exp(-x)"], True),
 
-            # Others
+            # Hyperbolic
             ("x ^ 4 + 2 * x ^ 2 * cosh(2 * a) + 1", [], True),
         ]
 
@@ -56,7 +59,7 @@ class ConditionsTest(unittest.TestCase):
 
     def testIsNonzero(self):
         test_data = [
-            ("x+a", ["x!=-a"], True),
+            ("x + a", ["x != -a"], True),
         ]
 
         for a, conds_str, res in test_data:
