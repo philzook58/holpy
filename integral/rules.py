@@ -2324,27 +2324,3 @@ class FunEquation(Rule):
         if check_wellformed(ne, ctx.get_conds()):
             return ne
         return e
-
-
-class ExchangeIntegrationOrder(Rule):
-    """INT x:[a,b]. INT y:[c,d]. body => INT y:[c,d]. INT x:[a,b]. body"""
-
-    def __init__(self):
-        self.name = "ExchangeIntegrationOrder"
-
-    def __str__(self):
-        return "interchange of the order of integration"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self)
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        if not (e.is_integral() and e.body.is_integral):
-            return e
-        a,b,c,d = e.lower,e.upper,e.body.lower,e.upper
-        if a.is_constant() and b.is_constant() and c.is_constant() and d.is_constant():
-            return Integral(e.body.var, c, d, Integral(e.var, a, b, e.body.body, e.diff), e.body.diff)
-        return e
