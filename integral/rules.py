@@ -1056,22 +1056,9 @@ class SimplifyPower(Rule):
         }
 
     def eval(self, e: Expr, ctx: Context) -> Expr:
-        if not e.is_power() and not (e.is_fun() and e.func_name == 'exp'):
+        if not e.is_power():
             return e
-        if e.is_fun() and e.func_name == 'exp':
-            arg = e.args[0]
-            if arg.is_times():
-                a, b = arg.args
-                if b.is_fun() and b.func_name == 'log':
-                    return b.args[0] ^ a
-            return e
-        elif e.args[0].is_power():
-            # x ^ a ^ b => x ^ (a * b)
-            return e.args[0].args[0] ^ (e.args[0].args[1] * e.args[1])
-        elif e.args[0].is_divides() and e.args[0].args[0] == Const(1) and e.args[0].args[1].is_power():
-            # (1 / x ^ a) ^ b => x ^ (-a * b)
-            return e.args[0].args[1].args[0] ^ (-e.args[0].args[1].args[1] * e.args[1])
-        elif e.args[1].is_plus() and e.args[0].is_const() and e.args[1].args[1].is_const():
+        if e.args[1].is_plus() and e.args[0].is_const() and e.args[1].args[1].is_const():
             # c1 ^ (a + c2) => c1 ^ c2 * c1 ^ a
             return (e.args[0] ^ e.args[1].args[1]) * (e.args[0] ^ e.args[1].args[0])
         elif e.args[1].is_minus() and e.args[0].is_const() and e.args[1].args[1].is_const():

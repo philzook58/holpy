@@ -192,10 +192,19 @@
         },
         {
             "type": "axiom",
-            "expr": "a ^ x ^ y = a ^ (x*y)",
+            "expr": "a ^ x ^ y = a ^ (x * y)",
             "category": "power",
             "attributes": [
-                "bidirectional"
+                "bidirectional",
+                "simplify"
+            ]
+        },
+        {
+            "type": "axiom",
+            "expr": "(1 / a ^ x) ^ y = a ^ (-x * y)",
+            "category": "power",
+            "attributes": [
+                "simplify"
             ]
         },
         {
@@ -232,12 +241,15 @@
         },
         {
             "type": "axiom",
-            "expr": "exp(a + b) = exp(a) * exp(b)",
-            "category": "exp-log"
+            "expr": "exp(a) ^ b = exp(a * b)",
+            "category": "exp-log",
+            "attributes": [
+                "bidirectional"
+            ]
         },
         {
             "type": "axiom",
-            "expr": "exp(x*y) = exp(x)^y",
+            "expr": "exp(a + b) = exp(a) * exp(b)",
             "category": "exp-log"
         },
         {
@@ -247,16 +259,16 @@
         },
         {
             "type": "axiom",
-            "expr": "log(a * b) = log(a) + log(b)",
-            "category": "exp-log"
+            "expr": "exp(a * log(b)) = b ^ a",
+            "category": "exp-log",
+            "attributes": [
+                "simplify"
+            ]
         },
         {
             "type": "axiom",
-            "expr": "exp(a) ^ b = exp(a*b)",
-            "category": "exp-log",
-            "attributes": [
-                "bidirectional"
-            ]
+            "expr": "log(a * b) = log(a) + log(b)",
+            "category": "exp-log"
         },
         {
             "type": "axiom",
