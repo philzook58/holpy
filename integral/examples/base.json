@@ -198,6 +198,9 @@
         {
             "type": "axiom",
             "expr": "a ^ x ^ y = a ^ (x * y)",
+            "conds": [
+                "a > 0"
+            ],
             "category": "power",
             "attributes": [
                 "bidirectional",
@@ -206,7 +209,10 @@
         },
         {
             "type": "axiom",
-            "expr": "(1 / a ^ x) ^ y = a ^ (-x * y)",
+            "expr": "(1 / a ^ x) ^ y = a ^ (-(x * y))",
+            "conds": [
+                "a > 0"
+            ],
             "category": "power",
             "attributes": [
                 "simplify"
@@ -265,6 +271,9 @@
         {
             "type": "axiom",
             "expr": "exp(a * log(b)) = b ^ a",
+            "conds": [
+                "b > 0"
+            ],
             "category": "exp-log",
             "attributes": [
                 "simplify"
@@ -273,11 +282,19 @@
         {
             "type": "axiom",
             "expr": "log(a * b) = log(a) + log(b)",
+            "conds": [
+                "a > 0",
+                "b > 0"
+            ],
             "category": "exp-log"
         },
         {
             "type": "axiom",
             "expr": "log(a / b) = log(a) - log(b)",
+            "conds": [
+                "a > 0",
+                "b > 0"
+            ],
             "category": "exp-log",
             "attributes": [
                 "bidirectional"
@@ -286,6 +303,9 @@
         {
             "type": "axiom",
             "expr": "log(x ^ a) = a * log(x)",
+            "conds": [
+                "x > 0"
+            ],
             "category": "exp-log"
         },
         {
