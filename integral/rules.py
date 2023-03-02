@@ -710,18 +710,6 @@ class SeriesEvaluationIdentity(Rule):
                 continue
 
             return identity.rhs.inst_pat(inst)
-
-        # compute geometry series
-        idx = Var(e.index_var)
-        x = Symbol('x', [OP, FUN])
-        p = x ^ idx
-        mapping = expr.match(e.body, p)
-        if mapping!=None and \
-                ctx.get_conds().is_less(Fun('abs', mapping['x']), Const(1)) and e.upper == POS_INF:
-            t = mapping['x']
-            return (t**e.lower) / (Const(1)-t)
-
-
         # No matching identity found
         return e
 
