@@ -1464,7 +1464,8 @@ class Equation(Rule):
         assert self.old_expr is None or self.old_expr == e
 
         r = FullSimplify()
-        if r.eval(e, ctx) == r.eval(self.new_expr, ctx):
+        r1, r2 = r.eval(e, ctx), r.eval(self.new_expr, ctx)
+        if r1 == r2:
             return self.new_expr
 
         # Rewriting 1 to sin(x)^2 + cos(x)^2
