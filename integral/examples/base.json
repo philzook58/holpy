@@ -870,6 +870,10 @@
             "type": "axiom",
             "expr": "B(m,n) = Gamma(m) * Gamma(n) / Gamma(m+n)",
             "category": "gamma-beta"
+        },
+        {
+            "type": "axiom",
+            "expr": "(1-x^n) / (1-x) =  SUM(k, 1, n, x^(k-1))"
         }
     ],
     "name": "Base theory"

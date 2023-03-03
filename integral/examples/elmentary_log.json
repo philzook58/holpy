@@ -9,8 +9,8 @@
         {
             "conds": [
                 {
-                    "cond": "m != -1",
-                    "latex_cond": "m \\neq -1"
+                    "cond": "m >= 0",
+                    "latex_cond": "m \\ge 0"
                 },
                 {
                     "cond": "n >= 0",
@@ -19,6 +19,10 @@
                 {
                     "cond": "isInt(n)",
                     "latex_cond": "n \\in\\mathbb{Z}"
+                },
+                {
+                    "cond": "isInt(m)",
+                    "latex_cond": "m \\in\\mathbb{Z}"
                 }
             ],
             "finished": true,
@@ -109,8 +113,8 @@
         {
             "conds": [
                 {
-                    "cond": "m != -1",
-                    "latex_cond": "m \\neq -1"
+                    "cond": "m >= 0",
+                    "latex_cond": "m \\ge 0"
                 },
                 {
                     "cond": "n >= 0",
@@ -119,6 +123,10 @@
                 {
                     "cond": "isInt(n)",
                     "latex_cond": "n \\in\\mathbb{Z}"
+                },
+                {
+                    "cond": "isInt(m)",
+                    "latex_cond": "m \\in\\mathbb{Z}"
                 }
             ],
             "finished": true,
@@ -297,8 +305,8 @@
         {
             "conds": [
                 {
-                    "cond": "m != -1",
-                    "latex_cond": "m \\neq -1"
+                    "cond": "m >= 0",
+                    "latex_cond": "m \\ge 0"
                 },
                 {
                     "cond": "n >= 0",
@@ -307,6 +315,10 @@
                 {
                     "cond": "isInt(n)",
                     "latex_cond": "n \\in\\mathbb{Z}"
+                },
+                {
+                    "cond": "isInt(m)",
+                    "latex_cond": "m \\in\\mathbb{Z}"
                 },
                 {
                     "cond": "a > 0",
