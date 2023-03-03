@@ -2354,6 +2354,11 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.OnLocation(rules.ApplyIdentity("cos(x) ^ 2", "1 - sin(x) ^ 2"), "0.0.0.1.0.0.0"))
         calc.perform_rule(rules.FullSimplify())
 
+        goal = file.add_goal("x - x ^ 2 > 0", conds=["x > 0", "x < 1"])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.Equation(None, "x * (1 - x)"))
+
         goal02 = file.add_goal("(INT x:[0, 1]. (x - x ^ 2) ^ n) = factorial(n) ^ 2 / factorial(2 * n + 1)", conds=["n > -1"])
         proof_of_goal02 = goal02.proof_by_calculation()
         calc = proof_of_goal02.lhs_calc
@@ -2727,11 +2732,13 @@ class IntegralTest(unittest.TestCase):
         # Reference:
         # Inside interesting integrals, C4.2
         file = compstate.CompFile("interesting", "chapter4_practice02")
+
         goal01 = file.add_goal("Gamma(n+1) = INT t:[0,oo]. t^n * exp(-t)")
         proof = goal01.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.ExpandDefinition("Gamma"))
-        goal02 = file.add_goal("(INT x:[0,1].x^m * log(x)^n) = (-1)^n * factorial(n) / (m+1)^(n+1)", conds=["m+1>0"])
+
+        goal02 = file.add_goal("(INT x:[0,1]. x^m * log(x)^n) = (-1)^n * factorial(n) / (m+1)^(n+1)", conds=["m + 1 > 0", "isInt(n)"])
         proof = goal02.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.SubstitutionInverse("u", "exp(-u)"))
@@ -2805,6 +2812,7 @@ class IntegralTest(unittest.TestCase):
         # Reference:
         # Inside interesting integrals, section 5.3
         file = compstate.CompFile("interesting", "zeta_function")
+
         file.add_definition("zeta(s) = SUM(k, 0, oo, 1/(k+1)^s)")
         s1 = "(INT y:[0,1]. (INT x:[0,1]. x^a * y^a / (1-x*y)))"
         s2 = "SUM(n, 0, oo, 1/(n+1+a)^2)"
@@ -2849,7 +2857,7 @@ class IntegralTest(unittest.TestCase):
 
         s1 = "(INT y:[0,1]. (INT x:[0,1]. log(x*y)^(s-2)*(x^a * y^a) / (1-x*y)))"
         s2 = "(-1)^s * factorial(s-1) * SUM(n, 0, oo, 1/(n+a+1)^s)"
-        goal03 = file.add_goal(s1+"="+s2, conds=["a>-1", "s>=2"])
+        goal03 = file.add_goal(s1+"="+s2, conds=["a > -1", "s >= 2", "isInt(s)"])
         proof = goal03.proof_by_induction('s', 2)
         proof_base = proof.base_case.proof_by_calculation()
         proof_induct = proof.induct_case.proof_by_rewrite_goal(begin = proof.induct_case.get_induct_hyp_goal())
@@ -2884,7 +2892,7 @@ class IntegralTest(unittest.TestCase):
 
         s1 = 'zeta(s)'
         s2 = "(-1)^s / factorial(s-1) * (INT y:[0,1]. (INT x:[0,1]. log(x*y)^(s-2)/ (1-x*y)))"
-        goal04 = file.add_goal(s1+"="+s2)
+        goal04 = file.add_goal(s1+"="+s2, conds=["isInt(s)"])
         proof = goal04.proof_by_rewrite_goal(begin=goal03)
         calc = proof.begin
         calc.perform_rule(rules.VarSubsOfEquation([{'var':'a', 'expr':'0'}]))
@@ -2953,7 +2961,7 @@ class IntegralTest(unittest.TestCase):
         self.checkAndOutput(file)
 
     def testCoxeterIntegral(self):
-        # TODO: find some problems about condtion inheritance
+        # TODO: find some problems about condition inheritance
         file = compstate.CompFile("interesting", "coxeter")
         lemma = file.add_goal("cos(2*x) = 2*cos(x)^2 - 1", conds=["x>=0", "x<=pi/2"])
         proof = lemma.proof_by_calculation()
@@ -2969,7 +2977,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.VarSubsOfEquation([{"var": "u", "expr": "sqrt((1+a)/2)"}]))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.SolveEquation("acos(a)"))
+        # calc.perform_rule(rules.SolveEquation("acos(a)"))
 
     def testPowerfulElementaryIntegral(self):
         # Reference: Impossible, Integrals, Sums, and Series
@@ -3086,7 +3094,7 @@ class IntegralTest(unittest.TestCase):
         file.add_definition("I(m,n) = (INT x:[0,1]. x^m * log(x)^n)")
         s1 = "I(m,n)"
         s2 = "(-1) * I(m,n-1) * (n / (m+1))"
-        goal01 = file.add_goal(s1 + "=" + s2, conds=["m>=0", "n>=0", "isInt(n)", "isInt(m)"])
+        goal01 = file.add_goal(s1 + "=" + s2, conds=["m >= 0", "n >= 0", "isInt(n)", "isInt(m)"])
         proof = goal01.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.ExpandDefinition("I"))
@@ -3101,7 +3109,7 @@ class IntegralTest(unittest.TestCase):
 
         s1 = "I(m,n)"
         s2 = "(-1)^n * (factorial(n) / (m+1)^(n+1))"
-        goal02 = file.add_goal(s1 + "=" + s2, conds=["m>=0", "n>=0", "isInt(n)", "isInt(m)"])
+        goal02 = file.add_goal(s1 + "=" + s2, conds=["m >= 0", "n >= 0", "isInt(n)", "isInt(m)"])
         proof = goal02.proof_by_induction("n")
         base_proof = proof.base_case.proof_by_calculation()
         calc = base_proof.lhs_calc

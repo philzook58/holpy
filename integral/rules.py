@@ -187,69 +187,70 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
     
     """
     obligations: List[ProofObligation] = list()
-    conds = ctx.get_conds()
 
-    def add_obligation(e: Expr, conds: Conditions):
-        found = False
-        for lemma in ctx.get_lemmas():
-            if lemma.expr == e and set(lemma.conds.data).issubset(set(conds.data)):
-                found = True
-        if not found:
-            obligation = ProofObligation(e, conds)
-            if obligation not in obligations:
-                obligations.append(ProofObligation(e, conds))
+    def add_obligation(e: Expr):
+        obligation = ProofObligation(e, ctx.get_conds())
+        if obligation not in obligations:
+            obligations.append(obligation)
 
-    def rec(e: Expr, conds: Conditions):
+    def rec(e: Expr, ctx: Context):
         if e.is_var() or e.is_const():
             pass
         elif e.is_op():
             for arg in e.args:
-                rec(arg, conds)
+                rec(arg, ctx)
             if e.is_divides():
-                if conds.is_nonzero(e.args[1]):
+                if ctx.check_condition(Op("!=", e.args[1], Const(0))):
                     pass
                 else:
-                    add_obligation(Op("!=", e.args[1], Const(0)), conds)
-            # TODO: add checks for power
+                    add_obligation(Op("!=", e.args[1], Const(0)))
+            if e.is_power():
+                if ctx.check_condition(Op(">", e.args[0], Const(0))):
+                    pass
+                elif ctx.check_condition(Fun("isInt", e.args[1])):
+                    pass
+                else:
+                    add_obligation(Op(">", e.args[0], Const(0)))
+                    add_obligation(Fun("isInt", e.args[1]))
         elif e.is_fun():
             for arg in e.args:
-                rec(arg, conds)
+                rec(arg, ctx)
             if e.func_name == 'log':
-                if conds.is_positive(e.args[0]):
+                if ctx.check_condition(Op(">", e.args[0], Const(0))):
                     pass
                 else:
-                    add_obligation(Op(">", e.args[0], Const(0)), conds)
+                    add_obligation(Op(">", e.args[0], Const(0)))
             if e.func_name == 'sqrt':
-                if conds.is_not_negative(e.args[0]):
+                if ctx.check_condition(Op(">=", e.args[0], Const(0))):
                     pass
                 else:
-                    add_obligation(Op(">=", e.args[0], Const(0)), conds)
+                    add_obligation(Op(">=", e.args[0], Const(0)))
             # TODO: add checks for other functions
         elif e.is_integral():
-            conds2 = Conditions(conds)
+            ctx2 = Context(ctx)
             if e.lower != NEG_INF:
-                conds2.add_condition(expr.Op(">", Var(e.var), e.lower))
+                ctx2.add_condition(expr.Op(">", Var(e.var), e.lower))
             if e.upper != POS_INF:
-                conds2.add_condition(expr.Op("<", Var(e.var), e.upper))
-            rec(e.lower, conds)
-            rec(e.upper, conds)
-            rec(e.body, conds2)
+                ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
+            rec(e.lower, ctx)
+            rec(e.upper, ctx)
+            rec(e.body, ctx2)
         elif e.is_deriv():
-            rec(e.body, conds)
+            rec(e.body, ctx)
         elif e.is_summation():
-            conds2 = Conditions(conds)
+            ctx2 = Context(ctx)
             if e.lower != NEG_INF:
-                conds2.add_condition(expr.Op(">=", Var(e.index_var), e.lower))
+                ctx2.add_condition(expr.Op(">=", Var(e.index_var), e.lower))
             if e.upper != POS_INF:
-                conds2.add_condition(expr.Op("<=", Var(e.index_var), e.upper))
-            conds2.add_condition(expr.Fun("isInt", Var(e.index_var)))
-            rec(e.lower, conds)
-            rec(e.upper, conds)
-            rec(e.body, conds2)
+                ctx2.add_condition(expr.Op("<=", Var(e.index_var), e.upper))
+            ctx2.add_condition(expr.Fun("isInt", Var(e.index_var)))
+            rec(e.lower, ctx)
+            rec(e.upper, ctx)
+            rec(e.body, ctx2)
         else:
             pass
 
-    rec(e, conds)
+    rec(e, ctx)
     return obligations
 
 

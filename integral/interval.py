@@ -127,7 +127,7 @@ class Interval:
                 return expr.NEG_INF
             if a == expr.NEG_INF and b == expr.NEG_INF:
                 return expr.POS_INF
-            if a.is_inf() and b == expr.Const(0):
+            if a.is_inf() and b == expr.Const(0) or b == expr.Fun("sin", expr.Const(0)):
                 return None
             if b.is_inf():
                 return lim_mul(b, a)
@@ -175,7 +175,6 @@ class Interval:
     def __pow__(self, other: "Interval") -> "Interval":
         """Power in interval arithmetic."""
         from integral.poly import normalize_constant
-        from integral import limits
         if eval_expr(other.start) == eval_expr(other.end):
             # Exponent has single value
             if eval_expr(other.start) == 0:
@@ -345,8 +344,8 @@ class Interval:
             end = expr.POS_INF
             right = True
         else:
-            t1, t2 = expr.eval_expr(expr.Fun("abs",self.start)), \
-                     expr.eval_expr(expr.Fun("abs",self.end))
+            t1, t2 = expr.eval_expr(expr.Fun("abs", self.start)), \
+                     expr.eval_expr(expr.Fun("abs", self.end))
             if t1 > t2:
                 start = expr.Const(t2)
                 left = self.right_open

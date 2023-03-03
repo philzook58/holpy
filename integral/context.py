@@ -337,3 +337,13 @@ class Context:
                 self.extend_by_item(item)
 
         return
+
+    def check_condition(self, e: Expr) -> bool:
+        """Check the given condition under the extra conditions"""
+        conds = self.get_conds()
+        if conds.check_condition(e):
+            return True
+        for lemma in self.get_lemmas():
+            if lemma.expr == e and set(lemma.conds.data).issubset(set(conds.data)):
+                return True
+        return False

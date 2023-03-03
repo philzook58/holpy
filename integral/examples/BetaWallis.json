@@ -98,6 +98,52 @@
         {
             "conds": [
                 {
+                    "cond": "x > 0",
+                    "latex_cond": "x > 0"
+                },
+                {
+                    "cond": "x < 1",
+                    "latex_cond": "x < 1"
+                }
+            ],
+            "finished": true,
+            "goal": "x - x ^ 2 > 0",
+            "latex_goal": "x - x ^ {2} > 0",
+            "proof": {
+                "finished": true,
+                "goal": "x - x ^ 2 > 0",
+                "latex_goal": "x - x ^ {2} > 0",
+                "lhs_calc": {
+                    "latex_start": "x - x ^ {2}",
+                    "start": "x - x ^ 2",
+                    "steps": [
+                        {
+                            "latex_res": "x (1 - x)",
+                            "res": "x * (1 - x)",
+                            "rule": {
+                                "latex_str": "rewriting to \\(x (1 - x)\\)",
+                                "name": "Equation",
+                                "new_expr": "x * (1 - x)",
+                                "str": "rewriting to x * (1 - x)"
+                            },
+                            "type": "CalculationStep"
+                        }
+                    ],
+                    "type": "Calculation"
+                },
+                "rhs_calc": {
+                    "latex_start": "0",
+                    "start": "0",
+                    "steps": [],
+                    "type": "Calculation"
+                },
+                "type": "CalculationProof"
+            },
+            "type": "Goal"
+        },
+        {
+            "conds": [
+                {
                     "cond": "n > -1",
                     "latex_cond": "n > -1"
                 }

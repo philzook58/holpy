@@ -1462,6 +1462,17 @@ def eval_expr(e: Expr):
             return math.atan(eval_expr(e.args[0]))
         elif e.func_name == 'log':
             return math.log(eval_expr(e.args[0]))
+        elif e.func_name == 'factorial':
+            arg = eval_expr(e.args[0])
+            if int(arg) == arg:
+                return math.factorial(arg)
+            else:
+                from scipy.special import gamma
+                return gamma(float(arg) + 1)
+        elif e.func_name == 'Gamma':
+            arg = eval_expr(e.args[0])
+            from scipy.special import gamma
+            return gamma(float(arg))
 
     print(e)
     raise NotImplementedError

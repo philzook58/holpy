@@ -272,6 +272,10 @@
                 {
                     "cond": "s >= 2",
                     "latex_cond": "s \\ge 2"
+                },
+                {
+                    "cond": "isInt(s)",
+                    "latex_cond": "s \\in\\mathbb{Z}"
                 }
             ],
             "finished": true,
@@ -486,6 +490,12 @@
             "type": "Goal"
         },
         {
+            "conds": [
+                {
+                    "cond": "isInt(s)",
+                    "latex_cond": "s \\in\\mathbb{Z}"
+                }
+            ],
             "finished": true,
             "goal": "zeta(s) = (-1) ^ s / factorial(s - 1) * (INT y:[0,1]. INT x:[0,1]. log(x * y) ^ (s - 2) / (1 - x * y))",
             "latex_goal": "\\zeta{(s)} = \\frac{(-1) ^ {s}}{(s - 1)!} (\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y)}{1 - x y} \\,dx \\,dy)",
@@ -502,6 +512,10 @@
                         {
                             "cond": "s >= 2",
                             "latex_cond": "s \\ge 2"
+                        },
+                        {
+                            "cond": "isInt(s)",
+                            "latex_cond": "s \\in\\mathbb{Z}"
                         }
                     ],
                     "latex_start": "\\int_{0}^{1} \\int_{0}^{1} \\frac{\\log^{s - 2}(x y) (x ^ {a} y ^ {a})}{1 - x y} \\,dx \\,dy = (-1) ^ {s} (s - 1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(n + a + 1) ^ {s}}}",

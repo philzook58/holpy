@@ -40,6 +40,10 @@
                 {
                     "cond": "m + 1 > 0",
                     "latex_cond": "m + 1 > 0"
+                },
+                {
+                    "cond": "isInt(n)",
+                    "latex_cond": "n \\in\\mathbb{Z}"
                 }
             ],
             "finished": true,

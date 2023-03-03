@@ -10,6 +10,17 @@
             "finished": true,
             "goal": "(INT x. 1 / (x + a)) = log(abs(x + a)) + SKOLEM_CONST(C)",
             "latex_goal": "\\int \\frac{1}{x + a} \\,dx = \\log{(\\left| x + a \\right|)} + C",
+            "obligations": [
+                {
+                    "conds": [
+                        {
+                            "cond": "x != -a",
+                            "latex_cond": "x \\neq -a"
+                        }
+                    ],
+                    "expr": "abs(x + a) > 0"
+                }
+            ],
             "proof": {
                 "finished": true,
                 "goal": "(INT x. 1 / (x + a)) = log(abs(x + a)) + SKOLEM_CONST(C)",
@@ -59,7 +70,8 @@
                 },
                 "type": "CalculationProof"
             },
-            "type": "Goal"
+            "type": "Goal",
+            "wellformed": false
         },
         {
             "conds": [

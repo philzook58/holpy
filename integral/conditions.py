@@ -214,7 +214,13 @@ class Conditions:
 
     def is_integer(self, e: Expr):
         """Return whether conditions imply e is an integer."""
+        if e.is_constant() and isinstance(expr.eval_expr(e), int):
+            return True
         for cond in self.data:
             if cond.is_fun() and cond.func_name == "isInt" and cond.args[0] == e:
                 return True
+        if e.is_plus() and self.is_integer(e.args[0]) and self.is_integer(e.args[1]):
+            return True
+        if e.is_minus() and self.is_integer(e.args[0]) and self.is_integer(e.args[1]):
+            return True
         return False
