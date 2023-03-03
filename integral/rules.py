@@ -601,7 +601,7 @@ class DefiniteIntegralIdentity(Rule):
                 for cond in identity.conds.data:
                     cond = expr.expr_to_pattern(cond)
                     cond = cond.inst_pat(inst)
-                    if not ctx.get_conds().check_condition(cond):
+                    if not ctx.check_condition(cond):
                         satisfied = False
                 if satisfied:
                     return normalize(identity.rhs.inst_pat(inst), ctx.get_conds())
@@ -810,7 +810,7 @@ class SimplifyIdentity(Rule):
                 for cond in identity.conds.data:
                     cond = expr.expr_to_pattern(cond)
                     cond = cond.inst_pat(inst)
-                    if not ctx.get_conds().check_condition(cond):
+                    if not ctx.check_condition(cond):
                         satisfied = False
                 if satisfied:
                     return identity.rhs.inst_pat(inst)

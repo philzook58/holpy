@@ -86,7 +86,7 @@ def solve_equation(f: Expr, a: Expr, x: str, conds: Conditions) -> Optional[Expr
     if extract_res:
         # b * x + c = a  ==>  x = (a - c) / b
         b, c = extract_res
-        if normalize(b, conds) != Const(0) and (conds.is_positive(b) or conds.is_negative(b)):
+        if conds.is_nonzero(b):
             return normalize((a - c) / b, conds)
 
 def extract_linear(e: Expr, x: str) -> Optional[Tuple[Expr, Expr]]:
