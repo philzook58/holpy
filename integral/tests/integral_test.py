@@ -3079,5 +3079,77 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         self.checkAndOutput(file)
 
+    def testElementaryLogIntegral(self):
+        # Reference: Impossible, Integrals, Sums, and Series
+        # section 1.2
+        file = compstate.CompFile("interesting", "elmentary_log")
+        file.add_definition("I(m,n) = (INT x:[0,1]. x^m * log(x)^n)", conds=["m!=-1", "n>=0", "isInt(n)"])
+        s1 = "I(m,n)"
+        s2 = "(-1) * I(m,n-1) * (n / (m+1))"
+        goal01 = file.add_goal(s1 + "=" + s2, conds=["m!=-1", "n>=0", "isInt(n)"])
+        proof = goal01.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.ExpandDefinition("I"))
+        u = "log(x)^n"
+        v = "x^(m+1) / (m+1)"
+        calc.perform_rule(rules.IntegrationByParts(u, v))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("I"), "0.0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+
+        s1 = "I(m,n)"
+        s2 = "(-1)^n * (factorial(n) / (m+1)^(n+1))"
+        goal02 = file.add_goal(s1 + "=" + s2, conds=["m!=-1", "n>=0", "isInt(n)"])
+        proof = goal02.proof_by_induction("n")
+        base_proof = proof.base_case.proof_by_calculation()
+        calc = base_proof.lhs_calc
+        calc.perform_rule(rules.ExpandDefinition("I"))
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        induct_proof = proof.induct_case.proof_by_calculation()
+        calc = induct_proof.lhs_calc
+        calc.perform_rule(rules.ApplyEquation(goal01.goal))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.ApplyInductHyp(), "0.0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "-((-1) ^ n * factorial(n) * (m + 1) ^ (-n - 2) * (n + 1))"
+        s2 = "(-1)^(n+1) * ((n+1) * factorial(n)) / (m+1)^(n+2)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "(n+1) * factorial(n)"
+        s2 = "factorial(n+1)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc = induct_proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+
+        s1 = "(INT x:[0,a]. x^m *log(x)^n)"
+        s2 = "a^(m+1) * SUM(k, 0, n, (-1)^k*binom(n, k)*factorial(k)*log(a)^(n-k)/(m+1)^(k+1))"
+        goal03 = file.add_goal(s1+"="+s2, conds=["m!=-1", "n>=0", "isInt(n)", "a>0"])
+        proof = goal03.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.SubstitutionInverse("y", "a*y"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity("(a * y) ^ m", "a^m * y^m"), "0.0.0"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Equation("a*y", "y*a"))
+        s1 = "log(y*a)"
+        s2 = "log(y) + log(a)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "1.0.1.0"))
+        s1 = "(log(y) + log(a))^n"
+        s2 = "SUM(k, 0, n, binom(n, k)*log(y)^k*log(a)^(n-k))"
+        calc.perform_rule(rules.OnLocation(rules.SeriesExpansionIdentity(index_var = "k"), "1.0.1"))
+        s1 = "y ^ m * SUM(k, 0, n, binom(n,k) * log(y) ^ k * log(a) ^ (n - k))"
+        s2 = "SUM(k, 0, n, y^m * binom(n,k) * log(y) ^ k * log(a) ^ (n - k))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.OnLocation(rules.IntSumExchange(), "1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("I"), "1.0.1"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal02.goal), "1.0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+        self.checkAndOutput(file)
+
 if __name__ == "__main__":
     unittest.main()

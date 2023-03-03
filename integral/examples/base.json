@@ -751,6 +751,11 @@
             "category": "binomial"
         },
         {
+            "type": "axiom",
+            "expr": "(x+y)^n = SUM(k, 0, n, binom(n,k)*x^k*y^(n-k))",
+            "category": "binomial"
+        },
+        {
             "type": "header",
             "name": "Derived integrals",
             "level": 1
