@@ -79,6 +79,10 @@
                         {
                             "cond": "b < 2",
                             "latex_cond": "b < 2"
+                        },
+                        {
+                            "cond": "x > 0",
+                            "latex_cond": "x > 0"
                         }
                     ],
                     "expr": "x ^ a + 1 > 0"

@@ -2738,7 +2738,7 @@ class IntegralTest(unittest.TestCase):
         calc = proof.lhs_calc
         calc.perform_rule(rules.ExpandDefinition("Gamma"))
 
-        goal02 = file.add_goal("(INT x:[0,1]. x^m * log(x)^n) = (-1)^n * factorial(n) / (m+1)^(n+1)", conds=["m + 1 > 0", "isInt(n)"])
+        goal02 = file.add_goal("(INT x:[0,1]. x^m * log(x)^n) = (-1)^n * factorial(n) / (m+1)^(n+1)", conds=["m + 1 > 0", "n >= 0", "isInt(n)"])
         proof = goal02.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.SubstitutionInverse("u", "exp(-u)"))
@@ -2892,7 +2892,7 @@ class IntegralTest(unittest.TestCase):
 
         s1 = 'zeta(s)'
         s2 = "(-1)^s / factorial(s-1) * (INT y:[0,1]. (INT x:[0,1]. log(x*y)^(s-2)/ (1-x*y)))"
-        goal04 = file.add_goal(s1+"="+s2, conds=["isInt(s)"])
+        goal04 = file.add_goal(s1+"="+s2, conds=["s >= 2", "isInt(s)"])
         proof = goal04.proof_by_rewrite_goal(begin=goal03)
         calc = proof.begin
         calc.perform_rule(rules.VarSubsOfEquation([{'var':'a', 'expr':'0'}]))

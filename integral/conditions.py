@@ -119,7 +119,7 @@ class Conditions:
             if e.op in ['+', '*']:
                 if all(self.is_not_negative(arg) for arg in e.args):
                     return True
-            elif e.op == '^':
+            elif e.is_power():
                 if e.args[1].is_evaluable():
                     tmp = expr.eval_expr(e.args[1])
                     if tmp == int(tmp) and tmp > 0 and tmp % 2 == 0:

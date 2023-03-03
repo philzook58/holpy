@@ -492,6 +492,10 @@
         {
             "conds": [
                 {
+                    "cond": "s >= 2",
+                    "latex_cond": "s \\ge 2"
+                },
+                {
                     "cond": "isInt(s)",
                     "latex_cond": "s \\in\\mathbb{Z}"
                 }

@@ -188,7 +188,7 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
     """
     obligations: List[ProofObligation] = list()
 
-    def add_obligation(e: Expr):
+    def add_obligation(e: Expr, ctx: Context):
         obligation = ProofObligation(e, ctx.get_conds())
         if obligation not in obligations:
             obligations.append(obligation)
@@ -203,15 +203,16 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
                 if ctx.check_condition(Op("!=", e.args[1], Const(0))):
                     pass
                 else:
-                    add_obligation(Op("!=", e.args[1], Const(0)))
+                    add_obligation(Op("!=", e.args[1], Const(0)), ctx)
             if e.is_power():
                 if ctx.check_condition(Op(">", e.args[0], Const(0))):
                     pass
-                elif ctx.check_condition(Fun("isInt", e.args[1])):
+                elif ctx.check_condition(Fun("isInt", e.args[1])) and ctx.check_condition(Op(">=", e.args[1], Const(0))):
                     pass
                 else:
-                    add_obligation(Op(">", e.args[0], Const(0)))
-                    add_obligation(Fun("isInt", e.args[1]))
+                    add_obligation(Op(">", e.args[0], Const(0)), ctx)
+                    add_obligation(Fun("isInt", e.args[1]), ctx)
+                    add_obligation(Op(">=", e.args[1], Const(0)), ctx)
         elif e.is_fun():
             for arg in e.args:
                 rec(arg, ctx)
@@ -219,12 +220,12 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
                 if ctx.check_condition(Op(">", e.args[0], Const(0))):
                     pass
                 else:
-                    add_obligation(Op(">", e.args[0], Const(0)))
+                    add_obligation(Op(">", e.args[0], Const(0)), ctx)
             if e.func_name == 'sqrt':
                 if ctx.check_condition(Op(">=", e.args[0], Const(0))):
                     pass
                 else:
-                    add_obligation(Op(">=", e.args[0], Const(0)))
+                    add_obligation(Op(">=", e.args[0], Const(0)), ctx)
             # TODO: add checks for other functions
         elif e.is_integral():
             ctx2 = Context(ctx)
@@ -242,7 +243,7 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
             if e.lower != NEG_INF:
                 ctx2.add_condition(expr.Op(">=", Var(e.index_var), e.lower))
             if e.upper != POS_INF:
-                ctx2.add_condition(expr.Op("<=", Var(e.index_var), e.upper))
+                ctx2.add_condition(expr.Op(">=", e.upper - Var(e.index_var), Const(0)))
             ctx2.add_condition(expr.Fun("isInt", Var(e.index_var)))
             rec(e.lower, ctx)
             rec(e.upper, ctx)
