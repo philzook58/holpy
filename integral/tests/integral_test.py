@@ -3083,7 +3083,7 @@ class IntegralTest(unittest.TestCase):
         # Reference: Impossible, Integrals, Sums, and Series
         # section 1.2
         file = compstate.CompFile("interesting", "elmentary_log")
-        file.add_definition("I(m,n) = (INT x:[0,1]. x^m * log(x)^n)", conds=["m!=-1", "n>=0", "isInt(n)"])
+        file.add_definition("I(m,n) = (INT x:[0,1]. x^m * log(x)^n)")
         s1 = "I(m,n)"
         s2 = "(-1) * I(m,n-1) * (n / (m+1))"
         goal01 = file.add_goal(s1 + "=" + s2, conds=["m!=-1", "n>=0", "isInt(n)"])

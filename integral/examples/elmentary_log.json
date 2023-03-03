@@ -1,20 +1,6 @@
 {
     "content": [
         {
-            "conds": [
-                {
-                    "cond": "m != -1",
-                    "latex_cond": "m \\neq -1"
-                },
-                {
-                    "cond": "n >= 0",
-                    "latex_cond": "n \\ge 0"
-                },
-                {
-                    "cond": "isInt(n)",
-                    "latex_cond": "n \\in\\mathbb{Z}"
-                }
-            ],
             "eq": "I(m,n) = (INT x:[0,1]. x ^ m * log(x) ^ n)",
             "latex_eq": "I(m,n) = \\int_{0}^{1} x ^ {m} \\log^{n}(x) \\,dx",
             "latex_lhs": "I(m,n)",
