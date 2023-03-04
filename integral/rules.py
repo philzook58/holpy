@@ -5,20 +5,22 @@ from fractions import Fraction
 from typing import Optional, Dict, Tuple, Union, List, Set
 import functools
 import operator
+import math
 
 from integral import expr
 from integral.expr import Var, Const, Fun, EvalAt, Op, Integral, Symbol, Expr, \
     OP, CONST, VAR, sin, cos, FUN, decompose_expr_factor, \
-    Deriv, Inf, Limit, NEG_INF, POS_INF, IndefiniteIntegral, Summation, SUMMATION, INF
+    Deriv, Inf, Limit, NEG_INF, POS_INF, IndefiniteIntegral, Summation, SUMMATION
 from integral import parser
 from integral.solve import solve_equation, solve_for_term
 from integral import latex
 from integral import limits
 from integral import norm
-from integral.context import Context
+from integral.context import Context, apply_subterm
 from integral import poly
 from integral.poly import from_poly, to_poly, normalize
 from integral.conditions import Conditions
+from integral import condprover
 
 
 def deriv(var: str, e: Expr, ctx: Context) -> Expr:
@@ -484,6 +486,18 @@ class FunctionTable(Rule):
             return func_table[e.func_name][e.args[0]]
         else:
             return e
+        
+class FunctionEval(Rule):
+    def eval(self, e: Expr, ctx: Context) -> Expr:
+        if e.is_fun() and e.func_name == "binom":
+            if e.args[0].is_const() and e.args[1].is_const():
+                return expr.Const(math.comb(e.args[0].val, e.args[1].val))
+
+        if e.is_fun() and e.func_name == 'factorial':
+            if e.args[0].is_const() and condprover.approx_integer(e.args[0]):
+                return expr.Const(math.factorial(round(e.args[0].val)))
+
+        return e
 
 
 class ApplyIdentity(Rule):
@@ -843,51 +857,7 @@ class OnSubterm(Rule):
         return self.rule.get_substs()
 
     def eval(self, e: Expr, ctx: Context) -> Expr:
-        rule = self.rule
-        if e.is_var() or e.is_const() or e.is_inf() or e.is_skolem_func():
-            return rule.eval(e, ctx)
-        elif e.is_op():
-            args = [self.eval(arg, ctx) for arg in e.args]
-            return rule.eval(expr.Op(e.op, *args), ctx)
-        elif e.is_fun():
-            args = [self.eval(arg, ctx) for arg in e.args]
-            return rule.eval(expr.Fun(e.func_name, *args), ctx)
-        elif e.is_deriv():
-            return rule.eval(expr.Deriv(e.var, self.eval(e.body, ctx)), ctx)
-        elif e.is_integral():
-            # When evaluating the body, add interval constraint to context
-            ctx2 = Context(ctx)
-            ctx2.add_condition(expr.Op(">", Var(e.var), e.lower))
-            ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
-            lower = self.eval(e.lower, ctx)
-            upper = self.eval(e.upper, ctx)
-            body = self.eval(e.body, ctx2)
-            return rule.eval(expr.Integral(e.var, lower, upper, body, e.diff), ctx)
-        elif e.is_evalat():
-            return rule.eval(expr.EvalAt(
-                e.var, self.eval(e.lower, ctx), self.eval(e.upper, ctx),
-                self.eval(e.body, ctx)), ctx)
-        elif e.is_limit():
-            if e.lim == POS_INF:
-                ctx2 = Context(ctx)
-                ctx2.add_condition(expr.Op(">", Var(e.var), Const(0)))
-                return rule.eval(expr.Limit(e.var, e.lim, self.eval(e.body, ctx2)), ctx)
-            else:
-                return rule.eval(expr.Limit(e.var, e.lim, self.eval(e.body, ctx)), ctx)
-        elif e.is_indefinite_integral():
-            return rule.eval(expr.IndefiniteIntegral(e.var, self.eval(e.body, ctx), e.skolem_args), ctx)
-        elif e.is_summation():
-            # When evaluating the body, add interval and integer constraint to context
-            ctx2 = Context(ctx)
-            ctx2.add_condition(expr.Op(">=", Var(e.index_var), e.lower))
-            if e.upper != expr.POS_INF:
-                ctx2.add_condition(expr.Op("<=", Var(e.index_var), e.upper))
-            ctx2.add_condition(expr.Fun("isInt", Var(e.index_var)))
-            return rule.eval(
-                expr.Summation(e.index_var, self.eval(e.lower, ctx), self.eval(e.upper, ctx),
-                               self.eval(e.body, ctx2)), ctx)
-        else:
-            raise NotImplementedError
+        return apply_subterm(e, self.rule.eval, ctx)
 
 
 class OnLocation(Rule):
@@ -1102,6 +1072,7 @@ class FullSimplify(Rule):
             s = OnSubterm(SimplifyPower()).eval(s, ctx)
             s = OnSubterm(ReduceLimit()).eval(s, ctx)
             s = OnSubterm(SimplifyIdentity()).eval(s, ctx)
+            s = OnSubterm(FunctionEval()).eval(s, ctx)
             if s == current:
                 break
             current = s
@@ -1316,6 +1287,7 @@ def full_normalize(e: Expr, ctx: Context) -> Expr:
     for i in range(5):
         e = normalize(e, ctx)
         e = FunctionTable().eval(e, ctx)
+        e = FunctionEval().eval(e, ctx)
     return e
 
 

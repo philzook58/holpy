@@ -788,21 +788,6 @@ def to_const_poly(e: expr.Expr) -> ConstantPolynomial:
         else:
             return const_singleton(expr.Fun(e.func_name, norm_a))
 
-    elif e.is_fun() and e.func_name == "binom":
-        norm_a = normalize_constant(e.args[0])
-        norm_b = normalize_constant(e.args[1])
-        if norm_a.is_const() and norm_b.is_const():
-            return to_const_poly(expr.Const(math.comb(norm_a.val, norm_b.val)))
-        else:
-            return const_singleton(expr.binom(norm_a, norm_b))
-
-    elif e.is_fun() and e.func_name == 'factorial':
-        norm_a = normalize_constant(e.args[0])
-        if norm_a.is_const() and int(norm_a.val) == float(norm_a.val) and norm_a.val >= 0:
-            return to_const_poly(expr.Const(math.factorial(norm_a.val)))
-        else:
-            return const_singleton(expr.factorial(norm_a))
-
     elif e.is_fun():
         args_norm = [normalize_constant(arg) for arg in e.args]
         return const_singleton(expr.Fun(e.func_name, *args_norm))

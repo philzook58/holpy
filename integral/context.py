@@ -1,9 +1,10 @@
 """Context of integral calculations"""
 
-from typing import Optional, List, Dict, Union
+from typing import Optional, List, Dict, Union, Callable
 import os
 import json
 
+from integral import expr
 from integral.expr import Expr, Eq, Op, Const, expr_to_pattern
 from integral import parser
 from integral.conditions import Conditions
@@ -397,3 +398,50 @@ class Context:
 
     def is_not_equal(self, e1: Expr, e2: Expr) -> bool:
         return self.check_condition(Op("!=", e1, e2))
+
+
+def apply_subterm(e: Expr, f: Callable[[Expr, Context], Expr], ctx: Context) -> Expr:
+    def rec(e: Expr, ctx: Context):
+        if e.is_var() or e.is_const() or e.is_inf() or e.is_skolem_func():
+            return f(e, ctx)
+        elif e.is_op():
+            args = [rec(arg, ctx) for arg in e.args]
+            return f(expr.Op(e.op, *args), ctx)
+        elif e.is_fun():
+            args = [rec(arg, ctx) for arg in e.args]
+            return f(expr.Fun(e.func_name, *args), ctx)
+        elif e.is_deriv():
+            return f(expr.Deriv(e.var, rec(e.body, ctx)), ctx)
+        elif e.is_integral():
+            # When evaluating the body, add interval constraint to context
+            ctx2 = Context(ctx)
+            ctx2.add_condition(expr.Op(">", expr.Var(e.var), e.lower))
+            ctx2.add_condition(expr.Op("<", expr.Var(e.var), e.upper))
+            lower = rec(e.lower, ctx)
+            upper = rec(e.upper, ctx)
+            body = rec(e.body, ctx2)
+            return f(expr.Integral(e.var, lower, upper, body, e.diff), ctx)
+        elif e.is_evalat():
+            return f(expr.EvalAt(e.var, rec(e.lower, ctx), rec(e.upper, ctx),
+                                 rec(e.body, ctx)), ctx)
+        elif e.is_limit():
+            if e.lim == expr.POS_INF:
+                ctx2 = Context(ctx)
+                ctx2.add_condition(expr.Op(">", expr.Var(e.var), Const(0)))
+                return f(expr.Limit(e.var, e.lim, rec(e.body, ctx2)), ctx)
+            else:
+                return f(expr.Limit(e.var, e.lim, rec(e.body, ctx)), ctx)
+        elif e.is_indefinite_integral():
+            return f(expr.IndefiniteIntegral(e.var, rec(e.body, ctx), e.skolem_args), ctx)
+        elif e.is_summation():
+            # When evaluating the body, add interval and integer constraint to context
+            ctx2 = Context(ctx)
+            ctx2.add_condition(expr.Op(">=", expr.Var(e.index_var), e.lower))
+            if e.upper != expr.POS_INF:
+                ctx2.add_condition(expr.Op("<=", expr.Var(e.index_var), e.upper))
+            ctx2.add_condition(expr.Fun("isInt", expr.Var(e.index_var)))
+            return f(
+                expr.Summation(e.index_var, rec(e.lower, ctx), rec(e.upper, ctx), rec(e.body, ctx2)), ctx)
+        else:
+            raise NotImplementedError
+    return rec(e, ctx)

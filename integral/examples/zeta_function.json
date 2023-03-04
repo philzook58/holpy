@@ -284,12 +284,12 @@
             "proof": {
                 "base_case": {
                     "finished": true,
-                    "goal": "(INT y:[0,1]. INT x:[0,1]. x ^ a * y ^ a / (-(x * y) + 1)) = SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
-                    "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{-x y + 1} \\,dx \\,dy = \\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
+                    "goal": "(INT y:[0,1]. INT x:[0,1]. x ^ a * y ^ a / (-(x * y) + 1)) = factorial(1) * SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
+                    "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{-x y + 1} \\,dx \\,dy = (1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
                     "proof": {
                         "finished": true,
-                        "goal": "(INT y:[0,1]. INT x:[0,1]. x ^ a * y ^ a / (-(x * y) + 1)) = SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
-                        "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{-x y + 1} \\,dx \\,dy = \\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
+                        "goal": "(INT y:[0,1]. INT x:[0,1]. x ^ a * y ^ a / (-(x * y) + 1)) = factorial(1) * SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
+                        "latex_goal": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{-x y + 1} \\,dx \\,dy = (1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
                         "lhs_calc": {
                             "latex_start": "\\int_{0}^{1} \\int_{0}^{1} \\frac{x ^ {a} y ^ {a}}{-x y + 1} \\,dx \\,dy",
                             "start": "INT y:[0,1]. INT x:[0,1]. x ^ a * y ^ a / (-(x * y) + 1)",
@@ -330,9 +330,19 @@
                             "type": "Calculation"
                         },
                         "rhs_calc": {
-                            "latex_start": "\\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
-                            "start": "SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
-                            "steps": [],
+                            "latex_start": "(1)! \\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
+                            "start": "factorial(1) * SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
+                            "steps": [
+                                {
+                                    "latex_res": "\\sum_{n=0}^{\\infty}{\\frac{1}{(a + n + 1) ^ {2}}}",
+                                    "res": "SUM(n, 0, oo, 1 / (a + n + 1) ^ 2)",
+                                    "rule": {
+                                        "name": "FullSimplify",
+                                        "str": "full simplify"
+                                    },
+                                    "type": "CalculationStep"
+                                }
+                            ],
                             "type": "Calculation"
                         },
                         "type": "CalculationProof"

@@ -93,6 +93,8 @@ class IntegralTest(unittest.TestCase):
         calc = proof_base.lhs_calc
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
+        calc = proof_base.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
 
         calc = proof_induct.lhs_calc
         calc.perform_rule(rules.IntegrationByParts(
@@ -563,6 +565,8 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.Equation("1 / (b * u^2 + b)", "(1/b) * (1 / (1^2 + u^2))"))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
+        calc = proof_base.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
 
         # Induction case, LHS
         calc = proof_induct.lhs_calc
@@ -608,6 +612,8 @@ class IntegralTest(unittest.TestCase):
         calc = proof_base.lhs_calc
         calc.perform_rule(rules.ExpandDefinition("Gamma"))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof_base.rhs_calc
         calc.perform_rule(rules.FullSimplify())
 
         calc = proof_induct.lhs_calc
@@ -2837,6 +2843,8 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.Equation("-(x * y) + 1", "1-x*y"))
         calc.perform_rule(rules.ApplyEquation(goal01.goal))
         calc.perform_rule(rules.FullSimplify())
+        calc = proof_base.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
         calc = proof_induct.begin
         calc.perform_rule(rules.DerivEquation('a'))
         calc.perform_rule(rules.OnLocation(rules.DerivIntExchange(), "0"))
@@ -3088,6 +3096,9 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.ExpandDefinition("I"))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
+        calc = base_proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+
         induct_proof = proof.induct_case.proof_by_calculation()
         calc = induct_proof.lhs_calc
         calc.perform_rule(rules.ApplyEquation(goal01.goal))
