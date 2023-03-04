@@ -3,7 +3,7 @@
 from copy import copy
 from typing import Dict, List
 
-from integral.expr import Expr, eval_expr, match, expr_to_pattern, Op
+from integral.expr import Expr, eval_expr, match, expr_to_pattern, Op, Const, Var
 from integral.conditions import Conditions
 from integral.context import Context, Identity
 from integral.parser import parse_expr
@@ -397,11 +397,25 @@ def get_standard_inequalities() -> List[Identity]:
 
 def check_condition(e: Expr, ctx: Context) -> bool:
     """Check whether e holds under the given context."""
+
+    # Some special checks
+    if e.is_greater_eq() and e.args[0].is_integral() and e.args[1] == Const(0):
+        ctx2 = Context(ctx)
+        ctx2.add_condition(Op(">", Var(e.args[0].var), e.args[0].lower))
+        ctx2.add_condition(Op("<", Var(e.args[0].var), e.args[0].upper))
+        return check_condition(Op(">=", e.args[0].body, Const(0)), ctx2)
+
+    if ctx.get_substs():
+        new_e = e
+        for var, subst_e in ctx.get_substs().items():
+            new_e = new_e.subst(var, subst_e)
+        if new_e != e:
+            if check_condition(new_e, ctx):
+                return True
+
     conds = ctx.get_conds()
     all_conds = init_all_conds(conds)
     ineqs = get_standard_inequalities()
     ineqs.extend(ctx.get_inequalities())
     saturate(subject_of(e), ineqs, all_conds)
-    # print('Final')
-    # print_all_conds(all_conds)
     return len(check_cond(e, all_conds, dict())) == 1

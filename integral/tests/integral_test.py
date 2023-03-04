@@ -728,7 +728,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.Equation("1 / (u * (u + 1))", "1/u - 1/(u+1)"))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.Substitution(var_name="x", var_subst=parser.parse_expr("u+1")))
+        calc.perform_rule(rules.Substitution(var_name="y", var_subst=parser.parse_expr("u+1")))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
         calc = proof.rhs_calc
@@ -2415,11 +2415,11 @@ class IntegralTest(unittest.TestCase):
         goal08 = file.add_goal("(INT x:[0, oo]. exp(-x) / sqrt(x)) = (INT x:[-oo, oo]. exp(-(x^2)))")
         proof_of_goal08 = goal08.proof_by_calculation()
         calc = proof_of_goal08.lhs_calc
-        calc.perform_rule(rules.Substitution(var_name="x", var_subst="sqrt(x)"))
+        calc.perform_rule(rules.Substitution(var_name="y", var_subst="sqrt(x)"))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.Equation("2 * (INT x:[0,oo]. exp(-(x ^ 2)))",
-                                         "(INT x:[0,oo]. exp(-(x ^ 2))) + (INT x:[0,oo]. exp(-(x ^ 2)))"))
-        calc.perform_rule(rules.OnLocation(rules.Substitution(var_name="x", var_subst="-x"), "0"))
+        calc.perform_rule(rules.Equation("2 * (INT y:[0,oo]. exp(-(y ^ 2)))",
+                                         "(INT y:[0,oo]. exp(-(y ^ 2))) + (INT y:[0,oo]. exp(-(y ^ 2)))"))
+        calc.perform_rule(rules.OnLocation(rules.Substitution(var_name="z", var_subst="-y"), "0"))
         calc = proof_of_goal08.rhs_calc
         calc.perform_rule(rules.SplitRegion("0"))
 

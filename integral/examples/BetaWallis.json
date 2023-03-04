@@ -628,20 +628,20 @@
                     "start": "INT x:[0,oo]. exp(-x) / sqrt(x)",
                     "steps": [
                         {
-                            "latex_res": "\\int_{0}^{\\infty} 2 (\\frac{x e^{-x ^ {2}}}{\\left| x \\right|}) \\,dx",
-                            "res": "INT x:[0,oo]. 2 * (x * exp(-(x ^ 2)) / abs(x))",
+                            "latex_res": "\\int_{0}^{\\infty} 2 (\\frac{y e^{-y ^ {2}}}{\\left| y \\right|}) \\,dy",
+                            "res": "INT y:[0,oo]. 2 * (y * exp(-(y ^ 2)) / abs(y))",
                             "rule": {
-                                "latex_str": "substitute \\(x\\) for \\(\\sqrt{x}\\)",
+                                "latex_str": "substitute \\(y\\) for \\(\\sqrt{x}\\)",
                                 "name": "Substitution",
-                                "str": "substitute x for sqrt(x)",
-                                "var_name": "x",
+                                "str": "substitute y for sqrt(x)",
+                                "var_name": "y",
                                 "var_subst": "sqrt(x)"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\int_{0}^{\\infty} e^{-x ^ {2}} \\,dx)",
-                            "res": "2 * (INT x:[0,oo]. exp(-(x ^ 2)))",
+                            "latex_res": "2 (\\int_{0}^{\\infty} e^{-y ^ {2}} \\,dy)",
+                            "res": "2 * (INT y:[0,oo]. exp(-(y ^ 2)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -649,27 +649,27 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(\\int_{0}^{\\infty} e^{-x ^ {2}} \\,dx) + (\\int_{0}^{\\infty} e^{-x ^ {2}} \\,dx)",
-                            "res": "(INT x:[0,oo]. exp(-(x ^ 2))) + (INT x:[0,oo]. exp(-(x ^ 2)))",
+                            "latex_res": "(\\int_{0}^{\\infty} e^{-y ^ {2}} \\,dy) + (\\int_{0}^{\\infty} e^{-y ^ {2}} \\,dy)",
+                            "res": "(INT y:[0,oo]. exp(-(y ^ 2))) + (INT y:[0,oo]. exp(-(y ^ 2)))",
                             "rule": {
-                                "latex_str": "rewriting \\(2 (\\int_{0}^{\\infty} e^{-x ^ {2}} \\,dx)\\) to \\((\\int_{0}^{\\infty} e^{-x ^ {2}} \\,dx) + (\\int_{0}^{\\infty} e^{-x ^ {2}} \\,dx)\\)",
+                                "latex_str": "rewriting \\(2 (\\int_{0}^{\\infty} e^{-y ^ {2}} \\,dy)\\) to \\((\\int_{0}^{\\infty} e^{-y ^ {2}} \\,dy) + (\\int_{0}^{\\infty} e^{-y ^ {2}} \\,dy)\\)",
                                 "name": "Equation",
-                                "new_expr": "(INT x:[0,oo]. exp(-(x ^ 2))) + (INT x:[0,oo]. exp(-(x ^ 2)))",
-                                "old_expr": "2 * (INT x:[0,oo]. exp(-(x ^ 2)))",
-                                "str": "rewriting 2 * (INT x:[0,oo]. exp(-(x ^ 2))) to (INT x:[0,oo]. exp(-(x ^ 2))) + (INT x:[0,oo]. exp(-(x ^ 2)))"
+                                "new_expr": "(INT y:[0,oo]. exp(-(y ^ 2))) + (INT y:[0,oo]. exp(-(y ^ 2)))",
+                                "old_expr": "2 * (INT y:[0,oo]. exp(-(y ^ 2)))",
+                                "str": "rewriting 2 * (INT y:[0,oo]. exp(-(y ^ 2))) to (INT y:[0,oo]. exp(-(y ^ 2))) + (INT y:[0,oo]. exp(-(y ^ 2)))"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(\\int_{-\\infty}^{0} e^{-x ^ {2}} \\,dx) + (\\int_{0}^{\\infty} e^{-x ^ {2}} \\,dx)",
-                            "res": "(INT x:[-oo,0]. exp(-(x ^ 2))) + (INT x:[0,oo]. exp(-(x ^ 2)))",
+                            "latex_res": "(\\int_{-\\infty}^{0} e^{-z ^ {2}} \\,dz) + (\\int_{0}^{\\infty} e^{-y ^ {2}} \\,dy)",
+                            "res": "(INT z:[-oo,0]. exp(-(z ^ 2))) + (INT y:[0,oo]. exp(-(y ^ 2)))",
                             "rule": {
-                                "latex_str": "substitute \\(x\\) for \\(-x\\) at 0",
+                                "latex_str": "substitute \\(z\\) for \\(-y\\) at 0",
                                 "loc": "0",
                                 "name": "Substitution",
-                                "str": "substitute x for -x at 0",
-                                "var_name": "x",
-                                "var_subst": "-x"
+                                "str": "substitute z for -y at 0",
+                                "var_name": "z",
+                                "var_subst": "-y"
                             },
                             "type": "CalculationStep"
                         }
