@@ -365,16 +365,8 @@ class Context:
 
     def check_condition(self, e: Expr) -> bool:
         """Check the given condition under the extra conditions"""
-        conds = self.get_conds()
-
         from integral import condprover
-        if condprover.check_condition(e, self):
-            return True
-
-        for lemma in self.get_lemmas():
-            if lemma.expr == e and set(lemma.conds.data).issubset(set(conds.data)):
-                return True
-        return False
+        return condprover.check_condition(e, self)
 
     def is_positive(self, e: Expr) -> bool:
         return self.check_condition(Op(">", e, Const(0)))

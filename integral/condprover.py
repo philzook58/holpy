@@ -400,6 +400,8 @@ def get_standard_inequalities() -> List[Identity]:
         (["x >= -pi", "x <= 0"], "sin(x) <= 0"),
         (["x > 0", "x < pi"], "sin(x) > 0"),
         (["x > -pi", "x < 0"], "sin(x) < 0"),
+        (["x > -pi / 2", "x < pi / 4"], "tan(x) < 1"),
+        (["x > 0", "x < pi / 2"], "tan(x) > 0"),
 
         # Hyperbolic
         ([], "cosh(x) > 0"),
@@ -441,5 +443,9 @@ def check_condition(e: Expr, ctx: Context) -> bool:
     all_conds = init_all_conds(conds)
     ineqs = get_standard_inequalities()
     ineqs.extend(ctx.get_inequalities())
+    for lemma in ctx.get_lemmas():
+        if lemma.expr.is_compare():
+            ineqs.append(lemma)
+
     saturate(subject_of(e), ineqs, all_conds)
     return len(check_cond(e, all_conds, dict())) == 1

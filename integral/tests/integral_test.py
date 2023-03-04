@@ -851,11 +851,6 @@ class IntegralTest(unittest.TestCase):
         # Inside interesting integrals, Section 2.2, example 4
         file = compstate.CompFile("interesting", "Trick2d")
 
-        sub_goal = file.add_goal("tan(x) + 1 > 0", conds=["x > 0", "x < pi / 4"])
-        proof = sub_goal.proof_by_calculation()
-        calc = proof.lhs_calc
-        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity("tan(x)", "sin(x) / cos(x)"), "0"))
-
         goal01 = file.add_goal("(INT x:[0,1]. log(x+1) / (x^2 + 1)) = (INT x:[0,pi / 4]. log(tan(x) + 1))")
         proof = goal01.proof_by_calculation()
         calc = proof.lhs_calc
@@ -968,19 +963,7 @@ class IntegralTest(unittest.TestCase):
 
         file.add_definition("I(a) = (INT x:[0,oo]. 1 / (x^4 + 2*x^2*cos(2*a) + 1))")
 
-        goal = file.add_goal("x^4 + 2*x^2*cos(2*a) + 1 > 0", conds=["cos(a) != 0"])
-        proof = goal.proof_by_case("x != 0")
-        proofa = proof.case_1.proof_by_calculation()
-        calc = proofa.lhs_calc
-        calc.perform_rule(rules.Equation(None, "(x^2 - 1) ^ 2 + 2*x^2*(1+cos(2*a))"))
-        calc.perform_rule(rules.ApplyIdentity("cos(2*a)", "2 * cos(a)^2 - 1"))
-        calc.perform_rule(rules.FullSimplify())
-        proofb = proof.case_2.proof_by_calculation()
-        calc = proofb.lhs_calc
-        calc.perform_rule(rules.FullSimplify())
-        self.assertTrue(proof.is_finished())
-
-        goal = file.add_goal("x^4 + 2*x^2*cos(2*a) + 1 != 0", conds=["cos(a) != 0"])
+        goal = file.add_goal("2*x^2*cos(2*a) + x^4 + 1 != 0", conds=["cos(a) != 0"])
         proof = goal.proof_by_case("x != 0")
         proofa = proof.case_1.proof_by_calculation()
         calc = proofa.lhs_calc
@@ -993,14 +976,8 @@ class IntegralTest(unittest.TestCase):
         self.assertTrue(proof.is_finished())
 
         goal = file.add_goal("2*x^2*cos(2*a) + x^4 + 1 != 0", conds=["cos(a) != 0"])
-        proof = goal.proof_by_case("x != 0")
-        proofa = proof.case_1.proof_by_calculation()
-        calc = proofa.lhs_calc
-        calc.perform_rule(rules.Equation(None, "(x^2 - 1) ^ 2 + 2*x^2*(1+cos(2*a))"))
-        calc.perform_rule(rules.ApplyIdentity("cos(2*a)", "2 * cos(a)^2 - 1"))
-        calc.perform_rule(rules.FullSimplify())
-        proofb = proof.case_2.proof_by_calculation()
-        calc = proofb.lhs_calc
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
         calc.perform_rule(rules.FullSimplify())
         self.assertTrue(proof.is_finished())
 
@@ -2623,12 +2600,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
 
-        sub_goal = file.add_goal("4 * x - x ^ 2 >= 0", conds=["x > 0", "x < 4"])
-        proof = sub_goal.proof_by_calculation()
-        calc = proof.lhs_calc
-        calc.perform_rule(rules.Equation("4 * x - x ^ 2", "x*(4 - x)"))
-
-        sub_goal = file.add_goal("sqrt(4 * x - x ^ 2) != 0", conds=["x > 0", "x < 4"])
+        sub_goal = file.add_goal("4 * x - x ^ 2 > 0", conds=["x > 0", "x < 4"])
         proof = sub_goal.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.Equation("4 * x - x ^ 2", "x*(4 - x)"))
