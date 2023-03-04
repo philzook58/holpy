@@ -6,7 +6,6 @@ from fractions import Fraction
 
 from integral import expr
 from integral.expr import Expr
-from integral.interval import Interval
 
 
 grammar = r"""
@@ -173,9 +172,6 @@ class ExprTransformer(Transformer):
     def eval_at_expr(self, body, var, lower, upper):
         return expr.EvalAt(var, lower, upper, body)
     
-    def interval_expr(self, l, e1, comma, e2, r):
-        return Interval(e1, e2, left_open=(l == '('), right_open=(r == ')'))
-
     def limit_inf_expr(self, var, lim, body):
         return expr.Limit(str(var), lim, body)
 
@@ -195,14 +191,6 @@ def parse_expr(s: str) -> Expr:
     """Parse an integral expression."""
     try:
         return expr_parser.parse(s)
-    except (exceptions.UnexpectedCharacters, exceptions.UnexpectedToken) as e:
-        print("When parsing:", s)
-        raise e
-
-def parse_interval(s: str) -> Interval:
-    """Parse an interval."""
-    try:
-        return interval_parser.parse(s)
     except (exceptions.UnexpectedCharacters, exceptions.UnexpectedToken) as e:
         print("When parsing:", s)
         raise e

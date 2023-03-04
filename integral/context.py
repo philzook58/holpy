@@ -390,3 +390,18 @@ class Context:
 
     def is_not_positive(self, e: Expr) -> bool:
         return self.check_condition(Op("<=", e, Const(0)))
+
+    def is_greater(self, e1: Expr, e2: Expr) -> bool:
+        return self.check_condition(Op(">", e1, e2))
+
+    def is_less(self, e1: Expr, e2: Expr) -> bool:
+        return self.check_condition(Op("<", e1, e2))
+
+    def is_greater_eq(self, e1: Expr, e2: Expr) -> bool:
+        return self.check_condition(Op(">=", e1, e2))
+
+    def is_less_eq(self, e1: Expr, e2: Expr) -> bool:
+        return self.check_condition(Op("<=", e1, e2))
+
+    def is_not_equal(self, e1: Expr, e2: Expr) -> bool:
+        return self.check_condition(Op("!=", e1, e2))

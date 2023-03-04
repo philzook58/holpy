@@ -399,15 +399,15 @@ class CalculationProof(StateItem):
         if self.predicate == '=':
             return self.lhs_calc.last_expr == self.rhs_calc.last_expr
         elif self.predicate == '>':
-            return self.ctx.get_conds().is_greater(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
+            return self.ctx.is_greater(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
         elif self.predicate == '<':
-            return self.ctx.get_conds().is_less(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
+            return self.ctx.is_less(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
         elif self.predicate == '<=':
-            return self.ctx.get_conds().is_not_greater(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
+            return self.ctx.is_less_eq(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
         elif self.predicate == '>=':
-            return self.ctx.get_conds().is_not_less(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
+            return self.ctx.is_greater_eq(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
         elif self.predicate == '!=':
-            return self.ctx.get_conds().is_not_equal(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
+            return self.ctx.is_not_equal(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
         raise NotImplementedError
 
     def export(self):
@@ -459,11 +459,11 @@ class InductionProof(StateItem):
             raise NotImplementedError
 
         # Base case: n = 0
-        eq0 = normalize(goal.subst(induct_var, self.start), self.ctx.get_conds())
+        eq0 = normalize(goal.subst(induct_var, self.start), self.ctx)
         self.base_case = Goal(self, self.ctx, eq0)
 
         # Inductive case:
-        eqI = normalize(goal.subst(induct_var, Var(induct_var) + 1), self.ctx.get_conds())
+        eqI = normalize(goal.subst(induct_var, Var(induct_var) + 1), self.ctx)
         ctx = Context(self.ctx)
         ctx.add_induct_hyp(self.goal)
         self.induct_case = Goal(self, ctx, eqI)
@@ -582,9 +582,8 @@ class RewriteGoalProof(StateItem):
         self.begin = Calculation(parent, self.ctx, begin.goal, conds=begin.conds, connection_symbol = '==>')
 
     def is_finished(self):
-        conds = self.ctx.get_conds()
-        f1 = normalize(self.begin.last_expr.lhs, conds) == normalize(self.goal.lhs, conds)
-        f2 = normalize(self.begin.last_expr.rhs, conds) == normalize(self.goal.rhs, conds)
+        f1 = normalize(self.begin.last_expr.lhs, self.ctx) == normalize(self.goal.lhs, self.ctx)
+        f2 = normalize(self.begin.last_expr.rhs, self.ctx) == normalize(self.goal.rhs, self.ctx)
         return f1 and f2
 
     def export(self):
