@@ -127,6 +127,7 @@ class CondProverTest(unittest.TestCase):
             ("sqrt(1 - x ^ 2) > 0", ["x > 0", "x < 1"], True),
             ("y * x > -1", ["y > -1", "y < 1", "x > 0", "x < 1"], True),
             ("a ^ 2 + b ^ 2 > 0", ["a != 0"], True),
+            ("-k + 1 != 0", ["k > 1"], True),
         ]
 
         for s, conds, res in test_data:

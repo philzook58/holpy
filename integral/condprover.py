@@ -280,6 +280,13 @@ def get_standard_inequalities() -> List[Identity]:
         (["a >= b", "c >= d"], "a + c >= b + d"),
         (["a >= b", "c > d"], "a + c > b + d"),
         (["a > b", "c >= d"], "a + c > b + d"),
+        (["a <= b"], "a + c <= b + c"),
+        (["a < b"], "a + c < b + c"),
+        (["a <= b"], "c + a <= c + b"),
+        (["a < b"], "c + a < c + b"),
+        (["a <= b", "c <= d"], "a + c <= b + d"),
+        (["a <= b", "c < d"], "a + c < b + d"),
+        (["a < b", "c <= d"], "a + c < b + d"),
 
         # Unary minus
         (["x > a"], "-x < -a"),
@@ -307,6 +314,9 @@ def get_standard_inequalities() -> List[Identity]:
         # Multiplication (simple)
         (["a != 0", "b != 0"], "a * b != 0"),
         (["a > 0", "b > 0"], "a * b > 0"),
+        (["a < 0", "b > 0"], "a * b < 0"),
+        (["a > 0", "b < 0"], "a * b < 0"),
+        (["a < 0", "b < 0"], "a * b > 0"),
 
         # Multiplication (one side is constant)
         (["a >= b", "c >= 0"], "c * a >= c * b"),
@@ -336,8 +346,17 @@ def get_standard_inequalities() -> List[Identity]:
 
         # Division
         (["a > 0", "b > 0"], "a / b > 0"),
+        (["a > 0", "b < 0"], "a / b < 0"),
+        (["a < 0", "b > 0"], "a / b < 0"),
+        (["a < 0", "b < 0"], "a / b > 0"),
         (["a >= b", "c > 0"], "a / c >= b / c"),
         (["a > b", "c > 0"], "a / c > b / c"),
+        (["a <= b", "c > 0"], "a / c <= b / c"),
+        (["a < b", "c > 0"], "a / c < b / c"),
+        (["a >= b", "c < 0"], "a / c <= b / c"),
+        (["a > b", "c < 0"], "a / c < b / c"),
+        (["a <= b", "c < 0"], "a / c >= b / c"),
+        (["a < b", "c < 0"], "a / c > b / c"),
 
         # Square root
         (["a > 0"], "sqrt(a) > 0"),
@@ -359,6 +378,9 @@ def get_standard_inequalities() -> List[Identity]:
         (["x >= 1"], "log(x) >= 0"),
         (["x <= 1", "x > 0"], "log(x) <= 0"),
         (["x != 1"], "log(x) != 0"),
+
+        # Absolute value
+        (["x != 0"], "abs(x) > 0"),
 
         # Exponential
         ([], "exp(x) > 0"),
