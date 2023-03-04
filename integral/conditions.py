@@ -76,20 +76,6 @@ class Conditions:
         res2 = interval.get_bounds_for_expr(e, bounds)
         return res.intersection(res2)
     
-    def check_condition(self, cond: Expr) -> bool:
-        res = Interval.from_condition(cond)
-        if res:
-            e, interval = res
-            interval2 = self.get_bounds_for_expr(e)
-            return interval2.contained_in(interval)
-        elif cond.is_not_equals():
-            return self.is_not_equal(cond.args[0], cond.args[1])
-        elif cond.is_fun() and cond.func_name == "isInt":
-            return self.is_integer(cond.args[0])
-        else:
-            print("Warning: unable to check condition %s" % cond)
-            return False
-
     def is_positive(self, e: Expr) -> bool:
         """Return whether conditions imply e is positive."""
         if e.is_op():

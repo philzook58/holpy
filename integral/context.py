@@ -4,7 +4,7 @@ from typing import Optional, List, Dict, Union
 import os
 import json
 
-from integral.expr import Expr, Eq, expr_to_pattern, eval_expr, match
+from integral.expr import Expr, Eq, Op, Const, expr_to_pattern
 from integral import parser
 from integral.conditions import Conditions
 
@@ -369,14 +369,24 @@ class Context:
 
         from integral import condprover
         if condprover.check_condition(e, self):
-            if not conds.check_condition(e):
-                print("Wrong?", e, '[', conds, ']')
             return True
 
-        if conds.check_condition(e):
-            print("Missed", e, '[', conds, ']')
-            return True
         for lemma in self.get_lemmas():
             if lemma.expr == e and set(lemma.conds.data).issubset(set(conds.data)):
                 return True
         return False
+
+    def is_positive(self, e: Expr) -> bool:
+        return self.check_condition(Op(">", e, Const(0)))
+    
+    def is_negative(self, e: Expr) -> bool:
+        return self.check_condition(Op("<", e, Const(0)))
+
+    def is_nonzero(self, e: Expr) -> bool:
+        return self.check_condition(Op("!=", e, Const(0)))
+
+    def is_not_negative(self, e: Expr) -> bool:
+        return self.check_condition(Op(">=", e, Const(0)))
+
+    def is_not_positive(self, e: Expr) -> bool:
+        return self.check_condition(Op("<=", e, Const(0)))

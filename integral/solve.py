@@ -5,10 +5,10 @@ from typing import Optional, Tuple
 from integral import expr
 from integral.expr import Expr, POS_INF, NEG_INF, Const, Var
 from integral.poly import normalize
-from integral.conditions import Conditions
+from integral.context import Context
 
 
-def solve_equation(f: Expr, a: Expr, x: str, conds: Conditions) -> Optional[Expr]:
+def solve_equation(f: Expr, a: Expr, x: str, ctx: Context) -> Optional[Expr]:
     """Solve the equation f(x) = a for the variable x.
     
     First, try to isolate x on the left side by moving expressions
@@ -27,30 +27,30 @@ def solve_equation(f: Expr, a: Expr, x: str, conds: Conditions) -> Optional[Expr
         u, v = f.args
         if not u.contains_var(x):
             # u + v = a  ==>  v = a - u
-            return solve_equation(v, a - u, x, conds)
+            return solve_equation(v, a - u, x, ctx)
         if not v.contains_var(x):
             # u + v = a  ==>  u = a - v
-            return solve_equation(u, a - v, x, conds)
+            return solve_equation(u, a - v, x, ctx)
     if f.is_uminus():
         # -u = a  ==>  u = -a
         u, = f.args
-        return solve_equation(u, -a, x, conds)
+        return solve_equation(u, -a, x, ctx)
     if f.is_minus():
         u, v = f.args
         if not u.contains_var(x):
             # u - v = a  ==>  v = u - a
-            return solve_equation(v, u - a, x, conds)
+            return solve_equation(v, u - a, x, ctx)
         if not v.contains_var(x):
             # u - v = a  ==>  u = v + a
-            return solve_equation(u, v + a, x, conds)
+            return solve_equation(u, v + a, x, ctx)
     if f.is_times():
         u, v = f.args
-        if not u.contains_var(x) and conds.is_nonzero(u):
+        if not u.contains_var(x) and ctx.is_nonzero(u):
             # u * v = a  ==>  v = a / u
-            return solve_equation(v, a / u, x, conds)
-        if not v.contains_var(x) and conds.is_nonzero(v):
+            return solve_equation(v, a / u, x, ctx)
+        if not v.contains_var(x) and ctx.is_nonzero(v):
             # u * v = a  ==>  u = a / v
-            return solve_equation(u, a / v, x, conds)
+            return solve_equation(u, a / v, x, ctx)
     if f.is_divides():
         u, v = f.args
         if not u.contains_var(x):
@@ -58,36 +58,36 @@ def solve_equation(f: Expr, a: Expr, x: str, conds: Conditions) -> Optional[Expr
             rhs = u / a
             if u.is_constant() and a in (POS_INF, NEG_INF):
                 rhs = Const(0)
-            return solve_equation(v, rhs, x, conds)
+            return solve_equation(v, rhs, x, ctx)
         if not v.contains_var(x):
             # u / v = a  ==>  u = v * a
-            return solve_equation(u, v * a, x, conds)
+            return solve_equation(u, v * a, x, ctx)
     if f.is_power():
         u, v = f.args
         if not v.contains_var(x):
             # u ^ v = a  ==>  u = a ^ (1/v)
-            return solve_equation(u, a ^ (1/v), x, conds)
+            return solve_equation(u, a ^ (1/v), x, ctx)
     if f.is_fun():
         if f.func_name == "log":
-            return solve_equation(f.args[0], expr.exp(a), x, conds)
+            return solve_equation(f.args[0], expr.exp(a), x, ctx)
         elif f.func_name == "exp":
-            return solve_equation(f.args[0], expr.log(a), x, conds)
+            return solve_equation(f.args[0], expr.log(a), x, ctx)
         elif f.func_name == "sin":
-            return solve_equation(f.args[0], expr.arcsin(a), x, conds)
+            return solve_equation(f.args[0], expr.arcsin(a), x, ctx)
         elif f.func_name == "cos":
-            return solve_equation(f.args[0], expr.arccos(a), x, conds)
+            return solve_equation(f.args[0], expr.arccos(a), x, ctx)
         elif f.func_name == "tan":
-            return solve_equation(f.args[0], expr.arctan(a), x, conds)
+            return solve_equation(f.args[0], expr.arctan(a), x, ctx)
         elif f.func_name == "sqrt":
-            return solve_equation(f.args[0], a ^ 2, x, conds)
+            return solve_equation(f.args[0], a ^ 2, x, ctx)
 
     # Try linearity
     extract_res = extract_linear(f, x)
     if extract_res:
         # b * x + c = a  ==>  x = (a - c) / b
         b, c = extract_res
-        if conds.is_nonzero(b):
-            return normalize((a - c) / b, conds)
+        if ctx.is_nonzero(b):
+            return normalize((a - c) / b, ctx)
 
 def extract_linear(e: Expr, x: str) -> Optional[Tuple[Expr, Expr]]:
     """Attempt to write e in the form a * x + b.
@@ -132,7 +132,7 @@ def extract_linear(e: Expr, x: str) -> Optional[Tuple[Expr, Expr]]:
             if res:
                 return res[0] / v, res[1] / v
 
-def solve_for_term(eq: Expr, t: Expr, conds: Conditions) -> Optional[Expr]:
+def solve_for_term(eq: Expr, t: Expr, ctx: Context) -> Optional[Expr]:
     """A more general solving procedure for term t.
     
     Given equation of the form f = g, where both f and g may contain t.
@@ -151,13 +151,13 @@ def solve_for_term(eq: Expr, t: Expr, conds: Conditions) -> Optional[Expr]:
 
     # Now consider some simple cases
     if not eq.rhs.contains_var(var_name):
-        return solve_equation(eq.lhs, eq.rhs, var_name, conds)
+        return solve_equation(eq.lhs, eq.rhs, var_name, ctx)
     
     if not eq.lhs.contains_var(var_name):
-        return solve_equation(eq.rhs, eq.lhs, var_name, conds)
+        return solve_equation(eq.rhs, eq.lhs, var_name, ctx)
     
     # Finally, try transforming the equation to f = 0
-    res = solve_equation(eq.lhs - eq.rhs, Const(0), var_name, conds)
+    res = solve_equation(eq.lhs - eq.rhs, Const(0), var_name, ctx)
     if res:
         if res.contains_var(var_name):
             raise AssertionError("solve_equation returns %s" % res)

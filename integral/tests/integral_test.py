@@ -30,7 +30,7 @@ class IntegralTest(unittest.TestCase):
     def testStandard(self):
         file = compstate.CompFile("base", "standard")
 
-        goal1 = file.add_goal("(INT x. 1 / (x + a)) = log(abs(x + a)) + SKOLEM_CONST(C)", conds=["x!=-a"])
+        goal1 = file.add_goal("(INT x. 1 / (x + a)) = log(abs(x + a)) + SKOLEM_CONST(C)", conds=["x + a != 0"])
         proof = goal1.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.Substitution("u", parser.parse_expr("x + a")))

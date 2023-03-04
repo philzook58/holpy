@@ -26,9 +26,8 @@ def deriv(var: str, e: Expr, ctx: Context) -> Expr:
     name var.
 
     """
-    conds = ctx.get_conds()
     def normal(x):
-        return normalize(x, conds)
+        return normalize(x, ctx)
 
     def rec(e):
         if e.is_var():
@@ -298,7 +297,7 @@ class Simplify(Rule):
         }
 
     def eval(self, e: Expr, ctx: Context) -> Expr:
-        res = normalize(e, ctx.get_conds())
+        res = normalize(e, ctx)
         return res
 
 
@@ -422,10 +421,9 @@ class Linearity(Rule):
                             c = c / f
                         else:
                             b = b / f
-                    conds = ctx.get_conds()
-                    c = normalize(c, conds)
-                    b = normalize(b, conds)
-                    return normalize(c * Summation(e.index_var, e.lower, e.upper, b), conds)
+                    c = normalize(c, ctx)
+                    b = normalize(b, ctx)
+                    return normalize(c * Summation(e.index_var, e.lower, e.upper, b), ctx)
                 else:
                     return e
             else:
@@ -525,7 +523,7 @@ class ApplyIdentity(Rule):
             inst = expr.match(e, identity.lhs)
             if inst is not None:
                 expected_rhs = identity.rhs.inst_pat(inst)
-                res.append(normalize(expected_rhs, ctx.get_conds()))
+                res.append(normalize(expected_rhs, ctx))
         return res
 
     def eval(self, e: Expr, ctx: Context) -> Expr:
@@ -590,7 +588,7 @@ class DefiniteIntegralIdentity(Rule):
             inst[identity.lhs.var] = Var(e.var)
             assert identity.rhs.is_plus() and identity.rhs.args[1].is_skolem_func()
             pat_rhs = identity.rhs.args[0]  # remove Skolem constant C
-            return EvalAt(e.var, e.lower, e.upper, normalize(pat_rhs.inst_pat(inst), ctx.get_conds()))
+            return EvalAt(e.var, e.lower, e.upper, normalize(pat_rhs.inst_pat(inst), ctx))
 
         # Look for definite integral identities
         for identity in ctx.get_definite_integrals():
@@ -604,7 +602,7 @@ class DefiniteIntegralIdentity(Rule):
                     if not ctx.check_condition(cond):
                         satisfied = False
                 if satisfied:
-                    return normalize(identity.rhs.inst_pat(inst), ctx.get_conds())
+                    return normalize(identity.rhs.inst_pat(inst), ctx)
 
         # No matching identity found
         return e
@@ -1057,11 +1055,11 @@ class ReduceLimit(Rule):
             return e.body
 
         if e.lim == POS_INF:
-            return limits.reduce_inf_limit(e.body, e.var, conds=ctx.get_conds())
+            return limits.reduce_inf_limit(e.body, e.var, ctx)
         elif e.lim == NEG_INF:
-            raise limits.reduce_neg_inf_limit(e.body, e.var, conds=ctx.get_conds())
+            raise limits.reduce_neg_inf_limit(e.body, e.var, ctx)
         else:
-            return limits.reduce_finite_limit(e, conds=ctx.get_conds())
+            return limits.reduce_finite_limit(e, ctx)
 
 
 class FullSimplify(Rule):
@@ -1164,7 +1162,7 @@ class ApplyEquation(Rule):
                 return tmp.inst_pat(tmp_inst_lhs)
 
         # Finally, try to solve for e in the equation.
-        res = solve_for_term(self.eq, e, ctx.get_conds())
+        res = solve_for_term(self.eq, e, ctx)
         if res is not None:
             return res
         else:
@@ -1265,23 +1263,23 @@ class Substitution(Rule):
             ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
         flag = False
         if e.is_integral():
-            flag = normalize(e.diff, ctx2.get_conds()) == normalize(self.var_subst, ctx2.get_conds())
+            flag = normalize(e.diff, ctx2) == normalize(self.var_subst, ctx2)
         if flag:
-            body = normalize(e.body, ctx2.get_conds())
+            body = normalize(e.body, ctx2)
         else:
-            body = normalize(e.body / dfx, ctx2.get_conds())
-        body_subst = body.replace(normalize(var_subst, ctx2.get_conds()), var_name)
+            body = normalize(e.body / dfx, ctx2)
+        body_subst = body.replace(normalize(var_subst, ctx2), var_name)
         if e.var not in body_subst.get_vars():
             # Substitution is able to clear all x in original integrand
             self.f = body_subst
         else:
             # Substitution is unable to clear x, need to solve for x
-            gu = solve_equation(var_subst, var_name, e.var, ctx.get_conds())
+            gu = solve_equation(var_subst, var_name, e.var, ctx)
             if gu is None:
                 print('Solve %s = %s for %s' % (var_subst, var_name, e.var))
                 raise AssertionError("Substitution: unable to solve equation")
 
-            gu = normalize(gu, ctx.get_conds())
+            gu = normalize(gu, ctx)
             c = e.body.replace(parser.parse_expr(e.var), gu)
             if not flag:
                 new_problem_body = c * deriv(str(var_name), gu, ctx)
@@ -1291,33 +1289,32 @@ class Substitution(Rule):
 
         if e.is_integral():
             if e.lower == expr.NEG_INF:
-                lower = limits.reduce_neg_inf_limit(var_subst, e.var, ctx.get_conds())
+                lower = limits.reduce_neg_inf_limit(var_subst, e.var, ctx)
             else:
                 x = Var(e.var)
                 lower = self.var_subst
-                lower = limits.reduce_inf_limit(lower.subst(e.var, (1 / x) + e.lower), e.var, ctx.get_conds())
+                lower = limits.reduce_inf_limit(lower.subst(e.var, (1 / x) + e.lower), e.var, ctx)
                 lower = full_normalize(lower, ctx)
             if e.upper == expr.POS_INF:
-                upper = limits.reduce_inf_limit(var_subst, e.var, ctx.get_conds())
+                upper = limits.reduce_inf_limit(var_subst, e.var, ctx)
             else:
                 x = Var(e.var)
                 upper = self.var_subst
-                upper = limits.reduce_inf_limit(upper.subst(e.var, e.upper - (1 / x)), e.var, ctx.get_conds())
+                upper = limits.reduce_inf_limit(upper.subst(e.var, e.upper - (1 / x)), e.var, ctx)
                 upper = full_normalize(upper, ctx)
             if lower.is_evaluable() and upper.is_evaluable() and expr.eval_expr(lower) > expr.eval_expr(upper):
-                return normalize(Integral(self.var_name, upper, lower, Op("-", self.f)), ctx.get_conds())
+                return normalize(Integral(self.var_name, upper, lower, Op("-", self.f)), ctx)
             else:
-                return normalize(Integral(self.var_name, lower, upper, self.f), ctx.get_conds())
+                return normalize(Integral(self.var_name, lower, upper, self.f), ctx)
         elif e.is_indefinite_integral():
-            return normalize(IndefiniteIntegral(self.var_name, self.f, e.skolem_args), ctx.get_conds())
+            return normalize(IndefiniteIntegral(self.var_name, self.f, e.skolem_args), ctx)
         else:
             raise TypeError
 
 
 def full_normalize(e: Expr, ctx: Context) -> Expr:
-    conds = ctx.get_conds()
     for i in range(5):
-        e = normalize(e, conds)
+        e = normalize(e, ctx)
         e = FunctionTable().eval(e, ctx)
     return e
 
@@ -1369,13 +1366,13 @@ class SubstitutionInverse(Rule):
         # Solve the equations lower = f(u) and upper = f(u) for u.
         # Solve the equations lower = f(u) and upper = f(u) for u.
         x = Var("_" + self.var_name)
-        lower = solve_equation(self.var_subst, x, self.var_name, ctx.get_conds())
-        upper = solve_equation(self.var_subst, x, self.var_name, ctx.get_conds())
+        lower = solve_equation(self.var_subst, x, self.var_name, ctx)
+        upper = solve_equation(self.var_subst, x, self.var_name, ctx)
         if lower is None or upper is None:
             raise AssertionError("SubstitutionInverse: cannot solve")
 
-        lower = limits.reduce_inf_limit(lower.subst(x.name, (1 / x) + e.lower), x.name, ctx.get_conds())
-        upper = limits.reduce_inf_limit(upper.subst(x.name, e.upper - (1 / x)), x.name, ctx.get_conds())
+        lower = limits.reduce_inf_limit(lower.subst(x.name, (1 / x) + e.lower), x.name, ctx)
+        upper = limits.reduce_inf_limit(upper.subst(x.name, e.upper - (1 / x)), x.name, ctx)
 
         lower = full_normalize(lower, ctx)
         upper = full_normalize(upper, ctx)
@@ -1401,25 +1398,24 @@ class ExpandPolynomial(Rule):
         }
 
     def eval(self, e: Expr, ctx: Context) -> Expr:
-        conds = ctx.get_conds()
         if e.is_power() and e.args[1].is_const() and e.args[1].val > 1 and \
                 int(e.args[1].val) == e.args[1].val:
             n = int(e.args[1].val)
-            base = to_poly(self.eval(e.args[0], ctx), conds)
+            base = to_poly(self.eval(e.args[0], ctx), ctx)
             res = base
             for i in range(n - 1):
                 res = res * base
             return from_poly(res)
         elif e.is_times():
             s1, s2 = self.eval(e.args[0], ctx), self.eval(e.args[1], ctx)
-            return from_poly(to_poly(s1, conds) * to_poly(s2, conds))
+            return from_poly(to_poly(s1, ctx) * to_poly(s2, ctx))
         elif e.is_divides():
             s1, s2 = self.eval(e.args[0], ctx), self.eval(e.args[1], ctx)
-            p1, p2 = to_poly(s1, conds), to_poly(s2, conds)
+            p1, p2 = to_poly(s1, ctx), to_poly(s2, ctx)
             if p2.is_monomial():
                 return from_poly(p1 / p2)
             else:
-                return from_poly(p1 / poly.singleton(from_poly(p2), conds))
+                return from_poly(p1 / poly.singleton(from_poly(p2), ctx))
         elif e.is_integral():
             return expr.Integral(e.var, e.lower, e.upper, self.eval(e.body, ctx), e.diff)
         else:
@@ -1483,20 +1479,19 @@ class Equation(Rule):
         if e == Const(1) and expr.match(self.new_expr, p):
             return self.new_expr
 
-        conds = ctx.get_conds()
-        if norm.eq_quotient(e, self.new_expr, conds):
+        if norm.eq_quotient(e, self.new_expr, ctx):
             return self.new_expr
 
-        if norm.eq_power(e, self.new_expr, conds):
+        if norm.eq_power(e, self.new_expr, ctx):
             return self.new_expr
 
-        if norm.eq_log(e, self.new_expr, conds):
+        if norm.eq_log(e, self.new_expr, ctx):
             return self.new_expr
 
-        if norm.eq_definite_integral(e, self.new_expr, conds):
+        if norm.eq_definite_integral(e, self.new_expr, ctx):
             return self.new_expr
 
-        if norm.simp_definite_integral(e, conds) == normalize(self.new_expr, conds):
+        if norm.simp_definite_integral(e, ctx) == normalize(self.new_expr, ctx):
             return self.new_expr
 
         # x * sum(k,l,u,body) => sum(k, l, u, x* body)
@@ -1511,7 +1506,7 @@ class Equation(Rule):
             if idx not in out.get_vars():
                 e = Summation(idx, sum.lower, sum.upper, out * sum.body)
 
-        if normalize(norm.normalize_exp(e), conds) == normalize(self.new_expr, conds):
+        if normalize(norm.normalize_exp(e), ctx) == normalize(self.new_expr, ctx):
             return self.new_expr
 
         raise AssertionError("Equation: rewriting %s to %s failed" % (e, self.new_expr))
@@ -1559,29 +1554,29 @@ class IntegrationByParts(Rule):
         if e.is_integral():
             ctx2.add_condition(expr.Op(">", Var(e.var), e.lower))
             ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
-        conds = ctx2.get_conds()
-        e.body = normalize(e.body, conds)
+
+        e.body = normalize(e.body, ctx2)
         du = deriv(e.var, self.u, ctx)
         dv = deriv(e.var, self.v, ctx)
-        udv = normalize(self.u * dv, conds)
+        udv = normalize(self.u * dv, ctx2)
 
         equal = False
         if udv == e.body:
             equal = True
 
-        if not equal and norm.eq_quotient(udv, e.body, conds):
+        if not equal and norm.eq_quotient(udv, e.body, ctx2):
             equal = True
 
-        if not equal and norm.eq_power(udv, e.body, conds):
+        if not equal and norm.eq_power(udv, e.body, ctx2):
             equal = True
 
         if equal:
             if e.is_integral():
-                return expr.EvalAt(e.var, e.lower, e.upper, normalize(self.u * self.v, conds)) - \
-                       expr.Integral(e.var, e.lower, e.upper, normalize(self.v * du, conds), e.diff)
+                return expr.EvalAt(e.var, e.lower, e.upper, normalize(self.u * self.v, ctx2)) - \
+                       expr.Integral(e.var, e.lower, e.upper, normalize(self.v * du, ctx2), e.diff)
             elif e.is_indefinite_integral():
-                return normalize(self.u * self.v, conds) - \
-                       expr.IndefiniteIntegral(e.var, normalize(self.v * du, conds), e.skolem_args)
+                return normalize(self.u * self.v, ctx2) - \
+                       expr.IndefiniteIntegral(e.var, normalize(self.v * du, ctx2), e.skolem_args)
         else:
             raise AssertionError("Integration by parts: %s != %s" % (str(udv), str(e.body)))
 
@@ -1613,15 +1608,13 @@ class SplitRegion(Rule):
             else:
                 return OnLocation(self, sep_ints[0][1]).eval(e, ctx)
         x = Var("c")
-        is_cpv = limits.reduce_inf_limit(e.body.subst(e.var, self.c + 1 / x), x.name, ctx.get_conds()) in [POS_INF,
-                                                                                                           NEG_INF]
+        is_cpv = limits.reduce_inf_limit(e.body.subst(e.var, self.c + 1 / x), x.name, ctx) in [POS_INF, NEG_INF]
         if not is_cpv:
             return expr.Integral(e.var, e.lower, self.c, e.body, e.diff) + \
                    expr.Integral(e.var, self.c, e.upper, e.body, e.diff)
         else:
-            conds = ctx.get_conds()
-            return Limit(x.name, POS_INF, Integral(e.var, e.lower, normalize(self.c - 1 / x, conds), e.body) +
-                         Integral(e.var, normalize(self.c + 1 / x, conds), e.upper, e.body))
+            return Limit(x.name, POS_INF, Integral(e.var, e.lower, normalize(self.c - 1 / x, ctx), e.body) +
+                         Integral(e.var, normalize(self.c + 1 / x, ctx), e.upper, e.body))
 
 
 class IntegrateByEquation(Rule):
@@ -1644,10 +1637,9 @@ class IntegrateByEquation(Rule):
 
     def eval(self, e: Expr, ctx: Context) -> Expr:
         """Eliminate the lhs's integral in rhs by solving equation."""
-        conds = ctx.get_conds()
-        norm_e = normalize(e, conds)
+        norm_e = normalize(e, ctx)
         rhs_var = None
-        lhs = normalize(self.lhs, conds)
+        lhs = normalize(self.lhs, ctx)
 
         def get_coeff(t: Expr):
             nonlocal rhs_var
@@ -1669,16 +1661,16 @@ class IntegrateByEquation(Rule):
             else:
                 return Const(0)
 
-        coeff = normalize(get_coeff(norm_e), conds)
+        coeff = normalize(get_coeff(norm_e), ctx)
         if coeff == Const(0):
             return e
 
         if rhs_var != None:
-            new_rhs = normalize(norm_e + ((-coeff) * lhs.alpha_convert(rhs_var)), conds)
+            new_rhs = normalize(norm_e + ((-coeff) * lhs.alpha_convert(rhs_var)), ctx)
         else:
-            new_rhs = normalize(norm_e + ((-coeff) * lhs), conds)
-        self.coeff = normalize(-(coeff), conds)
-        return normalize(new_rhs / ((Const(1) - coeff)), conds)
+            new_rhs = normalize(norm_e + ((-coeff) * lhs), ctx)
+        self.coeff = normalize(-(coeff), ctx)
+        return normalize(new_rhs / ((Const(1) - coeff)), ctx)
 
 
 class ElimInfInterval(Rule):
@@ -1946,7 +1938,7 @@ class ExpandDefinition(Rule):
             for identity in ctx.get_definitions():
                 if identity.lhs.is_fun() and identity.lhs.func_name == self.func_name:
                     inst = expr.match(e, identity.lhs)
-                    return normalize(identity.rhs.inst_pat(inst), ctx.get_conds())
+                    return normalize(identity.rhs.inst_pat(inst), ctx)
         if e.is_var() and e.name == self.func_name:
             for identity in ctx.get_definitions():
                 if identity.lhs.is_symbol() and identity.lhs.name == self.func_name:
@@ -1993,7 +1985,7 @@ class FoldDefinition(Rule):
             if identity.lhs.is_fun() and identity.lhs.func_name == self.func_name:
                 inst = expr.match(e, identity.rhs)
                 if inst:
-                    return normalize(identity.lhs.inst_pat(inst), ctx.get_conds())
+                    return normalize(identity.lhs.inst_pat(inst), ctx)
 
             if identity.lhs.is_symbol() and identity.lhs.name == self.func_name:
                 if e == identity.rhs:
@@ -2080,8 +2072,8 @@ class ChangeSummationIndex(Rule):
 
     def eval(self, e: Expr, ctx: Context):
         assert e.is_summation()
-        tmp = normalize(Var(e.index_var) + e.lower - self.new_lower, ctx.get_conds())
-        new_upper = normalize(e.upper + self.new_lower - e.lower, ctx.get_conds()) \
+        tmp = normalize(Var(e.index_var) + e.lower - self.new_lower, ctx)
+        new_upper = normalize(e.upper + self.new_lower - e.lower, ctx) \
             if e.upper != POS_INF  else POS_INF
         return Summation(e.index_var, self.new_lower, new_upper, e.body.replace(Var(e.index_var), tmp))
     def __str__(self):
@@ -2255,10 +2247,10 @@ class SolveEquation(Rule):
     def eval(self, e: Expr, ctx: Context):
         assert e.is_equals()
 
-        res = solve_for_term(e, self.solve_for, ctx.get_conds())
+        res = solve_for_term(e, self.solve_for, ctx)
         if not res:
             raise AssertionError("SolveEquation: cannot solve")
-        return Op("=", self.solve_for, normalize(res, ctx.get_conds()))
+        return Op("=", self.solve_for, normalize(res, ctx))
 
     def __str__(self):
         return "solve equation for %s" % str(self.solve_for)
