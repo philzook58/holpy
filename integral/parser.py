@@ -11,6 +11,7 @@ from integral.interval import Interval
 
 grammar = r"""
     ?atom: CNAME -> var_expr
+        | "?" CNAME  -> symbol_expr
         | INT -> int_expr
         | DECIMAL -> decimal_expr
         | "D" CNAME "." expr -> deriv_expr
@@ -73,6 +74,9 @@ class ExprTransformer(Transformer):
 
     def var_expr(self, s):
         return expr.Var(str(s))
+    
+    def symbol_expr(self, s):
+        return expr.Symbol(str(s), [expr.VAR, expr.CONST, expr.OP, expr.FUN])
 
     def int_expr(self, n):
         return expr.Const(int(n))

@@ -367,14 +367,14 @@ class Context:
         """Check the given condition under the extra conditions"""
         conds = self.get_conds()
 
-        print(e, '[', conds, ']')
-
         from integral import condprover
         if condprover.check_condition(e, self):
+            if not conds.check_condition(e):
+                print("Wrong?", e, '[', conds, ']')
             return True
 
         if conds.check_condition(e):
-            print('MISS!!')
+            print("Missed", e, '[', conds, ']')
             return True
         for lemma in self.get_lemmas():
             if lemma.expr == e and set(lemma.conds.data).issubset(set(conds.data)):

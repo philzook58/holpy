@@ -65,29 +65,6 @@
             "finished": true,
             "goal": "(INT x:[0,oo]. log(x ^ a + 1) / (x ^ 2 - b * x + 1)) = (INT x:[0,oo]. log(x ^ a + 1) / (x ^ 2 - b * x + 1)) - a * (INT x:[0,oo]. log(x) / (x ^ 2 - b * x + 1))",
             "latex_goal": "\\int_{0}^{\\infty} \\frac{\\log{(x ^ {a} + 1)}}{x ^ {2} - b x + 1} \\,dx = (\\int_{0}^{\\infty} \\frac{\\log{(x ^ {a} + 1)}}{x ^ {2} - b x + 1} \\,dx) - a (\\int_{0}^{\\infty} \\frac{\\log{x}}{x ^ {2} - b x + 1} \\,dx)",
-            "obligations": [
-                {
-                    "conds": [
-                        {
-                            "cond": "a > 0",
-                            "latex_cond": "a > 0"
-                        },
-                        {
-                            "cond": "b > -2",
-                            "latex_cond": "b > -2"
-                        },
-                        {
-                            "cond": "b < 2",
-                            "latex_cond": "b < 2"
-                        },
-                        {
-                            "cond": "x > 0",
-                            "latex_cond": "x > 0"
-                        }
-                    ],
-                    "expr": "x ^ a + 1 > 0"
-                }
-            ],
             "proof": {
                 "finished": true,
                 "goal": "(INT x:[0,oo]. log(x ^ a + 1) / (x ^ 2 - b * x + 1)) = (INT x:[0,oo]. log(x ^ a + 1) / (x ^ 2 - b * x + 1)) - a * (INT x:[0,oo]. log(x) / (x ^ 2 - b * x + 1))",
@@ -226,8 +203,7 @@
                 },
                 "type": "CalculationProof"
             },
-            "type": "Goal",
-            "wellformed": false
+            "type": "Goal"
         },
         {
             "conds": [

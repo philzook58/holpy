@@ -1,7 +1,8 @@
 import unittest
 
 from integral.parser import parse_expr
-from integral.condprover import init_all_conds, check_cond, saturate_expr, check_condition, subject_of
+from integral.condprover import init_all_conds, check_cond, saturate_expr, check_condition, \
+    subject_of, print_all_conds
 from integral.conditions import Conditions
 from integral.context import Identity, Context
 
@@ -40,7 +41,8 @@ class CondProverTest(unittest.TestCase):
         all_conds = dict()
         for s, res in test_data:
             e = parse_expr(s)
-            self.assertEqual(check_cond(e, all_conds), res, s)
+            inst = dict()
+            self.assertEqual(len(check_cond(e, all_conds, inst)) == 1, res, s)
 
     def testCheckCond(self):
         test_data = [
@@ -65,10 +67,11 @@ class CondProverTest(unittest.TestCase):
             e = parse_expr(s)
             conds = Conditions(conds)
             all_conds = init_all_conds(conds)
-            self.assertEqual(check_cond(e, all_conds), res, "%s [%s]" % (e, conds))
+            inst = dict()
+            self.assertEqual(len(check_cond(e, all_conds, inst)) == 1, res, "%s [%s]" % (e, conds))
 
     def testSaturateExpr(self):
-        cos_identity = Identity("cos(x) >= 0", conds=Conditions(["x >= -pi / 2", "x <= pi / 2"]))
+        cos_identity = Identity("cos(?x) >= 0", conds=Conditions(["?x >= -pi / 2", "?x <= pi / 2"]))
         test_data = [
             (["x >= 0", "x <= pi / 2"], True),
             (["x >= 0", "x < pi / 2"], True),
@@ -80,10 +83,12 @@ class CondProverTest(unittest.TestCase):
             conds = Conditions(conds)
             all_conds = init_all_conds(conds)
             saturate_expr(parse_expr("cos(x)"), cos_identity, all_conds)
-            self.assertEqual(check_cond(parse_expr("cos(x) >= 0"), all_conds), res, conds)
+            inst = dict()
+            e = parse_expr("cos(x) >= 0")
+            self.assertEqual(len(check_cond(e, all_conds, inst)) == 1, res, conds)
 
     def testSaturateExpr2(self):
-        log_identity = Identity("log(x) >= 0", conds=Conditions(["x >= 1"]))
+        log_identity = Identity("log(?x) >= 0", conds=Conditions(["?x >= 1"]))
         test_data = [
             (["x > 1"], True),
             (["x > 0"], False),
@@ -93,10 +98,12 @@ class CondProverTest(unittest.TestCase):
             conds = Conditions(conds)
             all_conds = init_all_conds(conds)
             saturate_expr(parse_expr("log(x)"), log_identity, all_conds)
-            self.assertEqual(check_cond(parse_expr("log(x) >= 0"), all_conds), res, conds)
+            inst = dict()
+            e = parse_expr("log(x) >= 0")
+            self.assertEqual(len(check_cond(e, all_conds, inst)) == 1, res, conds)
 
     def testSaturateExpr3(self):
-        ineq_identity = Identity("a + c != b + c", conds=Conditions(["a != b"]))
+        ineq_identity = Identity("?a + ?c != ?b + ?c", conds=Conditions(["?a != ?b"]))
         test_data = [
             ("k + 1 != 0", ["k != -1"], True),
         ]
@@ -106,12 +113,20 @@ class CondProverTest(unittest.TestCase):
             conds = Conditions(conds)
             all_conds = init_all_conds(conds)
             saturate_expr(subject_of(e), ineq_identity, all_conds)
-            self.assertEqual(check_cond(e, all_conds), res, conds)
+            inst = dict()
+            self.assertEqual(len(check_cond(e, all_conds, inst)) == 1, res, "%s [%s]" % (e, conds))
 
     def testCheckCondition(self):
         test_data = [
             ("cos(x) >= 0", ["x > 0", "x < pi / 2"], True),
             ("log(x) >= 0", ["x > 1"], True),
+            ("1 + x ^ 2 > 0", ["x > 0"], True),
+            ("sin(x) > 0", ["x > 0", "x < pi / 2"], True),
+            ("x ^ 2 < 1", ["abs(x) < 1"], True),
+            ("2 * k + 1 > 0", ["k >= 0"], True),
+            ("sqrt(1 - x ^ 2) > 0", ["x > 0", "x < 1"], True),
+            ("y * x > -1", ["y > -1", "y < 1", "x > 0", "x < 1"], True),
+            ("a ^ 2 + b ^ 2 > 0", ["a != 0"], True),
         ]
 
         for s, conds, res in test_data:

@@ -1095,7 +1095,7 @@ class FullSimplify(Rule):
             s = OnSubterm(Linearity()).eval(current, ctx)
             if ctx != None:
                 for b in ctx.get_conds().data:
-                    if b.is_v_equals():
+                    if b.is_equals() and b.args[0].is_var() and b.args[1].is_constant():
                         s = s.subst(str(b.args[0]), b.args[1])
             s = OnSubterm(CommonIntegral()).eval(s, ctx)
             s = Simplify().eval(s, ctx)

@@ -1,10 +1,12 @@
 """Module for reasoning about conditions."""
 
+from copy import copy
 from typing import Dict, List
 
-from integral.expr import Expr, eval_expr, match
+from integral.expr import Expr, eval_expr, match, expr_to_pattern, Op
 from integral.conditions import Conditions
 from integral.context import Context, Identity
+from integral.parser import parse_expr
 
 
 def subject_of(cond: Expr) -> Expr:
@@ -64,9 +66,25 @@ def init_all_conds(conds: Conditions) -> Dict[Expr, List[Expr]]:
         if x not in all_conds:
             all_conds[x] = list()
         all_conds[x].append(cond)
+        if x.is_fun() and x.func_name == 'abs' and cond.is_less():
+            if x.args[0] not in all_conds:
+                all_conds[x.args[0]] = list()
+            all_conds[x.args[0]].append(Op("<", x.args[0], cond.args[1]))
+            all_conds[x.args[0]].append(Op(">", x.args[0], -cond.args[1]))
+        if x.is_fun() and x.func_name == 'abs' and cond.is_less_eq():
+            if x.args[0] not in all_conds:
+                all_conds[x.args[0]] = list()
+            all_conds[x.args[0]].append(Op("<=", x.args[0], cond.args[1]))
+            all_conds[x.args[0]].append(Op(">=", x.args[0], -cond.args[1]))
     return all_conds
 
-def check_cond(cond: Expr, all_conds: Dict[Expr, List[Expr]]) -> bool:
+def update_inst(k: str, v: Expr, inst: Dict[str, Expr]) -> Dict[str, Expr]:
+    """Update instantiation without changing the original."""
+    res = copy(inst)
+    res[k] = v
+    return res
+
+def check_cond(cond: Expr, all_conds: Dict[Expr, List[Expr]], inst: Dict[str, Expr]) -> List[Dict[str, Expr]]:
     """Determine whether cond is implied by the existing set of conditions.
     
     The following checks are performed:
@@ -77,70 +95,136 @@ def check_cond(cond: Expr, all_conds: Dict[Expr, List[Expr]]) -> bool:
     - If subject of cond appears in all_conds, try to use the conditions
       available to verify cond.
 
+    - Perform pattern matching.
+
     """
     x = subject_of(cond)
+
+    # Trivial case
+    if x in all_conds and cond in all_conds[x]:
+        return [inst]
 
     # If subject of cond is a constant
     if x.is_constant():
         if cond.is_equals() and cond.args[1].is_constant():
-            return approx_equal(x, cond.args[1])
+            if approx_equal(x, cond.args[1]):
+                return [inst]
         elif cond.is_not_equals() and cond.args[1].is_constant():
-            return approx_not_equal(x, cond.args[1])
+            if approx_not_equal(x, cond.args[1]):
+                return [inst]
         elif cond.is_greater() and cond.args[1].is_constant():
-            return approx_greater(x, cond.args[1])
+            if approx_greater(x, cond.args[1]):
+                return [inst]
         elif cond.is_greater_eq() and cond.args[1].is_constant():
-            return approx_greater_eq(x, cond.args[1])
+            if approx_greater_eq(x, cond.args[1]):
+                return [inst]
         elif cond.is_less() and cond.args[1].is_constant():
-            return approx_less(x, cond.args[1])
+            if approx_less(x, cond.args[1]):
+                return [inst]
         elif cond.is_less_eq() and cond.args[1].is_constant():
-            return approx_less_eq(x, cond.args[1])
+            if approx_less_eq(x, cond.args[1]):
+                return [inst]
         elif cond.is_fun() and cond.func_name == 'isInt':
-            return approx_integer(x)
+            if approx_integer(x):
+                return [inst]
 
     # If subject of cond appears in all_conds
-    if x in all_conds:
-        if cond in all_conds[x]:
-            return True
+    if cond.is_compare() and x in all_conds and cond.args[1].is_constant():
         for fact in all_conds[x]:
-            if cond.is_greater_eq() and cond.args[1].is_constant():
+            if not (fact.is_compare() and fact.args[1].is_constant()):
+                continue
+            if cond.is_greater_eq():
                 # x >= b --> b >= a --> x >= a
-                if (fact.is_greater() or fact.is_greater_eq()) and fact.args[1].is_constant():
+                if fact.is_greater() or fact.is_greater_eq():
                     if approx_greater_eq(fact.args[1], cond.args[1]):
-                        return True
-            if cond.is_greater() and cond.args[1].is_constant():
+                        return [inst]
+            if cond.is_greater():
                 # x >= b --> b > a --> x > a
-                if fact.is_greater_eq() and fact.args[1].is_constant():
-                    if approx_greater(fact.args[1], cond.args[1]):
-                        return True
+                if fact.is_greater_eq() and approx_greater(fact.args[1], cond.args[1]):
+                    return [inst]
                 # x > b --> b >= a --> x > a
-                if fact.is_greater() and fact.args[1].is_constant():
-                    if approx_greater_eq(fact.args[1], cond.args[1]):
-                        return True
-            if cond.is_less_eq() and cond.args[1].is_constant():
+                if fact.is_greater() and approx_greater_eq(fact.args[1], cond.args[1]):
+                    return [inst]
+            if cond.is_less_eq():
                 # x <= b --> b <= a --> x <= a
-                if (fact.is_less() or fact.is_less_eq()) and fact.args[1].is_constant():
+                if fact.is_less() or fact.is_less_eq():
                     if approx_less_eq(fact.args[1], cond.args[1]):
-                        return True
-            if cond.is_less() and cond.args[1].is_constant():
+                        return [inst]
+            if cond.is_less():
                 # x <= b --> b < a --> x < a
-                if fact.is_less_eq() and fact.args[1].is_constant():
-                    if approx_less(fact.args[1], cond.args[1]):
-                        return True
+                if fact.is_less_eq() and approx_less(fact.args[1], cond.args[1]):
+                    return [inst]
+                # x < b --> b <= a --> x < a
+                if fact.is_less() and approx_less_eq(fact.args[1], cond.args[1]):
+                    return [inst]
+            if cond.is_equals():
+                if fact.is_equals() and approx_equal(fact.args[1], cond.args[1]):
+                    return [inst]
+            if cond.is_not_equals():
+                if fact.is_not_equals() and approx_equal(fact.args[1], cond.args[1]):
+                    return [inst]
+                # x < a --> a <= b --> x != b
+                if fact.is_less() and approx_less_eq(fact.args[1], cond.args[1]):
+                    return [inst]
+                # x <= a --> a < b --> x != b
+                if fact.is_less_eq() and approx_less(fact.args[1], cond.args[1]):
+                    return [inst]
+                # x > a --> a >= b --> x != b
+                if fact.is_greater() and approx_greater_eq(fact.args[1], cond.args[1]):
+                    return [inst]
+                # x >= a --> a > b --> x != b
+                if fact.is_greater_eq() and approx_greater(fact.args[1], cond.args[1]):
+                    return [inst]
+                # x = a --> a != b --> x != b
+                if fact.is_equals() and approx_not_equal(fact.args[1], cond.args[1]):
+                    return [inst]
+        
+    # If the other side of cond is a pattern
+    if cond.is_compare() and x in all_conds and cond.args[1].is_symbol():
+        symb = cond.args[1].name
+        res = []
+        for fact in all_conds[x]:
+            if not fact.is_compare():
+                continue
+            if cond.is_greater_eq():
+                if fact.is_greater_eq() or fact.is_greater():
+                    res.append(update_inst(symb, fact.args[1], inst))
+            if cond.is_greater():
+                if fact.is_greater():
+                    res.append(update_inst(symb, fact.args[1], inst))
+            if cond.is_less_eq():
+                if fact.is_less_eq() or fact.is_less():
+                    res.append(update_inst(symb, fact.args[1], inst))
+            if cond.is_less():
+                if fact.is_less():
+                    res.append(update_inst(symb, fact.args[1], inst))
+            if cond.is_equals():
+                if fact.is_equals():
+                    res.append(update_inst(symb, fact.args[1], inst))
+            if cond.is_not_equals():
+                if fact.is_not_equals():
+                    res.append(update_inst(symb, fact.args[1], inst))
+        return res
 
     # Not found
-    return False
+    return list()
 
 def saturate_expr(e: Expr, ineq: Identity, all_conds: Dict[Expr, List[Expr]]):
     """Use the rule ineq to saturate facts about e, add to all_conds."""
     pat = subject_of(ineq.expr)
     inst = match(e, pat)
     if inst is not None:
-        res = ineq.expr.inst_pat(inst)
-        if check_cond(res, all_conds):
-            return  # already in all_conds
-
-        conds = [cond.inst_pat(inst) for cond in ineq.conds.data]
-        if all(check_cond(cond, all_conds) for cond in conds):
+        old_list = [inst]
+        for cond in ineq.conds.data:
+            new_list = []
+            for inst in old_list:
+                res = check_cond(cond.inst_pat(inst), all_conds, inst)
+                new_list.extend(res)
+            old_list = new_list
+        for inst in old_list:
+            res = ineq.expr.inst_pat(inst)
+            if check_cond(res, all_conds, inst):
+                continue  # already exists
             if e not in all_conds:
                 all_conds[e] = list()
             all_conds[e].append(res)
@@ -177,16 +261,147 @@ def saturate(e: Expr, ineqs: List[Identity], all_conds: Dict[Expr, List[Expr]], 
         if prev_size == next_size:
             return
         if next_size > size_limit or i > round_limit:
+            print_all_conds(all_conds)
             raise AssertionError("saturate: limit reached")
 
 def print_all_conds(all_conds: Dict[Expr, List[Expr]]):
     for x, conds in all_conds.items():
-        print("%s: %s\n" % (x, ', '.join(str(cond) for cond in conds)))
+        print("%s: %s" % (x, ', '.join(str(cond) for cond in conds)))
+
+def get_standard_inequalities() -> List[Identity]:
+    data = [
+        # Addition
+        (["a != b"], "a + c != b + c"),
+        (["a != b"], "c + a != c + b"),
+        (["a >= b"], "a + c >= b + c"),
+        (["a > b"], "a + c > b + c"),
+        (["a >= b"], "c + a >= c + b"),
+        (["a > b"], "c + a > c + b"),
+        (["a >= b", "c >= d"], "a + c >= b + d"),
+        (["a >= b", "c > d"], "a + c > b + d"),
+        (["a > b", "c >= d"], "a + c > b + d"),
+
+        # Unary minus
+        (["x > a"], "-x < -a"),
+        (["x >= a"], "-x <= -a"),
+        (["x < a"], "-x > -a"),
+        (["x <= a"], "-x >= -a"),
+        (["x != a"], "-x != -a"),
+
+        # Subtraction
+        (["a > b"], "c - a < c - b"),
+        (["a >= b"], "c - a <= c - b"),
+        (["a < b"], "c - a > c - b"),
+        (["a <= b"], "c - a >= c - b"),
+        (["a > b"], "a - c > b - c"),
+        (["a >= b"], "a - c >= b - c"),
+        (["a < b"], "a - c < b - c"),
+        (["a <= b"], "a - c <= b - c"),
+        (["a > b", "c <= d"], "a - c > b - d"),
+        (["a >= b", "c < d"], "a - c > b - d"),
+        (["a >= b", "c <= d"], "a - c >= b - d"),
+        (["a < b", "c >= d"], "a - c < b - d"),
+        (["a <= b", "c > d"], "a - c < b - d"),
+        (["a <= b", "c >= d"], "a - c <= b - d"),
+
+        # Multiplication (simple)
+        (["a != 0", "b != 0"], "a * b != 0"),
+        (["a > 0", "b > 0"], "a * b > 0"),
+
+        # Multiplication (one side is constant)
+        (["a >= b", "c >= 0"], "c * a >= c * b"),
+        (["a > b", "c > 0"], "c * a > c * b"),
+        (["a >= b", "c >= 0"], "a * c >= b * c"),
+        (["a > b", "c > 0"], "a * c > b * c"),
+        (["a <= b", "c >= 0"], "c * a <= c * b"),
+        (["a < b", "c > 0"], "c * a < c * b"),
+        (["a <= b", "c >= 0"], "a * c <= b * c"),
+        (["a < b", "c > 0"], "a * c < b * c"),
+
+        # Multiplication (left side > 0)
+        (["a >= b", "c >= d", "b >= 0"], "a * c >= b * d"),
+        (["a > b", "c >= d", "b > 0"], "a * c > b * d"),
+        (["a >= b", "c > d", "b > 0"], "a * c > b * d"),
+        (["a < b", "c < d", "a > 0"], "a * c < b * d"),
+        (["a <= b", "c < d", "a > 0"], "a * c <= b * d"),
+        (["a < b", "c <= d", "a > 0"], "a * c <= b * d"),
+
+        # Multiplication (right side > 0)
+        (["a >= b", "c >= d", "b >= 0"], "c * a >= d * b"),
+        (["a > b", "c >= d", "b > 0"], "c * a > d * b"),
+        (["a >= b", "c > d", "b > 0"], "c * a > d * b"),
+        (["a < b", "c < d", "a > 0"], "c * a < d * b"),
+        (["a <= b", "c < d", "a > 0"], "c * a < d * b"),
+        (["a < b", "c <= d", "a > 0"], "c * a < d * b"),
+
+        # Division
+        (["a > 0", "b > 0"], "a / b > 0"),
+        (["a >= b", "c > 0"], "a / c >= b / c"),
+        (["a > b", "c > 0"], "a / c > b / c"),
+
+        # Square root
+        (["a > 0"], "sqrt(a) > 0"),
+        (["a < 1", "a > 0"], "sqrt(a) < 1"),
+
+        # Power
+        ([], "a ^ 2 >= 0"),
+        (["a != 0"], "a ^ 2 > 0"),
+        (["x != 0"], "x ^ n != 0"),
+        (["x > 0"], "x ^ y > 0"),
+        (["x < a", "x > -a"], "x ^ 2 < a ^ 2"),
+        (["x <= a", "x >= -a"], "x ^ 2 <= a ^ 2"),
+        (["x != y"], "x ^ 2 - y ^ 2 != 0"),
+        (["y != x"], "x ^ 2 - y ^ 2 != 0"),
+        (["x != y"], "x ^ 4 - y ^ 4 != 0"),
+        (["y != x"], "x ^ 4 - y ^ 4 != 0"),
+
+        # Log
+        (["x >= 1"], "log(x) >= 0"),
+        (["x <= 1", "x > 0"], "log(x) <= 0"),
+        (["x != 1"], "log(x) != 0"),
+
+        # Exponential
+        ([], "exp(x) > 0"),
+        (["x > 0"], "exp(x) > 1"),
+        (["x >= 0"], "exp(x) >= 1"),
+        (["x < 0"], "exp(x) < 1"),
+        (["x <= 0"], "exp(x) <= 1"),
+
+        # Trigonometric
+        (["x >= -pi / 2", "x <= pi / 2"], "cos(x) >= 0"),
+        (["x >= pi / 2", "x <= 3 * pi / 2"], "cos(x) <= 0"),
+        (["x > -pi / 2", "x < pi / 2"], "cos(x) > 0"),
+        (["x > pi / 2", "x < 3 * pi / 2"], "cos(x) < 0"),
+        (["x >= 0", "x <= pi"], "sin(x) >= 0"),
+        (["x >= -pi", "x <= 0"], "sin(x) <= 0"),
+        (["x > 0", "x < pi"], "sin(x) > 0"),
+        (["x > -pi", "x < 0"], "sin(x) < 0"),
+
+        # Hyperbolic
+        ([], "cosh(x) > 0"),
+
+        # Factorial
+        ([], "factorial(x) >= 1"),
+
+        # isInt
+        (["isInt(a)", "isInt(b)"], "isInt(a + b)"),
+        (["isInt(a)", "isInt(b)"], "isInt(a - b)"),
+    ]
+
+    ineqs = []
+    for conds, e in data:
+        symb_e = expr_to_pattern(parse_expr(e))
+        symb_conds = [expr_to_pattern(parse_expr(cond)) for cond in conds]
+        ineqs.append(Identity(symb_e, conds=Conditions(symb_conds)))
+    return ineqs
 
 def check_condition(e: Expr, ctx: Context) -> bool:
     """Check whether e holds under the given context."""
     conds = ctx.get_conds()
     all_conds = init_all_conds(conds)
-    ineqs = ctx.get_inequalities()
+    ineqs = get_standard_inequalities()
+    ineqs.extend(ctx.get_inequalities())
     saturate(subject_of(e), ineqs, all_conds)
-    return check_cond(e, all_conds)
+    # print('Final')
+    # print_all_conds(all_conds)
+    return len(check_cond(e, all_conds, dict())) == 1

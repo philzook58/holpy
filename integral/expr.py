@@ -189,9 +189,6 @@ class Expr:
     def is_equals(self):
         return self.ty == OP and self.op == '='
 
-    def is_v_equals(self):
-        return self.is_equals() and self.args[0].is_var() and self.args[1].is_constant()
-
     def is_not_equals(self):
         return self.ty == OP and self.op == "!="
 
@@ -206,6 +203,9 @@ class Expr:
 
     def is_greater_eq(self):
         return self.ty == OP and self.op == ">="
+    
+    def is_compare(self):
+        return self.ty == OP and self.op in ('=', '!=', '<', '<=', '>', '>=')
 
     def is_inf(self):
         return self.ty == INF and (self.t == Decimal("inf") or self.t == Decimal("-inf"))
