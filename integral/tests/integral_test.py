@@ -656,9 +656,9 @@ class IntegralTest(unittest.TestCase):
         calc = proof.lhs_calc
         calc.perform_rule(rules.Substitution(var_name='t', var_subst=parser.parse_expr("sqrt(x-1)")))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.Substitution(var_name='x', var_subst=parser.parse_expr("t / sqrt(a + 1)")))
-        calc.perform_rule(rules.Equation("x ^ 2 * (a + 1) + a + 1",
-                                         "(a + 1) * (x^2 + 1)"))
+        calc.perform_rule(rules.Substitution(var_name='y', var_subst=parser.parse_expr("t / sqrt(a + 1)")))
+        calc.perform_rule(rules.Equation("y ^ 2 * (a + 1) + a + 1",
+                                         "(a + 1) * (y^2 + 1)"))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
         calc = proof.rhs_calc
@@ -2996,17 +2996,17 @@ class IntegralTest(unittest.TestCase):
         s1 = "2 * u * y + u ^ 2 + 1"
         s2 = "(u+y)^2 + (sqrt(1-y^2)^2)"
         calc.perform_rule(rules.Equation(s1, s2))
-        calc.perform_rule(rules.Substitution("t", "u+y"))
-        s1 = "(t ^ 2 - y ^ 2 + 1)"
-        s2 = "t^2 + (sqrt(1-y^2)^2)"
+        calc.perform_rule(rules.Substitution("s", "u+y"))
+        s1 = "(s ^ 2 - y ^ 2 + 1)"
+        s2 = "s^2 + (sqrt(1-y^2)^2)"
         calc.perform_rule(rules.Equation(s1, s2))
-        calc.perform_rule(rules.Substitution("u", "t/sqrt(1-y^2)"))
+        calc.perform_rule(rules.Substitution("v", "s/sqrt(1-y^2)"))
         calc.perform_rule(rules.FullSimplify())
-        s1 = "u ^ 2 * (-(y ^ 2) + 1) - y ^ 2 + 1"
-        s2 = "(u^2+1)*(1-y^2)"
+        s1 = "v ^ 2 * (-(y ^ 2) + 1) - y ^ 2 + 1"
+        s2 = "(v^2+1)*(1-y^2)"
         calc.perform_rule(rules.Equation(s1, s2))
-        s1 = "1 / ((u ^ 2 + 1) * (1 - y ^ 2))"
-        s2 = "1/(u^2+1) * (1-y^2)^-1"
+        s1 = "1 / ((v ^ 2 + 1) * (1 - y ^ 2))"
+        s2 = "1/(v^2+1) * (1-y^2)^-1"
         calc.perform_rule(rules.Equation(s1, s2))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.DefiniteIntegralIdentity())

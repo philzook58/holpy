@@ -234,44 +234,44 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\int_{y}^{y + 1} \\frac{1}{t ^ {2} - y ^ {2} + 1} \\,dt)",
-                            "res": "2 * (INT t:[y,y + 1]. 1 / (t ^ 2 - y ^ 2 + 1))",
+                            "latex_res": "2 (\\int_{y}^{y + 1} \\frac{1}{s ^ {2} - y ^ {2} + 1} \\,ds)",
+                            "res": "2 * (INT s:[y,y + 1]. 1 / (s ^ 2 - y ^ 2 + 1))",
                             "rule": {
-                                "latex_str": "substitute \\(t\\) for \\(u + y\\)",
+                                "latex_str": "substitute \\(s\\) for \\(u + y\\)",
                                 "name": "Substitution",
-                                "str": "substitute t for u + y",
-                                "var_name": "t",
+                                "str": "substitute s for u + y",
+                                "var_name": "s",
                                 "var_subst": "u + y"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\int_{y}^{y + 1} \\frac{1}{t ^ {2} + \\sqrt{1 - y ^ {2}} ^ {2}} \\,dt)",
-                            "res": "2 * (INT t:[y,y + 1]. 1 / (t ^ 2 + sqrt(1 - y ^ 2) ^ 2))",
+                            "latex_res": "2 (\\int_{y}^{y + 1} \\frac{1}{s ^ {2} + \\sqrt{1 - y ^ {2}} ^ {2}} \\,ds)",
+                            "res": "2 * (INT s:[y,y + 1]. 1 / (s ^ 2 + sqrt(1 - y ^ 2) ^ 2))",
                             "rule": {
-                                "latex_str": "rewriting \\(t ^ {2} - y ^ {2} + 1\\) to \\(t ^ {2} + \\sqrt{1 - y ^ {2}} ^ {2}\\)",
+                                "latex_str": "rewriting \\(s ^ {2} - y ^ {2} + 1\\) to \\(s ^ {2} + \\sqrt{1 - y ^ {2}} ^ {2}\\)",
                                 "name": "Equation",
-                                "new_expr": "t ^ 2 + sqrt(1 - y ^ 2) ^ 2",
-                                "old_expr": "t ^ 2 - y ^ 2 + 1",
-                                "str": "rewriting t ^ 2 - y ^ 2 + 1 to t ^ 2 + sqrt(1 - y ^ 2) ^ 2"
+                                "new_expr": "s ^ 2 + sqrt(1 - y ^ 2) ^ 2",
+                                "old_expr": "s ^ 2 - y ^ 2 + 1",
+                                "str": "rewriting s ^ 2 - y ^ 2 + 1 to s ^ 2 + sqrt(1 - y ^ 2) ^ 2"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\int_{y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}} \\frac{\\sqrt{-y ^ {2} + 1}}{u ^ {2} (-y ^ {2} + 1) + (-y ^ {2} + 1)} \\,du)",
-                            "res": "2 * (INT u:[y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)]. sqrt(-(y ^ 2) + 1) / (u ^ 2 * (-(y ^ 2) + 1) + (-(y ^ 2) + 1)))",
+                            "latex_res": "2 (\\int_{y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}} \\frac{\\sqrt{-y ^ {2} + 1}}{v ^ {2} (-y ^ {2} + 1) + (-y ^ {2} + 1)} \\,dv)",
+                            "res": "2 * (INT v:[y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)]. sqrt(-(y ^ 2) + 1) / (v ^ 2 * (-(y ^ 2) + 1) + (-(y ^ 2) + 1)))",
                             "rule": {
-                                "latex_str": "substitute \\(u\\) for \\(\\frac{t}{\\sqrt{1 - y ^ {2}}}\\)",
+                                "latex_str": "substitute \\(v\\) for \\(\\frac{s}{\\sqrt{1 - y ^ {2}}}\\)",
                                 "name": "Substitution",
-                                "str": "substitute u for t / sqrt(1 - y ^ 2)",
-                                "var_name": "u",
-                                "var_subst": "t / sqrt(1 - y ^ 2)"
+                                "str": "substitute v for s / sqrt(1 - y ^ 2)",
+                                "var_name": "v",
+                                "var_subst": "s / sqrt(1 - y ^ 2)"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 \\sqrt{-y ^ {2} + 1} (\\int_{y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}} \\frac{1}{u ^ {2} (-y ^ {2} + 1) - y ^ {2} + 1} \\,du)",
-                            "res": "2 * sqrt(-(y ^ 2) + 1) * (INT u:[y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)]. 1 / (u ^ 2 * (-(y ^ 2) + 1) - y ^ 2 + 1))",
+                            "latex_res": "2 \\sqrt{-y ^ {2} + 1} (\\int_{y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}} \\frac{1}{v ^ {2} (-y ^ {2} + 1) - y ^ {2} + 1} \\,dv)",
+                            "res": "2 * sqrt(-(y ^ 2) + 1) * (INT v:[y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)]. 1 / (v ^ 2 * (-(y ^ 2) + 1) - y ^ 2 + 1))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -279,32 +279,32 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 \\sqrt{-y ^ {2} + 1} (\\int_{y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}} \\frac{1}{(u ^ {2} + 1) (1 - y ^ {2})} \\,du)",
-                            "res": "2 * sqrt(-(y ^ 2) + 1) * (INT u:[y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)]. 1 / ((u ^ 2 + 1) * (1 - y ^ 2)))",
+                            "latex_res": "2 \\sqrt{-y ^ {2} + 1} (\\int_{y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}} \\frac{1}{(v ^ {2} + 1) (1 - y ^ {2})} \\,dv)",
+                            "res": "2 * sqrt(-(y ^ 2) + 1) * (INT v:[y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)]. 1 / ((v ^ 2 + 1) * (1 - y ^ 2)))",
                             "rule": {
-                                "latex_str": "rewriting \\(u ^ {2} (-y ^ {2} + 1) - y ^ {2} + 1\\) to \\((u ^ {2} + 1) (1 - y ^ {2})\\)",
+                                "latex_str": "rewriting \\(v ^ {2} (-y ^ {2} + 1) - y ^ {2} + 1\\) to \\((v ^ {2} + 1) (1 - y ^ {2})\\)",
                                 "name": "Equation",
-                                "new_expr": "(u ^ 2 + 1) * (1 - y ^ 2)",
-                                "old_expr": "u ^ 2 * (-(y ^ 2) + 1) - y ^ 2 + 1",
-                                "str": "rewriting u ^ 2 * (-(y ^ 2) + 1) - y ^ 2 + 1 to (u ^ 2 + 1) * (1 - y ^ 2)"
+                                "new_expr": "(v ^ 2 + 1) * (1 - y ^ 2)",
+                                "old_expr": "v ^ 2 * (-(y ^ 2) + 1) - y ^ 2 + 1",
+                                "str": "rewriting v ^ 2 * (-(y ^ 2) + 1) - y ^ 2 + 1 to (v ^ 2 + 1) * (1 - y ^ 2)"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 \\sqrt{-y ^ {2} + 1} (\\int_{y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}} \\frac{1}{u ^ {2} + 1} (1 - y ^ {2}) ^ {-1} \\,du)",
-                            "res": "2 * sqrt(-(y ^ 2) + 1) * (INT u:[y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)]. 1 / (u ^ 2 + 1) * (1 - y ^ 2) ^ (-1))",
+                            "latex_res": "2 \\sqrt{-y ^ {2} + 1} (\\int_{y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}} \\frac{1}{v ^ {2} + 1} (1 - y ^ {2}) ^ {-1} \\,dv)",
+                            "res": "2 * sqrt(-(y ^ 2) + 1) * (INT v:[y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)]. 1 / (v ^ 2 + 1) * (1 - y ^ 2) ^ (-1))",
                             "rule": {
-                                "latex_str": "rewriting \\(\\frac{1}{(u ^ {2} + 1) (1 - y ^ {2})}\\) to \\(\\frac{1}{u ^ {2} + 1} (1 - y ^ {2}) ^ {-1}\\)",
+                                "latex_str": "rewriting \\(\\frac{1}{(v ^ {2} + 1) (1 - y ^ {2})}\\) to \\(\\frac{1}{v ^ {2} + 1} (1 - y ^ {2}) ^ {-1}\\)",
                                 "name": "Equation",
-                                "new_expr": "1 / (u ^ 2 + 1) * (1 - y ^ 2) ^ (-1)",
-                                "old_expr": "1 / ((u ^ 2 + 1) * (1 - y ^ 2))",
-                                "str": "rewriting 1 / ((u ^ 2 + 1) * (1 - y ^ 2)) to 1 / (u ^ 2 + 1) * (1 - y ^ 2) ^ (-1)"
+                                "new_expr": "1 / (v ^ 2 + 1) * (1 - y ^ 2) ^ (-1)",
+                                "old_expr": "1 / ((v ^ 2 + 1) * (1 - y ^ 2))",
+                                "str": "rewriting 1 / ((v ^ 2 + 1) * (1 - y ^ 2)) to 1 / (v ^ 2 + 1) * (1 - y ^ 2) ^ (-1)"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\frac{\\int_{y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}} \\frac{1}{u ^ {2} + 1} \\,du}{\\sqrt{-y ^ {2} + 1}})",
-                            "res": "2 * ((INT u:[y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)]. 1 / (u ^ 2 + 1)) / sqrt(-(y ^ 2) + 1))",
+                            "latex_res": "2 (\\frac{\\int_{y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}} \\frac{1}{v ^ {2} + 1} \\,dv}{\\sqrt{-y ^ {2} + 1}})",
+                            "res": "2 * ((INT v:[y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)]. 1 / (v ^ 2 + 1)) / sqrt(-(y ^ 2) + 1))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -312,8 +312,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\frac{\\left. \\tan^{-1}{u} \\right\\vert_{u=y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}}}{\\sqrt{-y ^ {2} + 1}})",
-                            "res": "2 * (([atan(u)]_u=y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)) / sqrt(-(y ^ 2) + 1))",
+                            "latex_res": "2 (\\frac{\\left. \\tan^{-1}{v} \\right\\vert_{v=y/\\sqrt{-y ^ {2} + 1}}^{(y + 1)/\\sqrt{-y ^ {2} + 1}}}{\\sqrt{-y ^ {2} + 1}})",
+                            "res": "2 * (([atan(v)]_v=y / sqrt(-(y ^ 2) + 1),(y + 1) / sqrt(-(y ^ 2) + 1)) / sqrt(-(y ^ 2) + 1))",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"

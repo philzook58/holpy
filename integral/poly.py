@@ -1,7 +1,7 @@
 """Polynomials."""
 
 from fractions import Fraction
-from typing import Union
+from typing import Union, Dict
 import functools
 import operator
 import sympy
@@ -52,7 +52,7 @@ def collect_pairs(ps):
     
     return tuple(sorted(res_list, key=lambda p: p[0]))
 
-def collect_pairs_power(ps, ctx: Context):
+def collect_pairs_power(ps: Dict[expr.Expr, "Polynomial"], ctx: Context):
     res = {}
     res_list = []
     def is_non_negative(c: Polynomial):
@@ -62,9 +62,9 @@ def collect_pairs_power(ps, ctx: Context):
         if e.is_var() and ctx.is_not_negative(e):
             return True
         return False
+
     for v, c in ps:
         if v in res:
-            assert isinstance(c, Polynomial)
             if is_non_negative(c) and is_non_negative(res[v]):
                 res[v] += c
             elif ctx.is_nonzero(v):
@@ -73,22 +73,10 @@ def collect_pairs_power(ps, ctx: Context):
                 res_list.append((v, c))
         else:  # v not in res
             res[v] = c
-    
-    def zero_for(v):
-        if isinstance(v, expr.Expr):
-            return expr.Const(0)
-        elif isinstance(v, ConstantPolynomial):
-            return ConstantPolynomial(tuple())
-        elif isinstance(v, Polynomial):
-            return Polynomial(tuple(), Context())
-        elif isinstance(v, (int, Fraction)):
-            return 0
-        else:
-            raise NotImplementedError
 
-    for k, v in res.items():
-        if v != zero_for(v):
-            res_list.append((k, v))
+    for v, c in res.items():
+        if c != Polynomial(tuple(), Context()):
+            res_list.append((v, c))
     
     return tuple(sorted(res_list, key=lambda p: p[0]))
 
@@ -987,8 +975,10 @@ def to_poly(e: expr.Expr, ctx: Context) -> Polynomial:
             return singleton(e, ctx)
         else:
             return -singleton(expr.POS_INF, ctx)
+
     elif e.is_indefinite_integral():
         return singleton(expr.IndefiniteIntegral(e.var, normalize(e.body, ctx), e.skolem_args), ctx)
+
     elif e.is_summation():
         l, u = normalize(e.lower, ctx), normalize(e.upper, ctx)
         if l == u:

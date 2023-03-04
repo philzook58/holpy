@@ -40,32 +40,32 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\int_{0}^{\\infty} \\frac{\\sqrt{a + 1}}{x ^ {2} (a + 1) + a + 1} \\,dx)",
-                            "res": "2 * (INT x:[0,oo]. sqrt(a + 1) / (x ^ 2 * (a + 1) + a + 1))",
+                            "latex_res": "2 (\\int_{0}^{\\infty} \\frac{\\sqrt{a + 1}}{y ^ {2} (a + 1) + a + 1} \\,dy)",
+                            "res": "2 * (INT y:[0,oo]. sqrt(a + 1) / (y ^ 2 * (a + 1) + a + 1))",
                             "rule": {
-                                "latex_str": "substitute \\(x\\) for \\(\\frac{t}{\\sqrt{a + 1}}\\)",
+                                "latex_str": "substitute \\(y\\) for \\(\\frac{t}{\\sqrt{a + 1}}\\)",
                                 "name": "Substitution",
-                                "str": "substitute x for t / sqrt(a + 1)",
-                                "var_name": "x",
+                                "str": "substitute y for t / sqrt(a + 1)",
+                                "var_name": "y",
                                 "var_subst": "t / sqrt(a + 1)"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\int_{0}^{\\infty} \\frac{\\sqrt{a + 1}}{(a + 1) (x ^ {2} + 1)} \\,dx)",
-                            "res": "2 * (INT x:[0,oo]. sqrt(a + 1) / ((a + 1) * (x ^ 2 + 1)))",
+                            "latex_res": "2 (\\int_{0}^{\\infty} \\frac{\\sqrt{a + 1}}{(a + 1) (y ^ {2} + 1)} \\,dy)",
+                            "res": "2 * (INT y:[0,oo]. sqrt(a + 1) / ((a + 1) * (y ^ 2 + 1)))",
                             "rule": {
-                                "latex_str": "rewriting \\(x ^ {2} (a + 1) + a + 1\\) to \\((a + 1) (x ^ {2} + 1)\\)",
+                                "latex_str": "rewriting \\(y ^ {2} (a + 1) + a + 1\\) to \\((a + 1) (y ^ {2} + 1)\\)",
                                 "name": "Equation",
-                                "new_expr": "(a + 1) * (x ^ 2 + 1)",
-                                "old_expr": "x ^ 2 * (a + 1) + a + 1",
-                                "str": "rewriting x ^ 2 * (a + 1) + a + 1 to (a + 1) * (x ^ 2 + 1)"
+                                "new_expr": "(a + 1) * (y ^ 2 + 1)",
+                                "old_expr": "y ^ 2 * (a + 1) + a + 1",
+                                "str": "rewriting y ^ 2 * (a + 1) + a + 1 to (a + 1) * (y ^ 2 + 1)"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\frac{\\sqrt{a + 1}}{a + 1} (\\left. \\tan^{-1}{x} \\right\\vert_{x=0}^{\\infty}))",
-                            "res": "2 * (sqrt(a + 1) / (a + 1) * ([atan(x)]_x=0,oo))",
+                            "latex_res": "2 (\\frac{\\sqrt{a + 1}}{a + 1} (\\left. \\tan^{-1}{y} \\right\\vert_{y=0}^{\\infty}))",
+                            "res": "2 * (sqrt(a + 1) / (a + 1) * ([atan(y)]_y=0,oo))",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
