@@ -237,20 +237,6 @@ class Expr:
         if poly.normalize(tmp1 + tmp2, conds) == Const(0):
             return True
         return False
-
-    def all_dependencies(self):
-        """Return the set of all dependent variables in Skolem terms."""
-        if self.ty == SKOLEMFUNC:
-            return self.dependent_vars
-        elif self.is_constant() or self.ty == VAR:
-            return set()
-        elif self.ty in (OP, FUN):
-            res = set()
-            for arg in self.args:
-                res = res.union(arg.all_dependencies())
-            return res
-        else:
-            raise NotImplementedError
         
     def is_summation(self) -> TypeGuard["Summation"]:
         return self.ty == SUMMATION
@@ -470,12 +456,14 @@ class Expr:
         return locations
     
     def find_subexpr_pred(self, pred: Callable[["Expr"], bool]) -> List[Tuple["Expr", Location]]:
-        """Find list of subexpressions satisfying a given predicate."""
+        """Find list of subexpressions satisfying a given predicate.
+        
+        Larger expressions are placed later.
+        
+        """
         results = []
 
         def find(e: Expr, loc: Location):
-            if pred(e):
-                results.append((e, Location(loc)))
             if e.is_op() or e.is_fun():
                 for i, arg in enumerate(e.args):
                     find(arg, loc.append(i))
@@ -490,8 +478,14 @@ class Expr:
                 find(e.lower, loc.append(1))
                 find(e.upper, loc.append(2))
 
+            if pred(e):
+                results.append((e, Location(loc)))
+
         find(self, Location(""))
         return results
+
+    def find_all_subexpr(self) -> List[Tuple["Expr", Location]]:
+        return self.find_subexpr_pred(lambda t: True)
 
     def subst(self, var: str, e: "Expr") -> "Expr":
         """Substitute occurrence of var for e in self."""

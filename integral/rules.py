@@ -1976,7 +1976,7 @@ class FoldDefinition(Rule):
 
     @staticmethod
     def search(e: Expr, ctx: Context) -> List[Tuple[Expr, expr.Location, str]]:
-        subexprs = e.find_subexpr_pred(lambda t: True)
+        subexprs = e.find_all_subexpr()
         res = []
         for sube, loc in subexprs:
             for identity in ctx.get_definitions():

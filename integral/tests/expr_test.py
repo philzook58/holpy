@@ -522,14 +522,7 @@ class ExprTest(unittest.TestCase):
             v = parse_expr(v)
             self.assertEqual(str(v.normalize()), v_res)
 
-    def testAllDependencies(self):
-        test_data = [
-                    ("SKOLEM_FUNC(E(b))", {Var('b')}),
-                    ("1/2 * pi * SKOLEM_CONST(C)", set()),
-                    ("pi/2 * log(SKOLEM_FUNC(C(b)))", {Var('b')}),]
-        for s, res in test_data:
-            e = parse_expr(s)
-            self.assertEqual(res, e.all_dependencies())
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -1,22 +1,29 @@
 """Conditions"""
 
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Union
 
 from integral import expr
 from integral.expr import Expr
 from integral import latex
 from integral import interval
+from integral import parser
 from integral.interval import Interval
 
 
 class Conditions:
     """A condition is represented by a list of boolean expressions."""
-    def __init__(self, conds=None):
+    def __init__(self, conds: Union["Conditions", List[Union[str, Expr]]] = None):
         self.data: List[Expr] = list()
         if isinstance(conds, Conditions):
             self.data.extend(conds.data)
         elif conds is not None:
-            self.data.extend(conds)
+            for cond in conds:
+                if isinstance(cond, str):
+                    self.data.append(parser.parse_expr(cond))
+                elif isinstance(cond, Expr):
+                    self.data.append(cond)
+                else:
+                    raise TypeError
 
     def __hash__(self):
         return hash(tuple(self.data))

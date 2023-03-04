@@ -4,15 +4,17 @@ from typing import Optional, List, Dict, Union
 import os
 import json
 
-from integral.expr import Expr, Eq, expr_to_pattern
+from integral.expr import Expr, Eq, expr_to_pattern, eval_expr, match
 from integral import parser
 from integral.conditions import Conditions
 
 dirname = os.path.dirname(__file__)
 
 class Identity:
-    def __init__(self, expr: Expr, *,
+    def __init__(self, expr: Union[str, Expr], *,
                  conds: Optional[Conditions] = None, simp_level: int = 1, category: str = ""):
+        if isinstance(expr, str):
+            expr = parser.parse_expr(expr)
         self.expr = expr
         if conds is None:
             conds = Conditions()
@@ -81,6 +83,9 @@ class Context:
         # List of tables of function values
         self.function_tables: Dict[str, Dict[Expr, Expr]] = dict()
 
+        # List of inequalities
+        self.inequalities: List[Identity] = list()
+
         # Lemmas
         self.lemmas: List[Identity] = list()
 
@@ -119,6 +124,9 @@ class Context:
         res += "Function tables\n"
         for funcname in self.get_function_tables():
             res += "  table for %s\n" % funcname
+        res += "Inequalities\n"
+        for identity in self.get_inequalities():
+            res += str(identity) + "\n"
         res += "Lemmas\n"
         for identity in self.get_lemmas():
             res += str(identity) + "\n"
@@ -168,6 +176,11 @@ class Context:
     def get_function_tables(self) -> Dict[str, Dict[Expr, Expr]]:
         res = self.parent.get_function_tables() if self.parent is not None else dict()
         res.update(self.function_tables)
+        return res
+    
+    def get_inequalities(self) -> List[Identity]:
+        res = self.parent.get_inequalities() if self.parent is not None else []
+        res.extend(self.inequalities)
         return res
 
     def get_lemmas(self) -> List[Identity]:
@@ -257,6 +270,11 @@ class Context:
             output = parser.parse_expr(output)
             self.function_tables[funcname][input] = output
 
+    def add_inequality(self, e: Expr, conds: Conditions):
+        symb_e = expr_to_pattern(e)
+        symb_conds = [expr_to_pattern(cond) for cond in conds.data]
+        self.inequalities.append(Identity(symb_e, conds=Conditions(symb_conds)))
+
     def add_lemma(self, e: Union[Expr, str], conds: Conditions):
         if isinstance(e, str):
             e = parser.parse_expr(e)
@@ -311,6 +329,13 @@ class Context:
                 for cond in item['conds']:
                     conds.add_condition(parser.parse_expr(cond))
             self.add_simp_identity(e, conds)
+        if 'attributes' in item and 'inequality' in item['attributes']:
+            e = parser.parse_expr(item['expr'])
+            conds = Conditions()
+            if 'conds' in item:
+                for cond in item['conds']:
+                    conds.add_condition(parser.parse_expr(cond))
+            self.add_inequality(e, conds)
         if item['type'] == 'definition':
             e = parser.parse_expr(item['expr'])
             self.add_definition(e)
@@ -341,7 +366,15 @@ class Context:
     def check_condition(self, e: Expr) -> bool:
         """Check the given condition under the extra conditions"""
         conds = self.get_conds()
+
+        print(e, '[', conds, ']')
+
+        from integral import condprover
+        if condprover.check_condition(e, self):
+            return True
+
         if conds.check_condition(e):
+            print('MISS!!')
             return True
         for lemma in self.get_lemmas():
             if lemma.expr == e and set(lemma.conds.data).issubset(set(conds.data)):
