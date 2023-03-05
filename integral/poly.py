@@ -1015,6 +1015,54 @@ def simplify_identity(e: expr.Expr, ctx: Context) -> expr.Expr:
                 return identity.rhs.inst_pat(inst)
     return e
 
+def simplify_eq(e: expr.Expr, ctx: Context) -> expr.Expr:
+    if not e.is_var():
+        return e
+
+    for eq in ctx.get_conds().data:
+        if eq.is_equals() and e == eq.lhs and eq.rhs.is_constant():
+            return eq.rhs
+    return e
+
+def simplify_limit(e: expr.Expr, ctx: Context) -> expr.Expr:
+    from integral import limits
+    if not e.is_limit():
+        return e
+    if e.var not in e.body.get_vars():
+        return e.body
+
+    if e.lim == expr.POS_INF:
+        return limits.reduce_inf_limit(e.body, e.var, ctx)
+    elif e.lim == expr.NEG_INF:
+        raise limits.reduce_neg_inf_limit(e.body, e.var, ctx)
+    else:
+        return limits.reduce_finite_limit(e, ctx)
+
+def simplify_integral(e: expr.Expr, ctx: Context) -> expr.Expr:
+    if e.is_integral() and e.body.is_deriv() and e.body.var == e.var:
+        return expr.EvalAt(e.var, e.lower, e.upper, e.body.body)
+    else:
+        return e
+
+def simplify_power(e: expr.Expr, ctx: Context) -> expr.Expr:
+    if not e.is_power():
+        return e
+    if e.args[1].is_plus() and e.args[0].is_const() and e.args[1].args[1].is_const():
+        # c1 ^ (a + c2) => c1 ^ c2 * c1 ^ a
+        return (e.args[0] ^ e.args[1].args[1]) * (e.args[0] ^ e.args[1].args[0])
+    elif e.args[1].is_minus() and e.args[0].is_const() and e.args[1].args[1].is_const():
+        # c1 ^ (a - c2) => c1 ^ -c2 * c1 ^ a
+        return (e.args[0] ^ e.args[1].args[0]) * (e.args[0] ^ (-(e.args[1].args[1])))
+    elif e.args[0].is_uminus() and e.args[1].is_const():
+        # (-a) ^ n = (-1) ^ n * a ^ n
+        return (expr.Const(-1) ^ e.args[1]) * (e.args[0].args[0] ^ e.args[1])
+    elif e.args[0].is_minus() and e.args[0].args[0].is_uminus() and e.args[1].is_const():
+        # (-a - b) ^ n = (-1) ^ n * (a + b) ^ n
+        nega, negb = e.args[0].args
+        return (expr.Const(-1) ^ e.args[1]) * ((nega.args[0] + negb) ^ e.args[1])
+    else:
+        return e
+
 def normalize(e: expr.Expr, ctx: Context) -> expr.Expr:
     if e.is_equals():
         return expr.Eq(normalize(e.lhs, ctx), normalize(e.rhs, ctx))
@@ -1025,6 +1073,10 @@ def normalize(e: expr.Expr, ctx: Context) -> expr.Expr:
         e = apply_subterm(e, function_table, ctx)
         e = apply_subterm(e, function_eval, ctx)
         e = apply_subterm(e, simplify_identity, ctx)
+        e = apply_subterm(e, simplify_eq, ctx)
+        e = apply_subterm(e, simplify_limit, ctx)
+        e = apply_subterm(e, simplify_integral, ctx)
+        e = apply_subterm(e, simplify_power, ctx)
         if e == old_e:
             break
 

@@ -433,31 +433,6 @@ class Linearity(Rule):
         return rec(e)
 
 
-class CommonIntegral(Rule):
-    """Applies common integrals"""
-
-    def __init__(self):
-        self.name = "CommonIntegral"
-
-    def __str__(self):
-        return "common integrals"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self)
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        if not e.is_integral():
-            return e
-
-        if isinstance(e.body, Deriv) and e.body.var == e.var:
-            return EvalAt(e.var, e.lower, e.upper, e.body.body)
-        else:
-            return e
-
-
 class ApplyIdentity(Rule):
     """Apply identities (trigonometric, etc) to the current term.
     
@@ -882,91 +857,12 @@ class OnLocation(Rule):
         return rec(e, self.loc, ctx)
 
 
-class SimplifyPower(Rule):
-    """Apply the following simplifications on powers:
-
-    1. Collect repeated powers
-        x ^ a ^ b => x ^ (a * b).
-
-    2. Separate constants in the exponent if base is also a constant
-        c1 ^ (a + c2) => c1 ^ c2 * c1 ^ a
-
-    3. In the expression (-a) ^ n, separate out -1.
-        (-a) ^ n = (-1) ^ n * a ^ n
-        (-a + -b) ^ n = (-1) ^ n * (a + b) ^ n
-
-    """
-
-    def __init__(self):
-        self.name = "SimplifyPower"
-
-    def __str__(self):
-        return "simplify powers"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self)
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        if not e.is_power():
-            return e
-        if e.args[1].is_plus() and e.args[0].is_const() and e.args[1].args[1].is_const():
-            # c1 ^ (a + c2) => c1 ^ c2 * c1 ^ a
-            return (e.args[0] ^ e.args[1].args[1]) * (e.args[0] ^ e.args[1].args[0])
-        elif e.args[1].is_minus() and e.args[0].is_const() and e.args[1].args[1].is_const():
-            # c1 ^ (a - c2) => c1 ^ -c2 * c1 ^ a
-            return (e.args[0] ^ e.args[1].args[0]) * (e.args[0] ^ (-(e.args[1].args[1])))
-        elif e.args[0].is_uminus() and e.args[1].is_const():
-            # (-a) ^ n = (-1) ^ n * a ^ n
-            return (Const(-1) ^ e.args[1]) * (e.args[0].args[0] ^ e.args[1])
-        elif e.args[0].is_minus() and e.args[0].args[0].is_uminus() and e.args[1].is_const():
-            # (-a - b) ^ n = (-1) ^ n * (a + b) ^ n
-            nega, negb = e.args[0].args
-            return (Const(-1) ^ e.args[1]) * ((nega.args[0] + negb) ^ e.args[1])
-        else:
-            return e
-
-
-class ReduceLimit(Rule):
-    """Reduce limit expressions."""
-
-    def __init__(self):
-        self.name = "ReduceLimit"
-
-    def __str__(self):
-        return "reduce limits"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self)
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        if not e.is_limit():
-            return e
-        if e.var not in e.body.get_vars():
-            return e.body
-
-        if e.lim == POS_INF:
-            return limits.reduce_inf_limit(e.body, e.var, ctx)
-        elif e.lim == NEG_INF:
-            raise limits.reduce_neg_inf_limit(e.body, e.var, ctx)
-        else:
-            return limits.reduce_finite_limit(e, ctx)
-
-
 class FullSimplify(Rule):
     """Perform simplification by applying the following rules repeatedly:
 
     - Simplify
-    - CommonIntegral
     - Linearity
     - DerivativeSimplify
-    - SimplifyPower
-    - ReduceLimit
 
     """
 
@@ -987,15 +883,8 @@ class FullSimplify(Rule):
         current = e
         while True:
             s = OnSubterm(Linearity()).eval(current, ctx)
-            if ctx != None:
-                for b in ctx.get_conds().data:
-                    if b.is_equals() and b.args[0].is_var() and b.args[1].is_constant():
-                        s = s.subst(str(b.args[0]), b.args[1])
-            s = OnSubterm(CommonIntegral()).eval(s, ctx)
             s = Simplify().eval(s, ctx)
             s = OnSubterm(DerivativeSimplify()).eval(s, ctx)
-            s = OnSubterm(SimplifyPower()).eval(s, ctx)
-            s = OnSubterm(ReduceLimit()).eval(s, ctx)
             if s == current:
                 break
             current = s

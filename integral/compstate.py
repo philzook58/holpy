@@ -796,8 +796,6 @@ def parse_rule(item) -> Rule:
         return rules.LimitEquation(var, lim)
     elif item['name'] == 'IntSumExchange':
         return rules.IntSumExchange()
-    elif item['name'] == 'SimplifyPower':
-        return rules.SimplifyPower()
     elif item['name'] == 'DerivEquation':
         var = item['var']
         return rules.DerivEquation(var)
