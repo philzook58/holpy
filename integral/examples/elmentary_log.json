@@ -25,11 +25,11 @@
                     "latex_cond": "m \\in\\mathbb{Z}"
                 }
             ],
-            "finished": true,
+            "finished": false,
             "goal": "I(m,n) = -1 * I(m,n - 1) * (n / (m + 1))",
             "latex_goal": "I(m,n) = -1 I(m,n - 1) (\\frac{n}{m + 1})",
             "proof": {
-                "finished": true,
+                "finished": false,
                 "goal": "I(m,n) = -1 * I(m,n - 1) * (n / (m + 1))",
                 "latex_goal": "I(m,n) = -1 I(m,n - 1) (\\frac{n}{m + 1})",
                 "lhs_calc": {
@@ -59,8 +59,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{n (\\int_{0}^{1} x ^ {m} \\log^{n - 1}(x) \\,dx)}{m + 1}",
-                            "res": "-(n * (INT x:[0,1]. x ^ m * log(x) ^ (n - 1)) / (m + 1))",
+                            "latex_res": "-\\frac{n}{m + 1} (\\int_{0}^{1} x ^ {m} \\log^{n - 1}(x) \\,dx)",
+                            "res": "-(n / (m + 1) * (INT x:[0,1]. x ^ m * log(x) ^ (n - 1)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -68,8 +68,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{n I(m,n - 1)}{m + 1}",
-                            "res": "-(n * I(m,n - 1) / (m + 1))",
+                            "latex_res": "-\\frac{n}{m + 1} (\\int_{0}^{1} x ^ {m} \\log^{n - 1}(x) \\,dx)",
+                            "res": "-(n / (m + 1) * (INT x:[0,1]. x ^ m * log(x) ^ (n - 1)))",
                             "rule": {
                                 "func_name": "I",
                                 "loc": "0.0.1",
@@ -79,8 +79,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{n I(m,n - 1)}{m + 1}",
-                            "res": "-(n * I(m,n - 1) / (m + 1))",
+                            "latex_res": "-\\frac{n}{m + 1} (\\int_{0}^{1} x ^ {m} \\log^{n - 1}(x) \\,dx)",
+                            "res": "-(n / (m + 1) * (INT x:[0,1]. x ^ m * log(x) ^ (n - 1)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"

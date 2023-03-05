@@ -332,7 +332,10 @@
             "conds": [
                 "x > 0"
             ],
-            "category": "exp-log"
+            "category": "exp-log",
+            "attributes": [
+                "simplify"
+            ]
         },
         {
             "type": "axiom",
@@ -607,7 +610,7 @@
         },
         {
             "type": "axiom",
-            "expr": "cos(pi - u) = -cos(u)",
+            "expr": "cos(-u + pi) = -cos(u)",
             "category": "trigonometric",
             "attributes": [
                 "simplify"
@@ -639,7 +642,7 @@
         },
         {
             "type": "axiom",
-            "expr": "sin(pi - u) = sin(u)",
+            "expr": "sin(-u + pi) = sin(u)",
             "category": "trigonometric",
             "attributes": [
                 "simplify"

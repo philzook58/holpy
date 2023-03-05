@@ -386,6 +386,8 @@ def limit_mult(a: Limit, b: Limit, ctx: Context) -> Limit:
         return limit_mult(b, a, ctx=ctx)
     elif a.e == Const(0) and b.is_bounded:
         return Limit(0)
+    elif b.e == Const(0) and a.is_bounded:
+        return Limit(0)
     else:
         res_e = normalize(a.e * b.e, ctx)
         if a.side == TWO_SIDED or b.side == TWO_SIDED:

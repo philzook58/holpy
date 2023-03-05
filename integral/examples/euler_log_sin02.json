@@ -78,6 +78,25 @@
                             "type": "CalculationStep"
                         },
                         {
+                            "latex_res": "-\\frac{\\pi (-\\log{(2)} + \\log{(\\pi)})}{2} - \\frac{\\pi \\log{(2)}}{2} + \\frac{\\pi}{2}",
+                            "res": "-(pi * (-log(2) + log(pi)) / 2) - pi * log(2) / 2 + pi / 2",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "-(-\\frac{\\pi \\log{(2)}}{2} + \\frac{\\pi \\log{(\\pi)}}{2}) - \\frac{\\pi \\log{(2)}}{2} + \\frac{\\pi}{2}",
+                            "res": "-(-(pi * log(2) / 2) + pi * log(pi) / 2) - pi * log(2) / 2 + pi / 2",
+                            "rule": {
+                                "loc": "0.0.0",
+                                "name": "ExpandPolynomial",
+                                "str": "expand polynomial at 0.0.0"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
                             "latex_res": "-\\frac{\\pi \\log{(\\pi)}}{2} + \\frac{\\pi}{2}",
                             "res": "-(pi * log(pi) / 2) + pi / 2",
                             "rule": {

@@ -890,8 +890,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\pi}{4} (\\frac{1}{\\cos{a}})",
-                            "res": "pi / 4 * (1 / cos(a))",
+                            "latex_res": "\\frac{1}{4} (\\frac{\\pi}{\\cos{a}})",
+                            "res": "1/4 * (pi / cos(a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -906,8 +906,8 @@
                     "start": "pi / (4 * cos(a))",
                     "steps": [
                         {
-                            "latex_res": "\\frac{\\pi}{4} (\\frac{1}{\\cos{a}})",
-                            "res": "pi / 4 * (1 / cos(a))",
+                            "latex_res": "\\frac{1}{4} (\\frac{\\pi}{\\cos{a}})",
+                            "res": "1/4 * (pi / cos(a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -960,8 +960,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(-\\frac{\\pi}{4}) (\\frac{1}{\\cos{a}})",
-                            "res": "-(pi / 4) * (1 / cos(a))",
+                            "latex_res": "-\\frac{1}{4} (\\frac{\\pi}{\\cos{a}})",
+                            "res": "-1/4 * (pi / cos(a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -976,8 +976,8 @@
                     "start": "-(pi / (4 * cos(a)))",
                     "steps": [
                         {
-                            "latex_res": "(-\\frac{\\pi}{4}) (\\frac{1}{\\cos{a}})",
-                            "res": "-(pi / 4) * (1 / cos(a))",
+                            "latex_res": "-\\frac{1}{4} (\\frac{\\pi}{\\cos{a}})",
+                            "res": "-1/4 * (pi / cos(a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"

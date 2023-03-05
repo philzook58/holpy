@@ -65,8 +65,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "e^{1/4\\cdot (b ^ {2}/a)} (\\int_{-\\infty}^{\\infty} e^{-a (-1/2\\cdot (b/a) + x) ^ {2}} \\,dx)",
-                            "res": "exp(1/4 * (b ^ 2 / a)) * (INT x:[-oo,oo]. exp(-(a * (-1/2 * (b / a) + x) ^ 2)))",
+                            "latex_res": "e^{b ^ {2}/(4 a)} (\\int_{-\\infty}^{\\infty} e^{-a (-b/(2 a) + x) ^ {2}} \\,dx)",
+                            "res": "exp(b ^ 2 / (4 * a)) * (INT x:[-oo,oo]. exp(-(a * (-(b / (2 * a)) + x) ^ 2)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -74,8 +74,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "e^{1/4\\cdot (b ^ {2}/a)} (\\int_{-\\infty}^{\\infty} e^{-a y ^ {2}} \\,dy)",
-                            "res": "exp(1/4 * (b ^ 2 / a)) * (INT y:[-oo,oo]. exp(-(a * y ^ 2)))",
+                            "latex_res": "e^{b ^ {2}/(4 a)} (\\int_{-\\infty}^{\\infty} e^{-a y ^ {2}} \\,dy)",
+                            "res": "exp(b ^ 2 / (4 * a)) * (INT y:[-oo,oo]. exp(-(a * y ^ 2)))",
                             "rule": {
                                 "latex_str": "substitute \\(y\\) for \\(x - \\frac{b}{2 a}\\)",
                                 "name": "Substitution",
@@ -86,8 +86,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "e^{1/4\\cdot (b ^ {2}/a)} (\\sqrt{\\pi} (\\frac{1}{\\sqrt{a}}))",
-                            "res": "exp(1/4 * (b ^ 2 / a)) * (sqrt(pi) * (1 / sqrt(a)))",
+                            "latex_res": "e^{b ^ {2}/(4 a)} (\\frac{\\sqrt{\\pi}}{\\sqrt{a}})",
+                            "res": "exp(b ^ 2 / (4 * a)) * (sqrt(pi) / sqrt(a))",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
@@ -95,8 +95,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\sqrt{\\pi} (\\frac{e^{1/4\\cdot (b ^ {2}/a)}}{\\sqrt{a}})",
-                            "res": "sqrt(pi) * (exp(1/4 * (b ^ 2 / a)) / sqrt(a))",
+                            "latex_res": "\\frac{\\sqrt{\\pi}}{\\sqrt{a}} e^{b ^ {2}/(4 a)}",
+                            "res": "sqrt(pi) / sqrt(a) * exp(b ^ 2 / (4 * a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -111,8 +111,8 @@
                     "start": "exp(b ^ 2 / (4 * a)) * sqrt(pi / a)",
                     "steps": [
                         {
-                            "latex_res": "\\sqrt{\\pi} (\\frac{e^{1/4\\cdot (b ^ {2}/a)}}{\\sqrt{a}})",
-                            "res": "sqrt(pi) * (exp(1/4 * (b ^ 2 / a)) / sqrt(a))",
+                            "latex_res": "\\frac{\\sqrt{\\pi}}{\\sqrt{a}} e^{b ^ {2}/(4 a)}",
+                            "res": "sqrt(pi) / sqrt(a) * exp(b ^ 2 / (4 * a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -157,8 +157,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(-\\frac{\\sqrt{\\pi}}{4}) (\\frac{b ^ {2} e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {5/2}}) - \\frac{\\sqrt{\\pi}}{2} (\\frac{e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {3/2}})",
-                            "res": "-(sqrt(pi) / 4) * (b ^ 2 * exp(1/4 * (b ^ 2 / a)) / a ^ (5/2)) - sqrt(pi) / 2 * (exp(1/4 * (b ^ 2 / a)) / a ^ (3/2))",
+                            "latex_res": "-\\frac{b ^ {2}\\cdot \\sqrt{\\pi}}{4 a ^ {5/2}} e^{b ^ {2}/(4 a)} - \\frac{\\sqrt{\\pi}}{2 a ^ {3/2}} e^{b ^ {2}/(4 a)}",
+                            "res": "-(b ^ 2 * sqrt(pi) / (4 * a ^ (5/2)) * exp(b ^ 2 / (4 * a))) - sqrt(pi) / (2 * a ^ (3/2)) * exp(b ^ 2 / (4 * a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -173,8 +173,8 @@
                     "start": "-(b ^ 2 / (4 * a ^ 2)) * exp(b ^ 2 / (4 * a)) * sqrt(pi / a) - 1 / (2 * a) * exp(b ^ 2 / (4 * a)) * sqrt(pi / a)",
                     "steps": [
                         {
-                            "latex_res": "(-\\frac{\\sqrt{\\pi}}{4}) (\\frac{b ^ {2} e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {5/2}}) - \\frac{\\sqrt{\\pi}}{2} (\\frac{e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {3/2}})",
-                            "res": "-(sqrt(pi) / 4) * (b ^ 2 * exp(1/4 * (b ^ 2 / a)) / a ^ (5/2)) - sqrt(pi) / 2 * (exp(1/4 * (b ^ 2 / a)) / a ^ (3/2))",
+                            "latex_res": "-\\frac{b ^ {2}\\cdot \\sqrt{\\pi}}{4 a ^ {5/2}} e^{b ^ {2}/(4 a)} - \\frac{\\sqrt{\\pi}}{2 a ^ {3/2}} e^{b ^ {2}/(4 a)}",
+                            "res": "-(b ^ 2 * sqrt(pi) / (4 * a ^ (5/2)) * exp(b ^ 2 / (4 * a))) - sqrt(pi) / (2 * a ^ (3/2)) * exp(b ^ 2 / (4 * a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -219,8 +219,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\sqrt{\\pi}}{2} (\\frac{b e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {3/2}})",
-                            "res": "sqrt(pi) / 2 * (b * exp(1/4 * (b ^ 2 / a)) / a ^ (3/2))",
+                            "latex_res": "\\frac{b\\cdot \\sqrt{\\pi}}{2 a ^ {3/2}} e^{b ^ {2}/(4 a)}",
+                            "res": "b * sqrt(pi) / (2 * a ^ (3/2)) * exp(b ^ 2 / (4 * a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -235,8 +235,8 @@
                     "start": "b / (2 * a) * exp(b ^ 2 / (4 * a)) * sqrt(pi / a)",
                     "steps": [
                         {
-                            "latex_res": "\\frac{\\sqrt{\\pi}}{2} (\\frac{b e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {3/2}})",
-                            "res": "sqrt(pi) / 2 * (b * exp(1/4 * (b ^ 2 / a)) / a ^ (3/2))",
+                            "latex_res": "\\frac{b\\cdot \\sqrt{\\pi}}{2 a ^ {3/2}} e^{b ^ {2}/(4 a)}",
+                            "res": "b * sqrt(pi) / (2 * a ^ (3/2)) * exp(b ^ 2 / (4 * a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -286,8 +286,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\int_{-\\infty}^{\\infty} x e^{-a x ^ {2} + b x} \\,dx = \\frac{\\sqrt{\\pi}}{2} (\\frac{b e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {3/2}})",
-                            "res": "(INT x:[-oo,oo]. x * exp(-(a * x ^ 2) + b * x)) = sqrt(pi) / 2 * (b * exp(1/4 * (b ^ 2 / a)) / a ^ (3/2))",
+                            "latex_res": "\\int_{-\\infty}^{\\infty} x e^{-a x ^ {2} + b x} \\,dx = \\frac{b\\cdot \\sqrt{\\pi}}{2 a ^ {3/2}} e^{b ^ {2}/(4 a)}",
+                            "res": "(INT x:[-oo,oo]. x * exp(-(a * x ^ 2) + b * x)) = b * sqrt(pi) / (2 * a ^ (3/2)) * exp(b ^ 2 / (4 * a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -337,8 +337,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-(\\int_{-\\infty}^{\\infty} x ^ {2} e^{-a x ^ {2} + b x} \\,dx) = (-\\frac{\\sqrt{\\pi}}{4}) (\\frac{b ^ {2} e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {5/2}}) - \\frac{\\sqrt{\\pi}}{2} (\\frac{e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {3/2}})",
-                            "res": "-(INT x:[-oo,oo]. x ^ 2 * exp(-(a * x ^ 2) + b * x)) = -(sqrt(pi) / 4) * (b ^ 2 * exp(1/4 * (b ^ 2 / a)) / a ^ (5/2)) - sqrt(pi) / 2 * (exp(1/4 * (b ^ 2 / a)) / a ^ (3/2))",
+                            "latex_res": "-(\\int_{-\\infty}^{\\infty} x ^ {2} e^{-a x ^ {2} + b x} \\,dx) = -\\frac{b ^ {2}\\cdot \\sqrt{\\pi}}{4 a ^ {5/2}} e^{b ^ {2}/(4 a)} - \\frac{\\sqrt{\\pi}}{2 a ^ {3/2}} e^{b ^ {2}/(4 a)}",
+                            "res": "-(INT x:[-oo,oo]. x ^ 2 * exp(-(a * x ^ 2) + b * x)) = -(b ^ 2 * sqrt(pi) / (4 * a ^ (5/2)) * exp(b ^ 2 / (4 * a))) - sqrt(pi) / (2 * a ^ (3/2)) * exp(b ^ 2 / (4 * a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -346,8 +346,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\int_{-\\infty}^{\\infty} x ^ {2} e^{-a x ^ {2} + b x} \\,dx = \\frac{\\sqrt{\\pi}}{4} (\\frac{b ^ {2} e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {5/2}}) + \\frac{\\sqrt{\\pi}}{2} (\\frac{e^{1/4\\cdot (b ^ {2}/a)}}{a ^ {3/2}})",
-                            "res": "(INT x:[-oo,oo]. x ^ 2 * exp(-(a * x ^ 2) + b * x)) = sqrt(pi) / 4 * (b ^ 2 * exp(1/4 * (b ^ 2 / a)) / a ^ (5/2)) + sqrt(pi) / 2 * (exp(1/4 * (b ^ 2 / a)) / a ^ (3/2))",
+                            "latex_res": "\\int_{-\\infty}^{\\infty} x ^ {2} e^{-a x ^ {2} + b x} \\,dx = \\frac{b ^ {2}\\cdot \\sqrt{\\pi}}{4 a ^ {5/2}} e^{b ^ {2}/(4 a)} + \\frac{\\sqrt{\\pi}}{2 a ^ {3/2}} e^{b ^ {2}/(4 a)}",
+                            "res": "(INT x:[-oo,oo]. x ^ 2 * exp(-(a * x ^ 2) + b * x)) = b ^ 2 * sqrt(pi) / (4 * a ^ (5/2)) * exp(b ^ 2 / (4 * a)) + sqrt(pi) / (2 * a ^ (3/2)) * exp(b ^ 2 / (4 * a))",
                             "rule": {
                                 "latex_str": "solve equation for \\(\\int_{-\\infty}^{\\infty} x ^ {2} e^{-a x ^ {2} + b x} \\,dx\\)",
                                 "name": "SolveEquation",

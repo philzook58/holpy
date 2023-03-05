@@ -19,8 +19,8 @@
                     "start": "I(0)",
                     "steps": [
                         {
-                            "latex_res": "\\int_{0}^{\\infty} e^{-1/2\\cdot x ^ {2}} \\,dx",
-                            "res": "INT x:[0,oo]. exp(-1/2 * x ^ 2)",
+                            "latex_res": "\\int_{0}^{\\infty} e^{-x ^ {2}/2} \\,dx",
+                            "res": "INT x:[0,oo]. exp(-(x ^ 2 / 2))",
                             "rule": {
                                 "func_name": "I",
                                 "name": "ExpandDefinition",
@@ -29,8 +29,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\int_{0}^{\\infty} e^{-1/2\\cdot x ^ {2}} \\,dx",
-                            "res": "INT x:[0,oo]. exp(-1/2 * x ^ 2)",
+                            "latex_res": "\\int_{0}^{\\infty} e^{-x ^ {2}/2} \\,dx",
+                            "res": "INT x:[0,oo]. exp(-(x ^ 2 / 2))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -41,11 +41,11 @@
                             "latex_res": "\\int_{0}^{\\infty} e^{-x ^ {2}/2} \\,dx",
                             "res": "INT x:[0,oo]. exp(-(x ^ 2) / 2)",
                             "rule": {
-                                "latex_str": "rewriting \\(-\\frac{1}{2} x ^ {2}\\) to \\(\\frac{-x ^ {2}}{2}\\)",
+                                "latex_str": "rewriting \\(-\\frac{x ^ {2}}{2}\\) to \\(\\frac{-x ^ {2}}{2}\\)",
                                 "name": "Equation",
                                 "new_expr": "-(x ^ 2) / 2",
-                                "old_expr": "-1/2 * x ^ 2",
-                                "str": "rewriting -1/2 * x ^ 2 to -(x ^ 2) / 2"
+                                "old_expr": "-(x ^ 2 / 2)",
+                                "str": "rewriting -(x ^ 2 / 2) to -(x ^ 2) / 2"
                             },
                             "type": "CalculationStep"
                         },
@@ -103,8 +103,8 @@
                     "start": "D t. I(t)",
                     "steps": [
                         {
-                            "latex_res": "\\frac{d}{dt} \\int_{0}^{\\infty} e^{-1/2\\cdot x ^ {2}} \\cos{(t x)} \\,dx",
-                            "res": "D t. INT x:[0,oo]. exp(-1/2 * x ^ 2) * cos(t * x)",
+                            "latex_res": "\\frac{d}{dt} \\int_{0}^{\\infty} \\cos{(t x)} e^{-x ^ {2}/2} \\,dx",
+                            "res": "D t. INT x:[0,oo]. cos(t * x) * exp(-(x ^ 2 / 2))",
                             "rule": {
                                 "func_name": "I",
                                 "loc": "subterms",
@@ -114,8 +114,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-(\\int_{0}^{\\infty} x e^{-1/2\\cdot x ^ {2}} \\sin{(t x)} \\,dx)",
-                            "res": "-(INT x:[0,oo]. x * exp(-1/2 * x ^ 2) * sin(t * x))",
+                            "latex_res": "-(\\int_{0}^{\\infty} x \\sin{(t x)} e^{-x ^ {2}/2} \\,dx)",
+                            "res": "-(INT x:[0,oo]. x * sin(t * x) * exp(-(x ^ 2 / 2)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -123,8 +123,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-((\\left. -e^{-1/2\\cdot x ^ {2}} \\sin{(t x)} \\right\\vert_{x=0}^{\\infty}) - (\\int_{0}^{\\infty} -t e^{-1/2\\cdot x ^ {2}} \\cos{(t x)} \\,dx))",
-                            "res": "-(([-(exp(-1/2 * x ^ 2) * sin(t * x))]_x=0,oo) - (INT x:[0,oo]. -(t * exp(-1/2 * x ^ 2) * cos(t * x))))",
+                            "latex_res": "-((\\left. -\\sin{(t x)} e^{-x ^ {2}/2} \\right\\vert_{x=0}^{\\infty}) - (\\int_{0}^{\\infty} -t \\cos{(t x)} e^{-x ^ {2}/2} \\,dx))",
+                            "res": "-(([-(sin(t * x) * exp(-(x ^ 2 / 2)))]_x=0,oo) - (INT x:[0,oo]. -(t * cos(t * x) * exp(-(x ^ 2 / 2)))))",
                             "rule": {
                                 "latex_str": "integrate by parts \\(u \\to \\sin{(t x)}, v \\to -e^{-x ^ {2}/2}\\)",
                                 "name": "IntegrationByParts",
@@ -135,8 +135,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-t (\\int_{0}^{\\infty} e^{-1/2\\cdot x ^ {2}} \\cos{(t x)} \\,dx)",
-                            "res": "-(t * (INT x:[0,oo]. exp(-1/2 * x ^ 2) * cos(t * x)))",
+                            "latex_res": "-t (\\int_{0}^{\\infty} \\cos{(t x)} e^{-x ^ {2}/2} \\,dx)",
+                            "res": "-(t * (INT x:[0,oo]. cos(t * x) * exp(-(x ^ 2 / 2))))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -151,8 +151,8 @@
                     "start": "-t * I(t)",
                     "steps": [
                         {
-                            "latex_res": "(-t) (\\int_{0}^{\\infty} e^{-1/2\\cdot x ^ {2}} \\cos{(t x)} \\,dx)",
-                            "res": "-t * (INT x:[0,oo]. exp(-1/2 * x ^ 2) * cos(t * x))",
+                            "latex_res": "(-t) (\\int_{0}^{\\infty} \\cos{(t x)} e^{-x ^ {2}/2} \\,dx)",
+                            "res": "-t * (INT x:[0,oo]. cos(t * x) * exp(-(x ^ 2 / 2)))",
                             "rule": {
                                 "func_name": "I",
                                 "loc": "subterms",
@@ -162,8 +162,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-t (\\int_{0}^{\\infty} e^{-1/2\\cdot x ^ {2}} \\cos{(t x)} \\,dx)",
-                            "res": "-(t * (INT x:[0,oo]. exp(-1/2 * x ^ 2) * cos(t * x)))",
+                            "latex_res": "-t (\\int_{0}^{\\infty} \\cos{(t x)} e^{-x ^ {2}/2} \\,dx)",
+                            "res": "-(t * (INT x:[0,oo]. cos(t * x) * exp(-(x ^ 2 / 2))))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -387,8 +387,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{\\log{(2)}}{2} + \\frac{\\log{(\\pi)}}{2} - \\frac{1}{2} t ^ {2}",
-                            "res": "-(log(2) / 2) + log(pi) / 2 - 1/2 * t ^ 2",
+                            "latex_res": "-\\frac{t ^ {2}}{2} - \\frac{\\log{(2)}}{2} + \\frac{\\log{(\\pi)}}{2}",
+                            "res": "-(t ^ 2 / 2) - log(2) / 2 + log(pi) / 2",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -403,8 +403,8 @@
                     "start": "-(t ^ 2) / 2 + log(sqrt(pi / 2))",
                     "steps": [
                         {
-                            "latex_res": "-\\frac{\\log{(2)}}{2} + \\frac{\\log{(\\pi)}}{2} - \\frac{1}{2} t ^ {2}",
-                            "res": "-(log(2) / 2) + log(pi) / 2 - 1/2 * t ^ 2",
+                            "latex_res": "-\\frac{t ^ {2}}{2} - \\frac{\\log{(2)}}{2} + \\frac{\\log{(\\pi)}}{2}",
+                            "res": "-(t ^ 2 / 2) - log(2) / 2 + log(pi) / 2",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -437,8 +437,8 @@
                     "start": "log(I(t)) = -(t ^ 2) / 2 + log(sqrt(pi / 2))",
                     "steps": [
                         {
-                            "latex_res": "I{(t)} = e^{-\\log{(2)}/2 + \\log{(\\pi)}/2 - 1/2\\cdot t ^ {2}}",
-                            "res": "I(t) = exp(-(log(2) / 2) + log(pi) / 2 - 1/2 * t ^ 2)",
+                            "latex_res": "I{(t)} = e^{-t ^ {2}/2 - \\log{(2)}/2 + \\log{(\\pi)}/2}",
+                            "res": "I(t) = exp(-(t ^ 2 / 2) - log(2) / 2 + log(pi) / 2)",
                             "rule": {
                                 "latex_str": "solve equation for \\(I{(t)}\\)",
                                 "name": "SolveEquation",
@@ -451,17 +451,17 @@
                             "latex_res": "I{(t)} = \\frac{(2 ^ {1/2}) ^ {-1} \\pi ^ {1/2}}{e^{1/2\\cdot t ^ {2}}}",
                             "res": "I(t) = 2 ^ (1/2) ^ (-1) * pi ^ (1/2) / exp(1/2 * t ^ 2)",
                             "rule": {
-                                "latex_str": "rewriting \\(e^{-\\log{(2)}/2 + \\log{(\\pi)}/2 - 1/2\\cdot t ^ {2}}\\) to \\(\\frac{(2 ^ {1/2}) ^ {-1} \\pi ^ {1/2}}{e^{1/2\\cdot t ^ {2}}}\\)",
+                                "latex_str": "rewriting \\(e^{-t ^ {2}/2 - \\log{(2)}/2 + \\log{(\\pi)}/2}\\) to \\(\\frac{(2 ^ {1/2}) ^ {-1} \\pi ^ {1/2}}{e^{1/2\\cdot t ^ {2}}}\\)",
                                 "name": "Equation",
                                 "new_expr": "2 ^ (1/2) ^ (-1) * pi ^ (1/2) / exp(1/2 * t ^ 2)",
-                                "old_expr": "exp(-(log(2) / 2) + log(pi) / 2 - 1/2 * t ^ 2)",
-                                "str": "rewriting exp(-(log(2) / 2) + log(pi) / 2 - 1/2 * t ^ 2) to 2 ^ (1/2) ^ (-1) * pi ^ (1/2) / exp(1/2 * t ^ 2)"
+                                "old_expr": "exp(-(t ^ 2 / 2) - log(2) / 2 + log(pi) / 2)",
+                                "str": "rewriting exp(-(t ^ 2 / 2) - log(2) / 2 + log(pi) / 2) to 2 ^ (1/2) ^ (-1) * pi ^ (1/2) / exp(1/2 * t ^ 2)"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "I{(t)} = \\frac{\\sqrt{2} \\sqrt{\\pi}}{2} e^{-1/2\\cdot t ^ {2}}",
-                            "res": "I(t) = sqrt(2) * sqrt(pi) / 2 * exp(-1/2 * t ^ 2)",
+                            "latex_res": "I{(t)} = \\frac{\\sqrt{2} \\sqrt{\\pi}}{2} e^{-t ^ {2}/2}",
+                            "res": "I(t) = sqrt(2) * sqrt(pi) / 2 * exp(-(t ^ 2 / 2))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"

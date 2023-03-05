@@ -41,8 +41,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\lim\\limits_{t\\to \\infty} (\\,t ^ {-k + 1} \\log{t}\\,)}{-k + 1} - \\frac{\\int_{1}^{\\infty} x ^ {-k} \\,dx}{-k + 1}",
-                            "res": "(LIM {t -> oo}. t ^ (-k + 1) * log(t)) / (-k + 1) - (INT x:[1,oo]. x ^ -k) / (-k + 1)",
+                            "latex_res": "\\frac{\\lim\\limits_{t\\to \\infty} (\\,t ^ {-k + 1} \\log{t}\\,)}{-k + 1} - \\frac{1}{-k + 1} (\\int_{1}^{\\infty} x ^ {-k} \\,dx)",
+                            "res": "(LIM {t -> oo}. t ^ (-k + 1) * log(t)) / (-k + 1) - 1 / (-k + 1) * (INT x:[1,oo]. x ^ -k)",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -50,8 +50,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\lim\\limits_{t\\to \\infty} (\\,t ^ {-k + 1} \\log{t}\\,)}{-k + 1} - \\frac{\\left. \\frac{x ^ {-k + 1}}{-k + 1} \\right\\vert_{x=1}^{\\infty}}{-k + 1}",
-                            "res": "(LIM {t -> oo}. t ^ (-k + 1) * log(t)) / (-k + 1) - ([x ^ (-k + 1) / (-k + 1)]_x=1,oo) / (-k + 1)",
+                            "latex_res": "\\frac{\\lim\\limits_{t\\to \\infty} (\\,t ^ {-k + 1} \\log{t}\\,)}{-k + 1} - \\frac{1}{-k + 1} (\\left. \\frac{x ^ {-k + 1}}{-k + 1} \\right\\vert_{x=1}^{\\infty})",
+                            "res": "(LIM {t -> oo}. t ^ (-k + 1) * log(t)) / (-k + 1) - 1 / (-k + 1) * ([x ^ (-k + 1) / (-k + 1)]_x=1,oo)",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
@@ -190,7 +190,7 @@
                         },
                         {
                             "latex_res": "\\sum_{n=0}^{\\infty}{(-1) ^ {n} (\\int_{1}^{\\infty} x ^ {-2 n - 2} \\log{x} \\,dx)}",
-                            "res": "SUM(n, 0, oo, (-1) ^ n * (INT x:[1,oo]. x ^ (-2 * n - 2) * log(x)))",
+                            "res": "SUM(n, 0, oo, (-1) ^ n * (INT x:[1,oo]. x ^ (-(2 * n) - 2) * log(x)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -204,8 +204,8 @@
                                 "latex_str": "rewriting \\(x ^ {-2 n - 2} \\log{x}\\) to \\(\\frac{\\log{x}}{x ^ {2 n + 2}}\\)",
                                 "name": "Equation",
                                 "new_expr": "log(x) / x ^ (2 * n + 2)",
-                                "old_expr": "x ^ (-2 * n - 2) * log(x)",
-                                "str": "rewriting x ^ (-2 * n - 2) * log(x) to log(x) / x ^ (2 * n + 2)"
+                                "old_expr": "x ^ (-(2 * n) - 2) * log(x)",
+                                "str": "rewriting x ^ (-(2 * n) - 2) * log(x) to log(x) / x ^ (2 * n + 2)"
                             },
                             "type": "CalculationStep"
                         },
@@ -322,8 +322,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(\\int_{1}^{\\infty} \\frac{\\log{(\\frac{1}{x} + 1)}}{x ^ {2} + 1} \\,dx) + (\\int_{1}^{\\infty} \\frac{\\log{x}}{x ^ {2} + 1} \\,dx) + \\frac{\\pi \\log{(2)}}{8}",
-                            "res": "(INT x:[1,oo]. log(1 / x + 1) / (x ^ 2 + 1)) + (INT x:[1,oo]. log(x) / (x ^ 2 + 1)) + pi * log(2) / 8",
+                            "latex_res": "(\\int_{1}^{\\infty} \\frac{1}{x ^ {2} + 1} \\log{(\\frac{1}{x} + 1)} \\,dx) + (\\int_{1}^{\\infty} \\frac{\\log{x}}{x ^ {2} + 1} \\,dx) + \\frac{\\pi \\log{(2)}}{8}",
+                            "res": "(INT x:[1,oo]. 1 / (x ^ 2 + 1) * log(1 / x + 1)) + (INT x:[1,oo]. log(x) / (x ^ 2 + 1)) + pi * log(2) / 8",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -331,8 +331,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(\\int_{1}^{\\infty} \\frac{\\log{(\\frac{1}{x} + 1)}}{x ^ {2} + 1} \\,dx) + G + \\frac{\\pi \\log{(2)}}{8}",
-                            "res": "(INT x:[1,oo]. log(1 / x + 1) / (x ^ 2 + 1)) + G + pi * log(2) / 8",
+                            "latex_res": "(\\int_{1}^{\\infty} \\frac{1}{x ^ {2} + 1} \\log{(\\frac{1}{x} + 1)} \\,dx) + G + \\frac{\\pi \\log{(2)}}{8}",
+                            "res": "(INT x:[1,oo]. 1 / (x ^ 2 + 1) * log(1 / x + 1)) + G + pi * log(2) / 8",
                             "rule": {
                                 "eq": "(INT x:[1,oo]. log(x) / (x ^ 2 + 1)) = G",
                                 "latex_str": "apply equation \\(\\int_{1}^{\\infty} \\frac{\\log{x}}{x ^ {2} + 1} \\,dx = G\\) at 0.1",

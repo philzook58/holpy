@@ -1,6 +1,5 @@
 """Expressions."""
 
-import copy
 import math
 import functools
 from decimal import Decimal
@@ -962,12 +961,13 @@ class Var(Expr):
 class Const(Expr):
     """Constants."""
 
-    def __init__(self, val: Union[int, Decimal, Fraction]):
-        assert isinstance(val, (int, Decimal, Fraction))
+    def __init__(self, val: Union[int, Fraction]):
+        assert isinstance(val, (int, Fraction))
         self.ty = CONST
-        if isinstance(val, Decimal):
-            val = Fraction(val)
-        self.val = val
+        if isinstance(val, Fraction) and val.denominator == 1:
+            self.val = val.numerator
+        else:
+            self.val = val
 
     def __hash__(self):
         return hash((CONST, self.val))

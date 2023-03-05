@@ -2,10 +2,9 @@
 
 from decimal import Decimal
 from fractions import Fraction
-from typing import Optional, Dict, Tuple, Union, List, Set
+from typing import Optional, Dict, Tuple, Union, List
 import functools
 import operator
-import math
 
 from integral import expr
 from integral.expr import Var, Const, Fun, EvalAt, Op, Integral, Symbol, Expr, \
@@ -20,7 +19,6 @@ from integral.context import Context, apply_subterm
 from integral import poly
 from integral.poly import from_poly, to_poly, normalize
 from integral.conditions import Conditions
-from integral import condprover
 
 
 def deriv(var: str, e: Expr, ctx: Context) -> Expr:
@@ -1275,7 +1273,7 @@ class Equation(Rule):
         y = Symbol('y', [SUMMATION])
         p = x * y
         mapping = expr.match(e, p)
-        if mapping!=None:
+        if mapping is not None:
             sum = mapping[y.name]
             idx = sum.index_var
             out = mapping[x.name]
@@ -1383,6 +1381,7 @@ class SplitRegion(Rule):
                 return e
             else:
                 return OnLocation(self, sep_ints[0][1]).eval(e, ctx)
+
         x = Var("c")
         is_cpv = limits.reduce_inf_limit(e.body.subst(e.var, self.c + 1 / x), x.name, ctx) in [POS_INF, NEG_INF]
         if not is_cpv:

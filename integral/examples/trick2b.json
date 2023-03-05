@@ -5,8 +5,8 @@
             "start": "INT x:[0,pi]. x * sin(x) / (1 + cos(x) ^ 2)",
             "steps": [
                 {
-                    "latex_res": "\\int_{0}^{\\pi} \\frac{\\sin{y} (\\pi - y)}{\\cos^{2}(y) + 1} \\,dy",
-                    "res": "INT y:[0,pi]. sin(y) * (pi - y) / (cos(y) ^ 2 + 1)",
+                    "latex_res": "\\int_{0}^{\\pi} \\frac{\\sin{y} (-y + \\pi)}{\\cos^{2}(y) + 1} \\,dy",
+                    "res": "INT y:[0,pi]. sin(y) * (-y + pi) / (cos(y) ^ 2 + 1)",
                     "rule": {
                         "latex_str": "substitute \\(y\\) for \\(\\pi - x\\)",
                         "name": "Substitution",
@@ -17,8 +17,8 @@
                     "type": "CalculationStep"
                 },
                 {
-                    "latex_res": "\\int_{0}^{\\pi} -\\frac{y \\sin{y}}{\\cos^{2}(y) + 1} + \\pi (\\frac{\\sin{y}}{\\cos^{2}(y) + 1}) \\,dy",
-                    "res": "INT y:[0,pi]. -(y * sin(y) / (cos(y) ^ 2 + 1)) + pi * (sin(y) / (cos(y) ^ 2 + 1))",
+                    "latex_res": "\\int_{0}^{\\pi} -\\frac{y \\sin{y}}{\\cos^{2}(y) + 1} + \\frac{\\pi \\sin{y}}{\\cos^{2}(y) + 1} \\,dy",
+                    "res": "INT y:[0,pi]. -(y * sin(y) / (cos(y) ^ 2 + 1)) + pi * sin(y) / (cos(y) ^ 2 + 1)",
                     "rule": {
                         "name": "ExpandPolynomial",
                         "str": "expand polynomial"
