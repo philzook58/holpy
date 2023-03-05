@@ -687,6 +687,42 @@ class HeuristicIntegrationByParts(HeuristicRule):
     
     """
     def eval(self, e, loc=[]):
+        def well_formed_eval_at(e : Expr):
+            if isinstance(e, EvalAt):
+                return True
+            elif isinstance(e, Op):
+                if e.op in ("+", "-"):
+                    return well_formed_eval_at(e.args[0]) and \
+                            well_formed_eval_at(e.args[1])
+                elif e.op == "*":
+                    return well_formed_eval_at(e.args[1]) and \
+                        e.args[0].is_const()
+                else:
+                    return False
+            else:
+                return False
+        def separate_evalat(e : Expr) -> list[tuple["Expr", Location]]:
+            return e.find_subexpr_pred(lambda e: e.is_evalat())
+        def find_anti_deriv(e : Expr) -> Optional[Expr]:
+            """e is an expression ∫hdx after applying rule DefiniteIntegral,
+            find h's antiderivative.
+            """
+            # check if e is a summation of eval_at expressions
+            if not well_formed_eval_at(e):
+                return None
+            # extract eval_at expressions eval_at_i
+            evalat_tms = [e[0] for e in separate_evalat(e)]
+            # check the correctness of extraction: e == ∑ eval_at_i
+            norm_e = rules.Simplify().eval(e, ctx=ctx)
+            eval_at_sum = rules.Simplify().eval(sum(evalat_tms[1:], evalat_tms[0]), ctx=ctx)
+            assert norm_e == eval_at_sum
+            new_e = e
+            for tm in evalat_tms:
+                new_e = new_e.replace(tm, tm.body)
+            return new_e
+            
+
+
         if not isinstance(e, Integral):
             return e
 
@@ -701,15 +737,17 @@ class HeuristicIntegrationByParts(HeuristicRule):
             rest_factor = [f for f in factors if f != h]
             G = functools.reduce(operator.mul, rest_factor)
             H = rules.DefiniteIntegralIdentity().eval(Integral(e.var, e.lower, e.upper, h), ctx=ctx)
-            if H.body != h or h == exp(Var(e.var)):
-                u = G
-                v = H.body
-                try: # can't deriv abs now
-                    new_integral = rules.IntegrationByParts(u, v).eval(e, ctx=ctx)
-                except:
-                    continue
-                step = [calc.IntegrationByPartsStep(new_integral, u, v, loc)]
-                res.append((new_integral, step))
+            ad_h = find_anti_deriv(H)
+            if ad_h is None:
+                continue
+            u = G
+            v = ad_h
+            try: # can't deriv abs now
+                new_integral = rules.IntegrationByParts(u, v).eval(e, ctx=ctx)
+            except:
+                continue
+            step = [calc.IntegrationByPartsStep(new_integral, u, v, loc)]
+            res.append((new_integral, step))
         
         return res
 
@@ -1180,6 +1218,8 @@ class Slagle(rules.Rule):
                 rule = rules.Substitution(step.var_name, step.var_subst)
             elif step.reason == "Substitution inverse":
                 rule = rules.SubstitutionInverse(step.var_name, step.var_subst)
+            elif step.reason == "Integrate by parts":
+                rule = rules.IntegrationByParts(step.u, step.v)
             else:
                 raise NotImplementedError(step.reason)
             if not loc.is_empty:
