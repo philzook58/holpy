@@ -947,7 +947,7 @@ class IntegralTest(unittest.TestCase):
         calc = proof.lhs_calc
         calc.perform_rule(rules.OnSubterm(rules.ExpandDefinition("cosh")))
         calc.perform_rule(rules.Equation(
-            "x ^ 4 + 2 * x ^ 2 * (1/2 * (exp(-2 * a) + exp(2 * a))) + 1",
+            "x ^ 4 + 2 * x ^ 2 * (1/2 * exp(-2 * a) + 1/2 * exp(2 * a)) + 1",
             "(x ^ 2 + exp(2 * a)) * (x ^ 2 + exp(-2 * a))"))
         calc.perform_rule(rules.Equation(
             "1 / ((x ^ 2 + exp(2 * a)) * (x ^ 2 + exp(-2 * a)))",

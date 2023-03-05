@@ -828,8 +828,8 @@
                     "start": "INT x:[0,pi / 2]. sqrt(sin(x))",
                     "steps": [
                         {
-                            "latex_res": "\\int_{0}^{\\sin^{2}(\\frac{\\pi}{2})} \\frac{1}{2} (\\frac{1}{u ^ {1/4} \\sqrt{-u + 1}}) \\,du",
-                            "res": "INT u:[0,sin(pi / 2) ^ 2]. 1/2 * (1 / (u ^ (1/4) * sqrt(-u + 1)))",
+                            "latex_res": "\\int_{0}^{1} \\frac{1}{2} (\\frac{1}{u ^ {1/4} \\sqrt{-u + 1}}) \\,du",
+                            "res": "INT u:[0,1]. 1/2 * (1 / (u ^ (1/4) * sqrt(-u + 1)))",
                             "rule": {
                                 "latex_str": "substitute \\(u\\) for \\(\\sin^{2}(x)\\)",
                                 "name": "Substitution",
@@ -921,8 +921,8 @@
                     "start": "INT x:[0,pi / 2]. sqrt(cos(x))",
                     "steps": [
                         {
-                            "latex_res": "\\int_{\\cos^{2}(\\frac{\\pi}{2})}^{\\cos^{2}(0)} \\frac{1}{2} (\\frac{1}{u ^ {1/4} \\sqrt{-u + 1}}) \\,du",
-                            "res": "INT u:[cos(pi / 2) ^ 2,cos(0) ^ 2]. 1/2 * (1 / (u ^ (1/4) * sqrt(-u + 1)))",
+                            "latex_res": "\\int_{0}^{1} \\frac{1}{2} (\\frac{1}{u ^ {1/4} \\sqrt{-u + 1}}) \\,du",
+                            "res": "INT u:[0,1]. 1/2 * (1 / (u ^ (1/4) * sqrt(-u + 1)))",
                             "rule": {
                                 "latex_str": "substitute \\(u\\) for \\(\\cos^{2}(x)\\)",
                                 "name": "Substitution",

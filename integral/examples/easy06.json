@@ -13,8 +13,8 @@
                     "start": "INT x:[-oo,oo]. 1 / cosh(x)",
                     "steps": [
                         {
-                            "latex_res": "\\int_{-\\infty}^{\\infty} \\frac{1}{\\frac{1}{2} (e^{-x} + e^{x})} \\,dx",
-                            "res": "INT x:[-oo,oo]. 1 / (1/2 * (exp(-x) + exp(x)))",
+                            "latex_res": "\\int_{-\\infty}^{\\infty} \\frac{1}{\\frac{1}{2} e^{-x} + \\frac{1}{2} e^{x}} \\,dx",
+                            "res": "INT x:[-oo,oo]. 1 / (1/2 * exp(-x) + 1/2 * exp(x))",
                             "rule": {
                                 "func_name": "cosh",
                                 "loc": "subterms",

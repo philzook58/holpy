@@ -19,8 +19,8 @@
                     "start": "I(0)",
                     "steps": [
                         {
-                            "latex_res": "\\int_{0}^{\\infty} \\cos{(0)} e^{-1/2\\cdot x ^ {2}} \\,dx",
-                            "res": "INT x:[0,oo]. cos(0) * exp(-1/2 * x ^ 2)",
+                            "latex_res": "\\int_{0}^{\\infty} e^{-1/2\\cdot x ^ {2}} \\,dx",
+                            "res": "INT x:[0,oo]. exp(-1/2 * x ^ 2)",
                             "rule": {
                                 "func_name": "I",
                                 "name": "ExpandDefinition",

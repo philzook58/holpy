@@ -19,8 +19,8 @@
                     "start": "INT x:[0,oo]. 1 / (1 + exp(a * x))",
                     "steps": [
                         {
-                            "latex_res": "\\int_{1}^{\\infty} \\frac{1}{a u (e^{\\log{u}} + 1)} \\,du",
-                            "res": "INT u:[1,oo]. 1 / (a * u * (exp(log(u)) + 1))",
+                            "latex_res": "\\int_{1}^{\\infty} \\frac{1}{a u (u + 1)} \\,du",
+                            "res": "INT u:[1,oo]. 1 / (a * u * (u + 1))",
                             "rule": {
                                 "latex_str": "substitute \\(u\\) for \\(e^{a x}\\)",
                                 "name": "Substitution",

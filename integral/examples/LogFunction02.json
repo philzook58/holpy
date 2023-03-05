@@ -109,8 +109,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{x}{1 - x ^ {2}} = \\frac{1}{2} (\\sum_{k=0}^{\\infty}{(-1) ^ {k} (-x) ^ {k}} - \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}})",
-                            "res": "x / (1 - x ^ 2) = 1/2 * (SUM(k, 0, oo, (-1) ^ k * (-x) ^ k) - SUM(k, 0, oo, x ^ k * (-1) ^ k))",
+                            "latex_res": "\\frac{x}{1 - x ^ {2}} = \\frac{1}{2} \\sum_{k=0}^{\\infty}{(-1) ^ {k} (-x) ^ {k}} - \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}}",
+                            "res": "x / (1 - x ^ 2) = 1/2 * SUM(k, 0, oo, (-1) ^ k * (-x) ^ k) - 1/2 * SUM(k, 0, oo, x ^ k * (-1) ^ k)",
                             "rule": {
                                 "latex_str": "solve equation for \\(\\frac{x}{1 - x ^ {2}}\\)",
                                 "name": "SolveEquation",
@@ -120,8 +120,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{x}{1 - x ^ {2}} = \\frac{1}{2} (\\sum_{k=0}^{\\infty}{x ^ {k}} - \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}})",
-                            "res": "x / (1 - x ^ 2) = 1/2 * (SUM(k, 0, oo, x ^ k) - SUM(k, 0, oo, x ^ k * (-1) ^ k))",
+                            "latex_res": "\\frac{x}{1 - x ^ {2}} = \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k}} - \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}}",
+                            "res": "x / (1 - x ^ 2) = 1/2 * SUM(k, 0, oo, x ^ k) - 1/2 * SUM(k, 0, oo, x ^ k * (-1) ^ k)",
                             "rule": {
                                 "latex_str": "rewrite \\((-1) ^ {k} (-x) ^ {k}\\) to \\(x ^ {k}\\) using identity",
                                 "name": "ApplyIdentity",
@@ -132,8 +132,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{x}{1 - x ^ {2}} = -\\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}} + \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k}}",
-                            "res": "x / (1 - x ^ 2) = -1/2 * SUM(k, 0, oo, x ^ k * (-1) ^ k) + 1/2 * SUM(k, 0, oo, x ^ k)",
+                            "latex_res": "\\frac{x}{1 - x ^ {2}} = \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k}} - \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}}",
+                            "res": "x / (1 - x ^ 2) = 1/2 * SUM(k, 0, oo, x ^ k) - 1/2 * SUM(k, 0, oo, x ^ k * (-1) ^ k)",
                             "rule": {
                                 "loc": "1",
                                 "name": "ExpandPolynomial",

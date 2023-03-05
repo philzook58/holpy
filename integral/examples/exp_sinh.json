@@ -62,8 +62,8 @@
                     "start": "INT t:[0,oo]. exp(-p * t) * sinh(t) ^ 3",
                     "steps": [
                         {
-                            "latex_res": "\\int_{0}^{\\infty} e^{(-p) t} (\\frac{1}{2} (-e^{-t} + e^{t})) ^ {3} \\,dt",
-                            "res": "INT t:[0,oo]. exp(-p * t) * (1/2 * (-exp(-t) + exp(t))) ^ 3",
+                            "latex_res": "\\int_{0}^{\\infty} e^{(-p) t} (-\\frac{1}{2} e^{-t} + \\frac{1}{2} e^{t}) ^ {3} \\,dt",
+                            "res": "INT t:[0,oo]. exp(-p * t) * (-1/2 * exp(-t) + 1/2 * exp(t)) ^ 3",
                             "rule": {
                                 "func_name": "sinh",
                                 "loc": "subterms",

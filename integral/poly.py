@@ -8,7 +8,7 @@ import sympy
 import math
 
 from integral import expr
-from integral.context import Context
+from integral.context import Context, apply_subterm
 
 
 def collect_pairs(ps):
@@ -975,10 +975,44 @@ def to_poly(e: expr.Expr, ctx: Context) -> Polynomial:
     else:
         return singleton(e, ctx)
 
+def function_eval(e: expr.Expr, ctx: Context) -> expr.Expr:
+    if e.is_fun() and e.func_name == "binom":
+        if e.args[0].is_const() and e.args[1].is_const():
+            return expr.Const(math.comb(e.args[0].val, e.args[1].val))
+
+    if e.is_fun() and e.func_name == 'factorial':
+        if e.args[0].is_const() and abs(round(e.args[0].val) - e.args[0].val) < 1e-15 and round(e.args[0].val) >= 0:
+            return expr.Const(math.factorial(round(e.args[0].val)))
+
+    return e
+
+def function_table(e: expr.Expr, ctx: Context) -> expr.Expr:
+    if not e.is_fun() or len(e.args) != 1:
+        return e
+
+    func_table = ctx.get_function_tables()
+    if not e.func_name in func_table:
+        return e
+    if not e.args[0].is_constant():
+        return e
+    if e.args[0] in func_table[e.func_name]:
+        return func_table[e.func_name][e.args[0]]
+    else:
+        return e
+
 def normalize(e: expr.Expr, ctx: Context) -> expr.Expr:
     if e.is_equals():
         return expr.Eq(normalize(e.lhs, ctx), normalize(e.rhs, ctx))
-    return from_poly(to_poly(e, ctx))
+
+    for i in range(5):
+        old_e = e
+        e = from_poly(to_poly(e, ctx))
+        e = apply_subterm(e, function_table, ctx)
+        e = apply_subterm(e, function_eval, ctx)
+        if e == old_e:
+            break
+
+    return e
 
 """
 Conversion from polynomials to terms.

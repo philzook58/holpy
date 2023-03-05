@@ -263,8 +263,8 @@
                     "start": "I(0,b)",
                     "steps": [
                         {
-                            "latex_res": "\\int_{0}^{\\infty} \\frac{\\log{(1)}}{b ^ {2} + x ^ {2}} \\,dx",
-                            "res": "INT x:[0,oo]. log(1) / (b ^ 2 + x ^ 2)",
+                            "latex_res": "\\int_{0}^{\\infty} 0 \\,dx",
+                            "res": "INT x:[0,oo]. 0",
                             "rule": {
                                 "func_name": "I",
                                 "name": "ExpandDefinition",

@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 
 from integral.expr import Expr, Var, Const
 from integral import rules, expr
-from integral.rules import Rule, check_wellformed, full_normalize
+from integral.rules import Rule, check_wellformed
 from integral.conditions import Conditions
 from integral.context import Context
 from integral import latex
@@ -459,11 +459,11 @@ class InductionProof(StateItem):
             raise NotImplementedError
 
         # Base case: n = 0
-        eq0 = full_normalize(goal.subst(induct_var, self.start), self.ctx)
+        eq0 = normalize(goal.subst(induct_var, self.start), self.ctx)
         self.base_case = Goal(self, self.ctx, eq0)
 
         # Inductive case:
-        eqI = full_normalize(goal.subst(induct_var, Var(induct_var) + 1), self.ctx)
+        eqI = normalize(goal.subst(induct_var, Var(induct_var) + 1), self.ctx)
         ctx = Context(self.ctx)
         ctx.add_induct_hyp(self.goal)
         self.induct_case = Goal(self, ctx, eqI)
@@ -582,8 +582,8 @@ class RewriteGoalProof(StateItem):
         self.begin = Calculation(parent, self.ctx, begin.goal, conds=begin.conds, connection_symbol = '==>')
 
     def is_finished(self):
-        f1 = full_normalize(self.begin.last_expr.lhs, self.ctx) == full_normalize(self.goal.lhs, self.ctx)
-        f2 = full_normalize(self.begin.last_expr.rhs, self.ctx) == full_normalize(self.goal.rhs, self.ctx)
+        f1 = normalize(self.begin.last_expr.lhs, self.ctx) == normalize(self.goal.lhs, self.ctx)
+        f2 = normalize(self.begin.last_expr.rhs, self.ctx) == normalize(self.goal.rhs, self.ctx)
         return f1 and f2
 
     def export(self):

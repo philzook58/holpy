@@ -458,48 +458,6 @@ class CommonIntegral(Rule):
             return e
 
 
-class FunctionTable(Rule):
-    """Apply information from function table."""
-
-    def __init__(self):
-        self.name = "FunctionTable"
-
-    def __str__(self):
-        return "apply function table"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self),
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        if not e.is_fun() or len(e.args) != 1:
-            return e
-
-        func_table = ctx.get_function_tables()
-        if not e.func_name in func_table:
-            return e
-        if not e.args[0].is_constant():
-            return e
-        if e.args[0] in func_table[e.func_name]:
-            return func_table[e.func_name][e.args[0]]
-        else:
-            return e
-        
-class FunctionEval(Rule):
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        if e.is_fun() and e.func_name == "binom":
-            if e.args[0].is_const() and e.args[1].is_const():
-                return expr.Const(math.comb(e.args[0].val, e.args[1].val))
-
-        if e.is_fun() and e.func_name == 'factorial':
-            if e.args[0].is_const() and condprover.approx_integer(e.args[0]):
-                return expr.Const(math.factorial(round(e.args[0].val)))
-
-        return e
-
-
 class ApplyIdentity(Rule):
     """Apply identities (trigonometric, etc) to the current term.
     
@@ -555,7 +513,7 @@ class ApplyIdentity(Rule):
             inst = expr.match(e, identity.lhs)
             if inst is not None:
                 expected_rhs = identity.rhs.inst_pat(inst)
-                if full_normalize(expected_rhs, ctx) == full_normalize(self.target, ctx):
+                if normalize(expected_rhs, ctx) == normalize(self.target, ctx):
                     return self.target
 
         raise AssertionError("ApplyIdentity: no matching identity for %s" % e)
@@ -1067,12 +1025,10 @@ class FullSimplify(Rule):
                         s = s.subst(str(b.args[0]), b.args[1])
             s = OnSubterm(CommonIntegral()).eval(s, ctx)
             s = Simplify().eval(s, ctx)
-            s = OnSubterm(FunctionTable()).eval(s, ctx)
             s = OnSubterm(DerivativeSimplify()).eval(s, ctx)
             s = OnSubterm(SimplifyPower()).eval(s, ctx)
             s = OnSubterm(ReduceLimit()).eval(s, ctx)
             s = OnSubterm(SimplifyIdentity()).eval(s, ctx)
-            s = OnSubterm(FunctionEval()).eval(s, ctx)
             if s == current:
                 break
             current = s
@@ -1265,14 +1221,14 @@ class Substitution(Rule):
                 x = Var(e.var)
                 lower = self.var_subst
                 lower = limits.reduce_inf_limit(lower.subst(e.var, (1 / x) + e.lower), e.var, ctx)
-                lower = full_normalize(lower, ctx)
+                lower = normalize(lower, ctx)
             if e.upper == expr.POS_INF:
                 upper = limits.reduce_inf_limit(var_subst, e.var, ctx)
             else:
                 x = Var(e.var)
                 upper = self.var_subst
                 upper = limits.reduce_inf_limit(upper.subst(e.var, e.upper - (1 / x)), e.var, ctx)
-                upper = full_normalize(upper, ctx)
+                upper = normalize(upper, ctx)
             if lower.is_evaluable() and upper.is_evaluable() and expr.eval_expr(lower) > expr.eval_expr(upper):
                 return normalize(Integral(self.var_name, upper, lower, Op("-", self.f)), ctx)
             else:
@@ -1281,14 +1237,6 @@ class Substitution(Rule):
             return normalize(IndefiniteIntegral(self.var_name, self.f, e.skolem_args), ctx)
         else:
             raise TypeError
-
-
-def full_normalize(e: Expr, ctx: Context) -> Expr:
-    for i in range(5):
-        e = normalize(e, ctx)
-        e = FunctionTable().eval(e, ctx)
-        e = FunctionEval().eval(e, ctx)
-    return e
 
 
 class SubstitutionInverse(Rule):
@@ -1346,8 +1294,8 @@ class SubstitutionInverse(Rule):
         lower = limits.reduce_inf_limit(lower.subst(x.name, (1 / x) + e.lower), x.name, ctx)
         upper = limits.reduce_inf_limit(upper.subst(x.name, e.upper - (1 / x)), x.name, ctx)
 
-        lower = full_normalize(lower, ctx)
-        upper = full_normalize(upper, ctx)
+        lower = normalize(lower, ctx)
+        upper = normalize(upper, ctx)
         if lower.is_evaluable() and upper.is_evaluable() and expr.eval_expr(lower) > expr.eval_expr(upper):
             return -expr.Integral(self.var_name, upper, lower, new_e_body)
         else:
