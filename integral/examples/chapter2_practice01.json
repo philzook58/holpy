@@ -286,8 +286,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\int_{0}^{1} 2 \\log{(2)} (\\frac{1}{\\sqrt{y} \\sqrt{-y + 1}}) + \\frac{\\log{y}}{\\sqrt{y} \\sqrt{-y + 1}} \\,dy",
-                            "res": "INT y:[0,1]. 2 * log(2) * (1 / (sqrt(y) * sqrt(-y + 1))) + log(y) / (sqrt(y) * sqrt(-y + 1))",
+                            "latex_res": "\\int_{0}^{1} \\log{(4)} (\\frac{1}{\\sqrt{y} \\sqrt{-y + 1}}) + \\frac{\\log{y}}{\\sqrt{y} \\sqrt{-y + 1}} \\,dy",
+                            "res": "INT y:[0,1]. log(4) * (1 / (sqrt(y) * sqrt(-y + 1))) + log(y) / (sqrt(y) * sqrt(-y + 1))",
                             "rule": {
                                 "loc": "0",
                                 "name": "ExpandPolynomial",

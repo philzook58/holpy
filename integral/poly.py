@@ -678,45 +678,10 @@ def to_const_poly(e: expr.Expr) -> ConstantPolynomial:
 
     elif e.is_fun() and e.func_name == 'sqrt':
         a = to_const_poly(e.args[0])
-        if a.is_fraction() and is_square(a.get_fraction()):
-            return const_fraction(Fraction(math.sqrt(a.get_fraction())))
-        elif a.is_monomial():
+        if a.is_monomial():
             return a ** Fraction(1 / 2)
         else:
             return const_singleton(expr.sqrt(from_const_poly(a)))
-
-    elif e.is_fun() and e.func_name == 'log':
-        a = to_const_poly(e.args[0])
-        if a.is_fraction() and a.get_fraction() == 1:
-            return const_fraction(0)
-        elif a.is_monomial():
-            mono = a.get_monomial()
-            log_factors = []
-            for n, e in mono.factors:
-                if isinstance(n, (int, Fraction)):
-                    log_factors.append(const_fraction(e) * const_singleton(expr.log(expr.Const(n))))
-                else:
-                    log_factors.append(const_fraction(e) * const_singleton(expr.log(n)))
-            if mono.coeff == 1:
-                return sum(log_factors[1:], log_factors[0])
-            else:
-                if isinstance(mono.coeff, int):
-                    int_factors = sympy.factorint(mono.coeff)
-                elif isinstance(mono.coeff, Fraction):
-                    int_factors = sympy.factorint(mono.coeff.numerator)
-                    denom_factors = sympy.factorint(mono.coeff.denominator)
-                    for b, e in denom_factors.items():
-                        if b not in int_factors:
-                            int_factors[b] = 0
-                        int_factors[b] -= e
-                else:
-                    raise NotImplementedError
-                log_ints = []
-                for b, e in int_factors.items():
-                    log_ints.append(ConstantPolynomial([ConstantMonomial(e, [(expr.log(expr.Const(b)), 1)])]))
-                return sum(log_factors + log_ints[1:], log_ints[0])
-        else:
-            return const_singleton(expr.log(from_const_poly(a)))
 
     elif e.is_fun():
         args_norm = [normalize_constant(arg) for arg in e.args]
@@ -818,9 +783,7 @@ def to_poly(e: expr.Expr, ctx: Context) -> Polynomial:
 
     elif e.is_fun() and e.func_name == "log":
         a, = e.args
-        if a.is_fun() and a.func_name == "exp":
-            return to_poly(a.args[0], ctx)
-        elif a.is_power() and a.args[1].is_constant():
+        if a.is_power() and a.args[1].is_constant():
             return Polynomial([Monomial(to_const_poly(a.args[1]), [(expr.log(normalize(a.args[0], ctx)), 1)], ctx)], ctx)
         elif a.is_divides() and a.args[0] == expr.Const(1):
             return to_poly(expr.Fun("log", a.args[1] ** expr.Const(-1)), ctx)
@@ -1047,6 +1010,45 @@ def simplify_trig(e: expr.Expr, ctx: Context) -> expr.Expr:
     else:
         return build(coeff)
 
+def simplify_log(e: expr.Expr, ctx: Context) -> expr.Expr:
+    if not (e.is_fun() and e.func_name == 'log'):
+        return e
+    
+    a = e.args[0]
+    if not a.is_constant():
+        return e
+
+    if a.is_const() and isinstance(a.val, int):
+        int_factors = sympy.factorint(a.val)
+        log_ints = []
+        for b, e in int_factors.items():
+            if e != 1:
+                log_ints.append(e * expr.log(expr.Const(b)))
+            else:
+                log_ints.append(expr.log(expr.Const(b)))
+            return sum(log_ints[1:], log_ints[0])
+    elif a.is_const() and isinstance(a.val, Fraction):
+        return expr.log(expr.Const(a.val.numerator)) - expr.log(expr.Const(a.val.denominator))
+    elif a.is_times():
+        return expr.log(a.args[0]) + expr.log(a.args[1])
+    elif a.is_divides():
+        return expr.log(a.args[0]) - expr.log(a.args[1])
+    elif a.is_fun() and a.func_name == 'sqrt':
+        return expr.log(a.args[0]) / 2
+    else:
+        return e
+
+def simplify_sqrt(e: expr.Expr, ctx: Context) -> expr.Expr:
+    if not (e.is_fun() and e.func_name == 'sqrt'):
+        return e
+
+    if e.args[0] == expr.Const(0):
+        return expr.Const(0)
+    if e.args[0] == expr.Const(1):
+        return expr.Const(1)
+
+    return e
+
 def normalize(e: expr.Expr, ctx: Context) -> expr.Expr:
     if e.is_equals():
         return expr.Eq(normalize(e.lhs, ctx), normalize(e.rhs, ctx))
@@ -1062,6 +1064,8 @@ def normalize(e: expr.Expr, ctx: Context) -> expr.Expr:
         e = apply_subterm(e, simplify_integral, ctx)
         e = apply_subterm(e, simplify_power, ctx)
         e = apply_subterm(e, simplify_trig, ctx)
+        e = apply_subterm(e, simplify_log, ctx)
+        e = apply_subterm(e, simplify_sqrt, ctx)
         if e == old_e:
             break
 

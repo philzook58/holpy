@@ -479,7 +479,7 @@ class IntegralTest(unittest.TestCase):
     def testExponential(self):
         file = compstate.CompFile("UCDavis", 'Exponential')
 
-        goal01 = file.add_goal("(INT x:[0,1]. (3^x + 4^x) / 5^x) = (-2/5) / (log(3) - log(5)) - (1/5) / (log(4) - log(5))")
+        goal01 = file.add_goal("(INT x:[0,1]. (3^x + 4^x) / 5^x) = (-2/5) / (log(3) - log(5)) - (1/5) / (2 * log(2) - log(5))")
         proof01 = goal01.proof_by_calculation()
         calc = proof01.lhs_calc
         calc.perform_rule(rules.Equation("(3^x + 4^x) / 5^x", "(3^x/5^x) + (4^x/5^x)"))
@@ -488,7 +488,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.Equation(None, "-2/5 / (log(3) - log(5)) - 1/5 / (log(4) - log(5))"))
+        calc.perform_rule(rules.Equation(None, "-2/5 / (log(3) - log(5)) - 1/5 / (2 * log(2) - log(5))"))
 
         goal02 = file.add_goal("(INT x. 30 * exp(-3*x) * (1 + 3 * exp(-x)) ^ 5) = "
                              "(-5/36)*(1 + 3*exp(-x))^8 + (20/63)*(1 + 3*exp(-x))^7 + (-5/27)*(1+3*exp(-x))^6 + SKOLEM_CONST(C)")

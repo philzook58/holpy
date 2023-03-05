@@ -336,6 +336,25 @@
         },
         {
             "type": "axiom",
+            "expr": "log(1) = 0",
+            "category": "exp-log",
+            "attributes": [
+                "simplify"
+            ]
+        },
+        {
+            "type": "axiom",
+            "expr": "log(1 / x) = -log(x)",
+            "conds": [
+                "x > 0"
+            ],
+            "category": "exp-log",
+            "attributes": [
+                "simplify"
+            ]
+        },
+        {
+            "type": "axiom",
             "expr": "log(exp(b)) = b",
             "category": "exp-log",
             "attributes": [
