@@ -1000,6 +1000,21 @@ def function_table(e: expr.Expr, ctx: Context) -> expr.Expr:
     else:
         return e
 
+def simplify_identity(e: expr.Expr, ctx: Context) -> expr.Expr:
+    for identity in ctx.get_simp_identities():
+        inst = expr.match(e, identity.lhs)
+        if inst is not None:
+            # Check conditions
+            satisfied = True
+            for cond in identity.conds.data:
+                cond = expr.expr_to_pattern(cond)
+                cond = cond.inst_pat(inst)
+                if not ctx.check_condition(cond):
+                    satisfied = False
+            if satisfied:
+                return identity.rhs.inst_pat(inst)
+    return e
+
 def normalize(e: expr.Expr, ctx: Context) -> expr.Expr:
     if e.is_equals():
         return expr.Eq(normalize(e.lhs, ctx), normalize(e.rhs, ctx))
@@ -1009,6 +1024,7 @@ def normalize(e: expr.Expr, ctx: Context) -> expr.Expr:
         e = from_poly(to_poly(e, ctx))
         e = apply_subterm(e, function_table, ctx)
         e = apply_subterm(e, function_eval, ctx)
+        e = apply_subterm(e, simplify_identity, ctx)
         if e == old_e:
             break
 

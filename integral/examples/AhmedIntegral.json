@@ -137,8 +137,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{-(\\int_{0}^{\\left| u \\right|/\\sqrt{2 u ^ {2} + 1}} \\frac{1}{\\frac{2 u ^ {2} + 1}{u ^ {2}} + (y \\sqrt{u ^ {-2} (2 u ^ {2} + 1)}) ^ {2}} (\\frac{\\sqrt{2 u ^ {2} + 1}}{\\left| u \\right|}) \\,dy) + (\\int_{0}^{1} \\frac{1}{x ^ {2} + 1} \\,dx)}{u ^ {2} + 1}",
-                            "res": "(-(INT y:[0,abs(u) / sqrt(2 * u ^ 2 + 1)]. 1 / ((2 * u ^ 2 + 1) / u ^ 2 + (y * sqrt(u ^ (-2) * (2 * u ^ 2 + 1))) ^ 2) * (sqrt(2 * u ^ 2 + 1) / abs(u))) + (INT x:[0,1]. 1 / (x ^ 2 + 1))) / (u ^ 2 + 1)",
+                            "latex_res": "\\frac{-(\\int_{0}^{u/\\sqrt{2 u ^ {2} + 1}} \\frac{1}{\\frac{2 u ^ {2} + 1}{u ^ {2}} + (y \\sqrt{u ^ {-2} (2 u ^ {2} + 1)}) ^ {2}} (\\frac{\\sqrt{2 u ^ {2} + 1}}{u}) \\,dy) + (\\int_{0}^{1} \\frac{1}{x ^ {2} + 1} \\,dx)}{u ^ {2} + 1}",
+                            "res": "(-(INT y:[0,u / sqrt(2 * u ^ 2 + 1)]. 1 / ((2 * u ^ 2 + 1) / u ^ 2 + (y * sqrt(u ^ (-2) * (2 * u ^ 2 + 1))) ^ 2) * (sqrt(2 * u ^ 2 + 1) / u)) + (INT x:[0,1]. 1 / (x ^ 2 + 1))) / (u ^ 2 + 1)",
                             "rule": {
                                 "latex_str": "inverse substitution for \\(y \\sqrt{u ^ {-2} (2 u ^ {2} + 1)}\\) at 0.0.0",
                                 "loc": "0.0.0",

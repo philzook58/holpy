@@ -13,8 +13,8 @@
                     "start": "INT x:[0,pi / 2]. sin(x) ^ 2 / (sin(x) + cos(x))",
                     "steps": [
                         {
-                            "latex_res": "\\int_{0}^{\\pi/2} \\frac{\\sin^{2}(\\frac{\\pi}{2} - y)}{\\cos{(\\frac{\\pi}{2} - y)} + \\sin{(\\frac{\\pi}{2} - y)}} \\,dy",
-                            "res": "INT y:[0,pi / 2]. sin(pi / 2 - y) ^ 2 / (cos(pi / 2 - y) + sin(pi / 2 - y))",
+                            "latex_res": "\\int_{0}^{\\pi/2} \\frac{\\cos^{2}(y)}{\\cos{y} + \\sin{y}} \\,dy",
+                            "res": "INT y:[0,pi / 2]. cos(y) ^ 2 / (cos(y) + sin(y))",
                             "rule": {
                                 "latex_str": "substitute \\(y\\) for \\(\\frac{\\pi}{2} - x\\)",
                                 "name": "Substitution",
@@ -188,8 +188,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{1}{2} (\\int_{0}^{1} 2 (\\frac{1}{(z ^ {2} + 1) (\\cos{(2 \\tan^{-1}{z})} + \\sin{(2 \\tan^{-1}{z})})}) \\,dz)",
-                            "res": "1/2 * (INT z:[0,1]. 2 * (1 / ((z ^ 2 + 1) * (cos(2 * atan(z)) + sin(2 * atan(z))))))",
+                            "latex_res": "\\frac{1}{2} (\\int_{0}^{1} 2 (\\frac{1}{(z ^ {2} + 1) (\\frac{-z ^ {2} + 1}{z ^ {2} + 1} + 2 (\\frac{z}{z ^ {2} + 1}))}) \\,dz)",
+                            "res": "1/2 * (INT z:[0,1]. 2 * (1 / ((z ^ 2 + 1) * ((-(z ^ 2) + 1) / (z ^ 2 + 1) + 2 * (z / (z ^ 2 + 1))))))",
                             "rule": {
                                 "latex_str": "substitute \\(z\\) for \\(\\tan{(\\frac{x}{2})}\\)",
                                 "name": "Substitution",

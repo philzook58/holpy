@@ -69,8 +69,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(\\int_{0}^{\\pi/2} \\frac{1}{2} \\log{(a \\sin{t})} \\,dt) + (\\int_{0}^{\\pi/2} \\frac{1}{2} \\log{(a \\sin{(\\pi - x)})} \\,dx)",
-                            "res": "(INT t:[0,pi / 2]. 1/2 * log(a * sin(t))) + (INT x:[0,pi / 2]. 1/2 * log(a * sin(pi - x)))",
+                            "latex_res": "(\\int_{0}^{\\pi/2} \\frac{1}{2} \\log{(a \\sin{t})} \\,dt) + (\\int_{0}^{\\pi/2} \\frac{1}{2} \\log{(a \\sin{x})} \\,dx)",
+                            "res": "(INT t:[0,pi / 2]. 1/2 * log(a * sin(t))) + (INT x:[0,pi / 2]. 1/2 * log(a * sin(x)))",
                             "rule": {
                                 "latex_str": "substitute \\(x\\) for \\(\\pi - t\\) at 1",
                                 "loc": "1",
@@ -82,8 +82,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{1}{2} (\\int_{0}^{\\pi/2} \\log{(a \\sin{x})} \\,dx) + \\frac{1}{2} (\\int_{0}^{\\pi/2} \\log{(a \\sin{t})} \\,dt)",
-                            "res": "1/2 * (INT x:[0,pi / 2]. log(a * sin(x))) + 1/2 * (INT t:[0,pi / 2]. log(a * sin(t)))",
+                            "latex_res": "\\frac{1}{2} (\\int_{0}^{\\pi/2} \\log{(a \\sin{t})} \\,dt) + \\frac{1}{2} (\\int_{0}^{\\pi/2} \\log{(a \\sin{x})} \\,dx)",
+                            "res": "1/2 * (INT t:[0,pi / 2]. log(a * sin(t))) + 1/2 * (INT x:[0,pi / 2]. log(a * sin(x)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -94,10 +94,10 @@
                             "latex_res": "\\frac{1}{2} (\\int_{0}^{\\pi/2} \\log{(a \\sin{x})} \\,dx) + \\frac{1}{2} (\\int_{0}^{\\pi/2} \\log{(a \\sin{x})} \\,dx)",
                             "res": "1/2 * (INT x:[0,pi / 2]. log(a * sin(x))) + 1/2 * (INT x:[0,pi / 2]. log(a * sin(x)))",
                             "rule": {
-                                "latex_str": "substitute \\(x\\) for \\(t\\) at 1",
-                                "loc": "1",
+                                "latex_str": "substitute \\(x\\) for \\(t\\) at 0.1",
+                                "loc": "0.1",
                                 "name": "Substitution",
-                                "str": "substitute x for t at 1",
+                                "str": "substitute x for t at 0.1",
                                 "var_name": "x",
                                 "var_subst": "t"
                             },
@@ -231,8 +231,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\pi}{2} \\log{(2 (\\frac{1}{a}))} + (\\int_{0}^{\\pi/2} \\log{(a \\cos{(\\frac{\\pi}{2} - t)})} \\,dt) + (\\int_{0}^{\\pi/2} \\log{(a \\sin{x})} \\,dx)",
-                            "res": "pi / 2 * log(2 * (1 / a)) + (INT t:[0,pi / 2]. log(a * cos(pi / 2 - t))) + (INT x:[0,pi / 2]. log(a * sin(x)))",
+                            "latex_res": "\\frac{\\pi}{2} \\log{(2 (\\frac{1}{a}))} + (\\int_{0}^{\\pi/2} \\log{(a \\sin{t})} \\,dt) + (\\int_{0}^{\\pi/2} \\log{(a \\sin{x})} \\,dx)",
+                            "res": "pi / 2 * log(2 * (1 / a)) + (INT t:[0,pi / 2]. log(a * sin(t))) + (INT x:[0,pi / 2]. log(a * sin(x)))",
                             "rule": {
                                 "latex_str": "substitute \\(t\\) for \\(\\frac{\\pi}{2} - x\\)",
                                 "name": "Substitution",
@@ -243,8 +243,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\pi}{2} \\log{(2 (\\frac{1}{a}))} + (\\int_{0}^{\\pi/2} \\log{(a \\cos{(\\frac{\\pi}{2} - x)})} \\,dx) + (\\int_{0}^{\\pi/2} \\log{(a \\sin{x})} \\,dx)",
-                            "res": "pi / 2 * log(2 * (1 / a)) + (INT x:[0,pi / 2]. log(a * cos(pi / 2 - x))) + (INT x:[0,pi / 2]. log(a * sin(x)))",
+                            "latex_res": "\\frac{\\pi}{2} \\log{(2 (\\frac{1}{a}))} + (\\int_{0}^{\\pi/2} \\log{(a \\sin{x})} \\,dx) + (\\int_{0}^{\\pi/2} \\log{(a \\sin{x})} \\,dx)",
+                            "res": "pi / 2 * log(2 * (1 / a)) + (INT x:[0,pi / 2]. log(a * sin(x))) + (INT x:[0,pi / 2]. log(a * sin(x)))",
                             "rule": {
                                 "latex_str": "substitute \\(x\\) for \\(t\\)",
                                 "name": "Substitution",

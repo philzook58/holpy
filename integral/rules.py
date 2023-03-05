@@ -756,38 +756,6 @@ class DerivativeSimplify(Rule):
         return deriv(e.var, e.body, ctx)
 
 
-class SimplifyIdentity(Rule):
-    """Simplification using identity."""
-
-    def __init__(self):
-        self.name = "SimplifyIdentity"
-
-    def __str__(self):
-        return "simplify identity"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self)
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        for identity in ctx.get_simp_identities():
-            inst = expr.match(e, identity.lhs)
-            if inst is not None:
-                # Check conditions
-                satisfied = True
-                for cond in identity.conds.data:
-                    cond = expr.expr_to_pattern(cond)
-                    cond = cond.inst_pat(inst)
-                    if not ctx.check_condition(cond):
-                        satisfied = False
-                if satisfied:
-                    return identity.rhs.inst_pat(inst)
-
-        return e
-
-
 class OnSubterm(Rule):
     """Apply given rule on subterms.
 
@@ -1028,7 +996,6 @@ class FullSimplify(Rule):
             s = OnSubterm(DerivativeSimplify()).eval(s, ctx)
             s = OnSubterm(SimplifyPower()).eval(s, ctx)
             s = OnSubterm(ReduceLimit()).eval(s, ctx)
-            s = OnSubterm(SimplifyIdentity()).eval(s, ctx)
             if s == current:
                 break
             current = s

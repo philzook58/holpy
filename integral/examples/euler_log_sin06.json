@@ -117,8 +117,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{1}{2}\\cdot 1 (\\left. \\log{(\\left| t \\right|)} \\right\\vert_{t=4/3}^{4}) + \\frac{\\sqrt{3} \\pi}{6}",
-                            "res": "-(1/2 * 1 * ([log(abs(t))]_t=4/3,4)) + sqrt(3) * pi / 6",
+                            "latex_res": "-\\frac{1}{2}\\cdot 1 (\\left. \\log{t} \\right\\vert_{t=4/3}^{4}) + \\frac{\\sqrt{3} \\pi}{6}",
+                            "res": "-(1/2 * 1 * ([log(t)]_t=4/3,4)) + sqrt(3) * pi / 6",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"

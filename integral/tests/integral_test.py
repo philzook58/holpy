@@ -1316,7 +1316,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.SplitRegion(parser.parse_expr('pi/2')))
         calc.perform_rule(rules.OnLocation(rules.Substitution('x', parser.parse_expr('pi - t')), '1'))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnLocation(rules.Substitution('x', parser.parse_expr('t')), '1'))
+        calc.perform_rule(rules.OnLocation(rules.Substitution('x', parser.parse_expr('t')), '0.1'))
         calc.perform_rule(rules.FullSimplify())
 
         calc = proof.rhs_calc
@@ -2467,7 +2467,6 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.OnLocation(rules.SplitRegion("pi / 2"), "0.1"))
         calc.perform_rule(rules.OnLocation(rules.Substitution(var_name="x", var_subst="pi - x"), "0.1.1"))
-        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity("sin(pi - x)", "sin(x)"), "0.1.1"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.SolveEquation("(INT x:[0, pi / 2]. 1 / sqrt(sin(x)))"))
 

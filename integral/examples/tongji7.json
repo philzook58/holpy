@@ -1139,8 +1139,8 @@
                     "type": "CalculationStep"
                 },
                 {
-                    "latex_res": "-\\frac{1}{2}\\cdot 1 (\\left. \\log{(\\left| v \\right|)} \\right\\vert_{v=1}^{2}) + (\\int_{0}^{1} \\frac{u}{u ^ {2} + 1} \\,du) + (\\left. \\tan^{-1}{u} \\right\\vert_{u=-1}^{1})",
-                    "res": "-1/2 * 1 * ([log(abs(v))]_v=1,2) + (INT u:[0,1]. u / (u ^ 2 + 1)) + ([atan(u)]_u=-1,1)",
+                    "latex_res": "-\\frac{1}{2}\\cdot 1 (\\left. \\log{v} \\right\\vert_{v=1}^{2}) + (\\int_{0}^{1} \\frac{u}{u ^ {2} + 1} \\,du) + (\\left. \\tan^{-1}{u} \\right\\vert_{u=-1}^{1})",
+                    "res": "-1/2 * 1 * ([log(v)]_v=1,2) + (INT u:[0,1]. u / (u ^ 2 + 1)) + ([atan(u)]_u=-1,1)",
                     "rule": {
                         "name": "DefiniteIntegralIdentity",
                         "str": "apply definite integral"
@@ -1148,8 +1148,8 @@
                     "type": "CalculationStep"
                 },
                 {
-                    "latex_res": "-\\frac{1}{2}\\cdot 1 (\\left. \\log{(\\left| v \\right|)} \\right\\vert_{v=1}^{2}) + (\\int_{1}^{2} \\frac{1}{2} (\\frac{1}{v}) \\,dv) + (\\left. \\tan^{-1}{u} \\right\\vert_{u=-1}^{1})",
-                    "res": "-1/2 * 1 * ([log(abs(v))]_v=1,2) + (INT v:[1,2]. 1/2 * (1 / v)) + ([atan(u)]_u=-1,1)",
+                    "latex_res": "-\\frac{1}{2}\\cdot 1 (\\left. \\log{v} \\right\\vert_{v=1}^{2}) + (\\int_{1}^{2} \\frac{1}{2} (\\frac{1}{v}) \\,dv) + (\\left. \\tan^{-1}{u} \\right\\vert_{u=-1}^{1})",
+                    "res": "-1/2 * 1 * ([log(v)]_v=1,2) + (INT v:[1,2]. 1/2 * (1 / v)) + ([atan(u)]_u=-1,1)",
                     "rule": {
                         "latex_str": "substitute \\(v\\) for \\(u ^ {2} + 1\\)",
                         "name": "Substitution",
@@ -1160,8 +1160,8 @@
                     "type": "CalculationStep"
                 },
                 {
-                    "latex_res": "-\\frac{1}{2}\\cdot 1 (\\left. \\log{(\\left| v \\right|)} \\right\\vert_{v=1}^{2}) + \\frac{1}{2}\\cdot 1 (\\left. \\log{(\\left| v \\right|)} \\right\\vert_{v=1}^{2}) + (\\left. \\tan^{-1}{u} \\right\\vert_{u=-1}^{1})",
-                    "res": "-1/2 * 1 * ([log(abs(v))]_v=1,2) + 1/2 * 1 * ([log(abs(v))]_v=1,2) + ([atan(u)]_u=-1,1)",
+                    "latex_res": "-\\frac{1}{2}\\cdot 1 (\\left. \\log{v} \\right\\vert_{v=1}^{2}) + \\frac{1}{2}\\cdot 1 (\\left. \\log{v} \\right\\vert_{v=1}^{2}) + (\\left. \\tan^{-1}{u} \\right\\vert_{u=-1}^{1})",
+                    "res": "-1/2 * 1 * ([log(v)]_v=1,2) + 1/2 * 1 * ([log(v)]_v=1,2) + ([atan(u)]_u=-1,1)",
                     "rule": {
                         "name": "DefiniteIntegralIdentity",
                         "str": "apply definite integral"

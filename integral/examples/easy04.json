@@ -73,8 +73,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{-(\\left. \\log{(\\left| y \\right|)} \\right\\vert_{y=2}^{\\infty}) + (\\left. \\log{(\\left| u \\right|)} \\right\\vert_{u=1}^{\\infty})}{a}",
-                            "res": "(-([log(abs(y))]_y=2,oo) + ([log(abs(u))]_u=1,oo)) / a",
+                            "latex_res": "\\frac{-(\\left. \\log{y} \\right\\vert_{y=2}^{\\infty}) + (\\left. \\log{u} \\right\\vert_{u=1}^{\\infty})}{a}",
+                            "res": "(-([log(y)]_y=2,oo) + ([log(u)]_u=1,oo)) / a",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
