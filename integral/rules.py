@@ -30,9 +30,10 @@ def deriv(var: str, e: Expr, ctx: Context) -> Expr:
     """
     def normal(x):
         return normalize(x, ctx)
-
     def rec(e):
-        if e.is_var():
+        if var not in e.get_vars():
+            return Const(0)
+        elif e.is_var():
             if e.name == var:
                 # dx. x = 1
                 return Const(1)
@@ -135,6 +136,9 @@ def deriv(var: str, e: Expr, ctx: Context) -> Expr:
             else:
                 return Deriv(var, e)
         elif e.is_integral():
+            if e.lower.is_constant():
+                return normal(Integral(e.var, e.lower, e.upper, rec(e.body))
+                          + e.body.subst(e.var, e.upper) * rec(e.upper))
             return normal(Integral(e.var, e.lower, e.upper, rec(e.body))
                           + e.body.subst(e.var, e.upper) * rec(e.upper)
                           - e.body.subst(e.var, e.lower) * rec(e.lower))
