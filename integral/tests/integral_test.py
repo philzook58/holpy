@@ -2313,7 +2313,7 @@ class IntegralTest(unittest.TestCase):
                                          "1 / (u ^ 2 * (a - b))"))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.Equation("(-(1 / a) + 1 / b) / (a - b)", "1 / (a * b)"))
+        calc.perform_rule(rules.Equation("1 / (a - b) * (-(1 / a) + 1 / b)", "1 / (a * b)"))
 
         goal02 = file.add_goal("(INT x:[0, 1]. x / (a * x + b * (1 - x)) ^ 3) = 1 / (2 * a ^ 2 * b)", conds=["a > 0", "b > 0", "a - b > 0"])
         proof_of_goal02 = goal02.proof_by_rewrite_goal(begin=goal01)
@@ -2323,7 +2323,6 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.Equation("(b * (-x + 1) + a * x) ^ 3", "(a * x + b * (1 - x)) ^ 3"))
         calc.perform_rule(rules.SolveEquation("(INT x:[0,1]. x / (a * x + b * (1 - x)) ^ 3)"))
-        calc.perform_rule(rules.Equation("1/2 * (1 / (a ^ 2 * b))", "1 / (2 * a ^ 2 * b)"))
 
         self.checkAndOutput(file)
 
