@@ -673,15 +673,6 @@ def to_const_poly(e: expr.Expr) -> ConstantPolynomial:
             return const_fraction(0)
         elif a.is_monomial() and b.is_fraction():
             return a ** b.get_fraction()
-        elif b.is_fraction():
-            rb = b.get_fraction()
-            if rb > 0 and int(rb) == rb and rb <= 3:
-                res = const_fraction(1)
-                for i in range(int(rb)):
-                    res *= a
-                return res
-            else:
-                return const_singleton(from_const_poly(a) ** from_const_poly(b))
         else:
             return const_singleton(from_const_poly(a) ** from_const_poly(b))
 
@@ -694,20 +685,6 @@ def to_const_poly(e: expr.Expr) -> ConstantPolynomial:
         else:
             return const_singleton(expr.sqrt(from_const_poly(a)))
 
-    elif e.is_fun() and e.func_name == 'pi':
-        return const_singleton(expr.pi)
-
-    elif e.is_fun() and e.func_name == 'exp':
-        a = to_const_poly(e.args[0])
-        if a.is_fraction() and a.get_fraction() == 0:
-            return const_fraction(1)
-        elif a.is_fraction():
-            return ConstantPolynomial([ConstantMonomial(1, [(expr.E, a.get_fraction())])])
-        elif e.args[0].is_fun() and e.args[0].func_name == "log":
-            return to_const_poly(e.args[0].args[0])
-        else:
-            return const_singleton(expr.exp(from_const_poly(a)))
-
     elif e.is_fun() and e.func_name == 'log':
         a = to_const_poly(e.args[0])
         if a.is_fraction() and a.get_fraction() == 1:
@@ -718,11 +695,6 @@ def to_const_poly(e: expr.Expr) -> ConstantPolynomial:
             for n, e in mono.factors:
                 if isinstance(n, (int, Fraction)):
                     log_factors.append(const_fraction(e) * const_singleton(expr.log(expr.Const(n))))
-                elif isinstance(n, expr.Expr) and n == expr.E:
-                    log_factors.append(const_fraction(e))
-                elif isinstance(n, expr.Expr) and n.is_fun() and n.func_name == "exp":
-                    body = n.args[0]
-                    log_factors.append(const_singleton(body))
                 else:
                     log_factors.append(const_fraction(e) * const_singleton(expr.log(n)))
             if mono.coeff == 1:

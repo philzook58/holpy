@@ -200,6 +200,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.Substitution("u", parser.parse_expr("x - 3")))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.OnSubterm(rules.ExpandPolynomial()))
         calc.perform_rule(rules.FullSimplify())
         self.assertEqual(str(calc.last_expr), "-(3 * exp(2) / 2) + exp(3) / 3 - 45 * exp(1) - 461/6")
 

@@ -277,6 +277,25 @@
         },
         {
             "type": "axiom",
+            "expr": "exp(0) = 1",
+            "category": "exp-log",
+            "attributes": [
+                "simplify"
+            ]
+        },
+        {
+            "type": "axiom",
+            "expr": "exp(log(b)) = b",
+            "conds": [
+                "b > 0"
+            ],
+            "category": "exp-log",
+            "attributes": [
+                "simplify"
+            ]
+        },
+        {
+            "type": "axiom",
             "expr": "exp(a * log(b)) = b ^ a",
             "conds": [
                 "b > 0"
@@ -314,6 +333,14 @@
                 "x > 0"
             ],
             "category": "exp-log"
+        },
+        {
+            "type": "axiom",
+            "expr": "log(exp(b)) = b",
+            "category": "exp-log",
+            "attributes": [
+                "simplify"
+            ]
         },
         {
             "type": "header",
