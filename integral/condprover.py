@@ -271,44 +271,44 @@ def print_all_conds(all_conds: Dict[Expr, List[Expr]]):
 def get_standard_inequalities() -> List[Identity]:
     data = [
         # Addition
+        (["a > b"], "a + c > b + c"),
+        (["a > b"], "c + a > c + b"),
+        (["a < b"], "a + c < b + c"),
+        (["a < b"], "c + a < c + b"),
         (["a != b"], "a + c != b + c"),
         (["a != b"], "c + a != c + b"),
         (["a >= b"], "a + c >= b + c"),
-        (["a > b"], "a + c > b + c"),
         (["a >= b"], "c + a >= c + b"),
-        (["a > b"], "c + a > c + b"),
-        (["a >= b", "c >= d"], "a + c >= b + d"),
+        (["a <= b"], "a + c <= b + c"),
+        (["a <= b"], "c + a <= c + b"),
         (["a >= b", "c > d"], "a + c > b + d"),
         (["a > b", "c >= d"], "a + c > b + d"),
-        (["a <= b"], "a + c <= b + c"),
-        (["a < b"], "a + c < b + c"),
-        (["a <= b"], "c + a <= c + b"),
-        (["a < b"], "c + a < c + b"),
-        (["a <= b", "c <= d"], "a + c <= b + d"),
         (["a <= b", "c < d"], "a + c < b + d"),
         (["a < b", "c <= d"], "a + c < b + d"),
+        (["a >= b", "c >= d"], "a + c >= b + d"),
+        (["a <= b", "c <= d"], "a + c <= b + d"),
 
         # Unary minus
         (["x > a"], "-x < -a"),
-        (["x >= a"], "-x <= -a"),
         (["x < a"], "-x > -a"),
-        (["x <= a"], "-x >= -a"),
         (["x != a"], "-x != -a"),
+        (["x >= a"], "-x <= -a"),
+        (["x <= a"], "-x >= -a"),
 
         # Subtraction
         (["a > b"], "c - a < c - b"),
-        (["a >= b"], "c - a <= c - b"),
         (["a < b"], "c - a > c - b"),
-        (["a <= b"], "c - a >= c - b"),
         (["a > b"], "a - c > b - c"),
-        (["a >= b"], "a - c >= b - c"),
         (["a < b"], "a - c < b - c"),
+        (["a >= b"], "c - a <= c - b"),
+        (["a <= b"], "c - a >= c - b"),
+        (["a >= b"], "a - c >= b - c"),
         (["a <= b"], "a - c <= b - c"),
         (["a > b", "c <= d"], "a - c > b - d"),
         (["a >= b", "c < d"], "a - c > b - d"),
-        (["a >= b", "c <= d"], "a - c >= b - d"),
         (["a < b", "c >= d"], "a - c < b - d"),
         (["a <= b", "c > d"], "a - c < b - d"),
+        (["a >= b", "c <= d"], "a - c >= b - d"),
         (["a <= b", "c >= d"], "a - c <= b - d"),
 
         # Multiplication (simple)
@@ -319,57 +319,57 @@ def get_standard_inequalities() -> List[Identity]:
         (["a < 0", "b < 0"], "a * b > 0"),
 
         # Multiplication (one side is constant)
-        (["a >= b", "c >= 0"], "c * a >= c * b"),
         (["a > b", "c > 0"], "c * a > c * b"),
-        (["a >= b", "c >= 0"], "a * c >= b * c"),
         (["a > b", "c > 0"], "a * c > b * c"),
-        (["a <= b", "c >= 0"], "c * a <= c * b"),
         (["a < b", "c > 0"], "c * a < c * b"),
-        (["a <= b", "c >= 0"], "a * c <= b * c"),
         (["a < b", "c > 0"], "a * c < b * c"),
+        (["a >= b", "c >= 0"], "c * a >= c * b"),
+        (["a >= b", "c >= 0"], "a * c >= b * c"),
+        (["a <= b", "c >= 0"], "c * a <= c * b"),
+        (["a <= b", "c >= 0"], "a * c <= b * c"),
 
         # Multiplication (left side > 0)
-        (["a >= b", "c >= d", "b >= 0"], "a * c >= b * d"),
         (["a > b", "c >= d", "b > 0"], "a * c > b * d"),
         (["a >= b", "c > d", "b > 0"], "a * c > b * d"),
         (["a < b", "c < d", "a > 0"], "a * c < b * d"),
+        (["a >= b", "c >= d", "b >= 0"], "a * c >= b * d"),
         (["a <= b", "c < d", "a > 0"], "a * c <= b * d"),
         (["a < b", "c <= d", "a > 0"], "a * c <= b * d"),
 
         # Multiplication (right side > 0)
-        (["a >= b", "c >= d", "b >= 0"], "c * a >= d * b"),
         (["a > b", "c >= d", "b > 0"], "c * a > d * b"),
         (["a >= b", "c > d", "b > 0"], "c * a > d * b"),
-        (["a < b", "c < d", "a > 0"], "c * a < d * b"),
         (["a <= b", "c < d", "a > 0"], "c * a < d * b"),
         (["a < b", "c <= d", "a > 0"], "c * a < d * b"),
+        (["a >= b", "c >= d", "b >= 0"], "c * a >= d * b"),
+        (["a <= b", "c <= d", "a > 0"], "c * a <= d * b"),
 
         # Division
         (["a > 0", "b > 0"], "a / b > 0"),
         (["a > 0", "b < 0"], "a / b < 0"),
         (["a < 0", "b > 0"], "a / b < 0"),
         (["a < 0", "b < 0"], "a / b > 0"),
-        (["a >= b", "c > 0"], "a / c >= b / c"),
         (["a > b", "c > 0"], "a / c > b / c"),
-        (["a <= b", "c > 0"], "a / c <= b / c"),
         (["a < b", "c > 0"], "a / c < b / c"),
-        (["a >= b", "c < 0"], "a / c <= b / c"),
         (["a > b", "c < 0"], "a / c < b / c"),
-        (["a <= b", "c < 0"], "a / c >= b / c"),
         (["a < b", "c < 0"], "a / c > b / c"),
+        (["a >= b", "c > 0"], "a / c >= b / c"),
+        (["a <= b", "c > 0"], "a / c <= b / c"),
+        (["a >= b", "c < 0"], "a / c <= b / c"),
+        (["a <= b", "c < 0"], "a / c >= b / c"),
 
         # Square root
         (["a > 0"], "sqrt(a) > 0"),
         (["a < 1", "a > 0"], "sqrt(a) < 1"),
 
         # Power
-        ([], "a ^ 2 >= 0"),
         (["a != 0"], "a ^ 2 > 0"),
-        (["x != 0"], "x ^ n != 0"),
+        ([], "a ^ 2 >= 0"),
         (["x > 0"], "x ^ y > 0"),
+        (["x != 0"], "x ^ n != 0"),
         (["x < a", "x > -a"], "x ^ 2 < a ^ 2"),
-        (["x <= a", "x >= -a"], "x ^ 2 <= a ^ 2"),
         (["x > a", "a >= 0"], "x ^ 2 > a ^ 2"),
+        (["x <= a", "x >= -a"], "x ^ 2 <= a ^ 2"),
         (["x >= a", "a >= 0"], "x ^ 2 >= a ^ 2"),
         (["x != y"], "x ^ 2 - y ^ 2 != 0"),
         (["y != x"], "x ^ 2 - y ^ 2 != 0"),
@@ -387,19 +387,19 @@ def get_standard_inequalities() -> List[Identity]:
         # Exponential
         ([], "exp(x) > 0"),
         (["x > 0"], "exp(x) > 1"),
-        (["x >= 0"], "exp(x) >= 1"),
         (["x < 0"], "exp(x) < 1"),
+        (["x >= 0"], "exp(x) >= 1"),
         (["x <= 0"], "exp(x) <= 1"),
 
         # Trigonometric
-        (["x >= -pi / 2", "x <= pi / 2"], "cos(x) >= 0"),
-        (["x >= pi / 2", "x <= 3 * pi / 2"], "cos(x) <= 0"),
         (["x > -pi / 2", "x < pi / 2"], "cos(x) > 0"),
         (["x > pi / 2", "x < 3 * pi / 2"], "cos(x) < 0"),
-        (["x >= 0", "x <= pi"], "sin(x) >= 0"),
-        (["x >= -pi", "x <= 0"], "sin(x) <= 0"),
+        (["x >= -pi / 2", "x <= pi / 2"], "cos(x) >= 0"),
+        (["x >= pi / 2", "x <= 3 * pi / 2"], "cos(x) <= 0"),
         (["x > 0", "x < pi"], "sin(x) > 0"),
         (["x > -pi", "x < 0"], "sin(x) < 0"),
+        (["x >= 0", "x <= pi"], "sin(x) >= 0"),
+        (["x >= -pi", "x <= 0"], "sin(x) <= 0"),
         (["x > -pi / 2", "x < pi / 4"], "tan(x) < 1"),
         (["x > 0", "x < pi / 2"], "tan(x) > 0"),
 
@@ -421,6 +421,8 @@ def get_standard_inequalities() -> List[Identity]:
         ineqs.append(Identity(symb_e, conds=Conditions(symb_conds)))
     return ineqs
 
+standard_inequalities = get_standard_inequalities()
+
 def check_condition(e: Expr, ctx: Context) -> bool:
     """Check whether e holds under the given context."""
 
@@ -441,7 +443,7 @@ def check_condition(e: Expr, ctx: Context) -> bool:
 
     conds = ctx.get_conds()
     all_conds = init_all_conds(conds)
-    ineqs = get_standard_inequalities()
+    ineqs = copy(standard_inequalities)
     ineqs.extend(ctx.get_inequalities())
     for lemma in ctx.get_lemmas():
         if lemma.expr.is_compare():
