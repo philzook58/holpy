@@ -2089,7 +2089,7 @@ class IntegralTest(unittest.TestCase):
         goal01 = file.add_goal(
             "(INT x:[0, oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)) = \
             1/2 * (INT x:[-oo, oo]. x * sin(a * x) / (x ^ 2 - b ^ 2))",\
-            conds = ["x!=b"])
+            conds=["x!=b"])
         proof_of_goal01 = goal01.proof_by_calculation()
         calc = proof_of_goal01.lhs_calc
         calc.perform_rule(rules.FullSimplify())
@@ -2100,7 +2100,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
 
         goal02 = file.add_goal("(INT x:[0, oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)) = pi / 2 * cos(a * b)",
-                               conds=["a > 0", "b > 0","b != x"])
+                               conds=["a > 0", "b > 0", "b != x"])
         proof_of_goal02 = goal02.proof_by_rewrite_goal(begin=goal01)
         calc = proof_of_goal02.begin
         calc.perform_rule(rules.OnLocation(rules.Equation("x ^ 2 - b ^ 2", "(x + b) * (x - b)"), "1"))
@@ -2122,9 +2122,10 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.Equation("(b / u - 1) * sin(a * b - a * u)",
                                          "(b / u) * sin(a * b - a * u) - sin(a * b - a * u)"))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnLocation(rules.Substitution(var_name="s", var_subst="a * b - a * u"), "1.0.1.0"))
-        calc.perform_rule(rules.OnLocation(rules.SplitRegion("0"), "1.0.1.0"))
-        calc.perform_rule(rules.OnLocation(rules.Substitution(var_name="s", var_subst="-s"), "1.0.1.0.0"))
+        calc.perform_rule(rules.OnLocation(rules.Substitution(var_name="s", var_subst="a * b - a * u"), "1.0.1.1"))
+        calc.perform_rule(rules.OnLocation(rules.SplitRegion("0"), "1.0.1.1"))
+        calc.perform_rule(rules.OnLocation(rules.Substitution(var_name="s", var_subst="-s"), "1.0.1.1.0"))
+        calc.perform_rule(rules.ApplyIdentity("sin(-s)", "-sin(s)"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(
             rules.ApplyIdentity("sin(a * b - a * u)", "sin(a * b) * cos(a * u) - cos(a * b) * sin(a * u)"))
