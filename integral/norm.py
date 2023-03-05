@@ -14,7 +14,7 @@ def unfold_power(p: Polynomial, n: int, ctx: Context) -> Polynomial:
     """Unfold power of a polynomial."""
     assert n >= 0
     if n == 0:
-        return poly.constant(poly.const_fraction(1), ctx)
+        return poly.constant(1, ctx)
 
     res = p
     for i in range(n-1):
@@ -99,7 +99,7 @@ def normalize_quotient(e: Expr, ctx: Context) -> NormalQuotient:
                 f1,f2 = e.args
                 n1,n2 = f1.args[0], f2.args[0]
                 if n1 == n2:
-                    return NormalQuotient(poly.constant(poly.const_fraction(1), ctx), poly.constant(poly.const_fraction(1, ctx)), ctx)
+                    return NormalQuotient(poly.constant(1, ctx), poly.constant(1, ctx), ctx)
                 try:
                     v = expr.eval_expr(poly.normalize(n1 - n2, ctx))
                     if v > 0:
@@ -129,7 +129,7 @@ def normalize_quotient(e: Expr, ctx: Context) -> NormalQuotient:
                 e = expr.Fun(e.func_name, *(quotient_normalize(arg, ctx) for arg in e.args))
 
         # Un-handled cases
-        return NormalQuotient(poly.singleton(e, ctx), poly.constant(poly.const_fraction(1), ctx), ctx)
+        return NormalQuotient(poly.singleton(e, ctx), poly.constant(1, ctx), ctx)
 
     return rec(e)
 
@@ -189,7 +189,7 @@ def add_normal_power(n1: NormalPower, n2: NormalPower) -> NormalPower:
         return add_normal_power(n2, n1)
     else:
         return NormalPower(poly.singleton(n1.to_expr(), n1.ctx) + poly.singleton(n2.to_expr(), n1.ctx),
-                           poly.constant(poly.const_fraction(1)), 1, n1.ctx)
+                           poly.constant(1, n1.ctx), 1, n1.ctx)
 
 def uminus_normal_power(n: NormalPower) -> NormalPower:
     """Negation of a normal form.
@@ -283,7 +283,7 @@ def normalize_power(e: Expr, ctx: Context) -> NormalPower:
                 return rec(e.args[0] ** Const(Fraction(1,2)))
 
         # Un-handled cases
-        return NormalPower(poly.singleton(e, ctx), poly.constant(poly.const_fraction(1), ctx), 1, ctx)
+        return NormalPower(poly.singleton(e, ctx), poly.constant(1, ctx), 1, ctx)
 
     return rec(e)
 
@@ -317,8 +317,6 @@ def normalize_log(e: Expr, ctx: Context) -> NormalLog:
     def rec(e: Expr) -> NormalLog:
         if e.is_minus():
             return minus_normal_log(rec(e.args[0]), rec(e.args[1]))
-        # elif e.is_uminus():
-        #     return NormalLog(poly.singleton(e.args[0], ctx) ** poly.constant(poly.const_fraction(-1), ctx))
         elif e.is_plus():
             return add_normal_log(rec(e.args[0]), rec(e.args[1]))
         elif e.is_fun() and e.func_name == 'log':

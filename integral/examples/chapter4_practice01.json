@@ -165,8 +165,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\frac{n!}{(n + 2)!})",
-                            "res": "2 * (factorial(n) / factorial(n + 2))",
+                            "latex_res": "\\frac{2 n!}{(n + 2)!}",
+                            "res": "2 * factorial(n) / factorial(n + 2)",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -174,37 +174,26 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\frac{n!}{(n + 2) (n + 1)!})",
-                            "res": "2 * (factorial(n) / ((n + 2) * factorial(n + 1)))",
+                            "latex_res": "\\frac{2 n!}{(n + 2) (n + 1)!}",
+                            "res": "2 * factorial(n) / ((n + 2) * factorial(n + 1))",
                             "rule": {
-                                "latex_str": "rewrite \\((n + 2)!\\) to \\((n + 2) (n + 1)!\\) using identity at 1.1",
-                                "loc": "1.1",
+                                "latex_str": "rewrite \\((n + 2)!\\) to \\((n + 2) (n + 1)!\\) using identity",
                                 "name": "ApplyIdentity",
                                 "source": "factorial(n + 2)",
-                                "str": "rewrite factorial(n + 2) to (n + 2) * factorial(n + 1) using identity at 1.1",
+                                "str": "rewrite factorial(n + 2) to (n + 2) * factorial(n + 1) using identity",
                                 "target": "(n + 2) * factorial(n + 1)"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\frac{n!}{(n + 2) ((n + 1) n!)})",
-                            "res": "2 * (factorial(n) / ((n + 2) * ((n + 1) * factorial(n))))",
+                            "latex_res": "\\frac{2 n!}{(n + 2) ((n + 1) n!)}",
+                            "res": "2 * factorial(n) / ((n + 2) * ((n + 1) * factorial(n)))",
                             "rule": {
-                                "latex_str": "rewrite \\((n + 1)!\\) to \\((n + 1) n!\\) using identity at 1.1.1",
-                                "loc": "1.1.1",
+                                "latex_str": "rewrite \\((n + 1)!\\) to \\((n + 1) n!\\) using identity",
                                 "name": "ApplyIdentity",
                                 "source": "factorial(n + 1)",
-                                "str": "rewrite factorial(n + 1) to (n + 1) * factorial(n) using identity at 1.1.1",
+                                "str": "rewrite factorial(n + 1) to (n + 1) * factorial(n) using identity",
                                 "target": "(n + 1) * factorial(n)"
-                            },
-                            "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "2 (\\frac{1}{(n + 1) (n + 2)})",
-                            "res": "2 * (1 / ((n + 1) * (n + 2)))",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
                             },
                             "type": "CalculationStep"
                         },
@@ -212,11 +201,8 @@
                             "latex_res": "\\frac{2}{(n + 1) (n + 2)}",
                             "res": "2 / ((n + 1) * (n + 2))",
                             "rule": {
-                                "latex_str": "rewriting \\(2 (\\frac{1}{(n + 1) (n + 2)})\\) to \\(\\frac{2}{(n + 1) (n + 2)}\\)",
-                                "name": "Equation",
-                                "new_expr": "2 / ((n + 1) * (n + 2))",
-                                "old_expr": "2 * (1 / ((n + 1) * (n + 2)))",
-                                "str": "rewriting 2 * (1 / ((n + 1) * (n + 2))) to 2 / ((n + 1) * (n + 2))"
+                                "name": "FullSimplify",
+                                "str": "full simplify"
                             },
                             "type": "CalculationStep"
                         }

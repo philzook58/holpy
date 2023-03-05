@@ -2,10 +2,9 @@
 
 from decimal import Decimal
 from fractions import Fraction
-from typing import Optional, Dict, Tuple, Union, List, Set
+from typing import Optional, Dict, Tuple, Union, List
 import functools
 import operator
-import math
 
 from integral import expr
 from integral.expr import Var, Const, Fun, EvalAt, Op, Integral, Symbol, Expr, \
@@ -20,7 +19,6 @@ from integral.context import Context, apply_subterm
 from integral import poly
 from integral.poly import from_poly, to_poly, normalize
 from integral.conditions import Conditions
-from integral import condprover
 
 
 def deriv(var: str, e: Expr, ctx: Context) -> Expr:
@@ -30,9 +28,10 @@ def deriv(var: str, e: Expr, ctx: Context) -> Expr:
     """
     def normal(x):
         return normalize(x, ctx)
-
     def rec(e):
-        if e.is_var():
+        if var not in e.get_vars():
+            return Const(0)
+        elif e.is_var():
             if e.name == var:
                 # dx. x = 1
                 return Const(1)
@@ -135,6 +134,9 @@ def deriv(var: str, e: Expr, ctx: Context) -> Expr:
             else:
                 return Deriv(var, e)
         elif e.is_integral():
+            if e.lower.is_constant():
+                return normal(Integral(e.var, e.lower, e.upper, rec(e.body))
+                          + e.body.subst(e.var, e.upper) * rec(e.upper))
             return normal(Integral(e.var, e.lower, e.upper, rec(e.body))
                           + e.body.subst(e.var, e.upper) * rec(e.upper)
                           - e.body.subst(e.var, e.lower) * rec(e.lower))
@@ -150,33 +152,46 @@ def deriv(var: str, e: Expr, ctx: Context) -> Expr:
 
     return rec(e)
 
+class ProofObligationBranch:
+    def __init__(self, exprs:List[Expr]):
+        self.exprs = exprs # satisfy all expressions
+    def export(self):
+        res = {
+            'exprs': [str(e) for e in self.exprs]
+        }
+        return res
+
 class ProofObligation:
     """Represents a proof obligation to prove e using the conditions
     in conds.
     
     """
-    def __init__(self, e: Expr, conds: Conditions):
-        self.e = e
+    def __init__(self, branches: List['ProofObligationBranch'], conds: Conditions):
+        self.branches = branches # if any branch is satisfied then the proof obligation is carried out
         self.conds = conds
 
     def __eq__(self, other: "ProofObligation"):
-        return self.e == other.e and self.conds == other.conds
+        return self.branches == other.branches
 
     def __le__(self, other: "ProofObligation"):
-        return self.e <= other.e and self.conds <= other.conds
+        if len(self.branches) < other.branches:
+            return True
+        elif len(self.branches > other.branches):
+            return False
+        return all(a < b for a,b in zip(self.branches, other.branches))
 
     def __str__(self):
-        return "%s  [%s]" % (self.e, self.conds)
+        return "%s" % self.branches
 
     def __repr__(self):
         return str(self)
 
     def __hash__(self):
-        return hash((self.e, self.conds))
+        return hash(tuple(self.branches))
 
     def export(self):
         res = {
-            'expr': str(self.e),
+            'branches': [branch.export() for branch in self.branches],
             'conds': self.conds.export()
         }
         return res
@@ -189,11 +204,12 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
     """
     obligations: List[ProofObligation] = list()
 
-    def add_obligation(e: Expr, ctx: Context):
-        obligation = ProofObligation(e, ctx.get_conds())
+    def add_obligation(branches: Union[List[ProofObligationBranch], Expr], ctx: Context):
+        if isinstance(branches, Expr):
+            branches = [ProofObligationBranch([branches])]
+        obligation = ProofObligation(branches, ctx.get_conds())
         if obligation not in obligations:
             obligations.append(obligation)
-
     def rec(e: Expr, ctx: Context):
         if e.is_var() or e.is_const():
             pass
@@ -227,6 +243,24 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
                     pass
                 else:
                     add_obligation(Op(">=", e.args[0], Const(0)), ctx)
+            if e.func_name == 'gamma':
+                f1 = ctx.check_condition(Op(">", e.args[0], Const(0)))
+                f2 = ctx.check_condition(Op('<'), e.args[0], Const(0)) and \
+                     ctx.check_condition(Fun("notInt", e.args[0]))
+                if f1 or f2:
+                    pass
+                else:
+                    branch1 = ProofObligationBranch([Op(">", e.args[0], Const(0))])
+                    branch2 = ProofObligationBranch([Op("<", e.args[0], Const(0)), Fun("notInt", e.args[0])])
+                    add_obligation([branch1, branch2], ctx)
+            if e.func_name == "acos" or e.func_name == "asin":
+                f1 = ctx.check_condition(Op(">=", e.args[0], Const(-1)))
+                f2 = ctx.check_condition(Op("<=", e.args[0], Const(1)))
+                if f1 and f2:
+                    pass
+                else:
+                    add_obligation(Op(">=", e.args[0], Const(-1)), ctx)
+                    add_obligation(Op("<=", e.args[0], Const(1)), ctx)
             # TODO: add checks for other functions
         elif e.is_integral():
             ctx2 = Context(ctx)
@@ -251,7 +285,6 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
             rec(e.body, ctx2)
         else:
             pass
-
     rec(e, ctx)
     return obligations
 
@@ -431,31 +464,6 @@ class Linearity(Rule):
             else:
                 return e
         return rec(e)
-
-
-class CommonIntegral(Rule):
-    """Applies common integrals"""
-
-    def __init__(self):
-        self.name = "CommonIntegral"
-
-    def __str__(self):
-        return "common integrals"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self)
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        if not e.is_integral():
-            return e
-
-        if isinstance(e.body, Deriv) and e.body.var == e.var:
-            return EvalAt(e.var, e.lower, e.upper, e.body.body)
-        else:
-            return e
 
 
 class ApplyIdentity(Rule):
@@ -756,38 +764,6 @@ class DerivativeSimplify(Rule):
         return deriv(e.var, e.body, ctx)
 
 
-class SimplifyIdentity(Rule):
-    """Simplification using identity."""
-
-    def __init__(self):
-        self.name = "SimplifyIdentity"
-
-    def __str__(self):
-        return "simplify identity"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self)
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        for identity in ctx.get_simp_identities():
-            inst = expr.match(e, identity.lhs)
-            if inst is not None:
-                # Check conditions
-                satisfied = True
-                for cond in identity.conds.data:
-                    cond = expr.expr_to_pattern(cond)
-                    cond = cond.inst_pat(inst)
-                    if not ctx.check_condition(cond):
-                        satisfied = False
-                if satisfied:
-                    return identity.rhs.inst_pat(inst)
-
-        return e
-
-
 class OnSubterm(Rule):
     """Apply given rule on subterms.
 
@@ -914,91 +890,12 @@ class OnLocation(Rule):
         return rec(e, self.loc, ctx)
 
 
-class SimplifyPower(Rule):
-    """Apply the following simplifications on powers:
-
-    1. Collect repeated powers
-        x ^ a ^ b => x ^ (a * b).
-
-    2. Separate constants in the exponent if base is also a constant
-        c1 ^ (a + c2) => c1 ^ c2 * c1 ^ a
-
-    3. In the expression (-a) ^ n, separate out -1.
-        (-a) ^ n = (-1) ^ n * a ^ n
-        (-a + -b) ^ n = (-1) ^ n * (a + b) ^ n
-
-    """
-
-    def __init__(self):
-        self.name = "SimplifyPower"
-
-    def __str__(self):
-        return "simplify powers"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self)
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        if not e.is_power():
-            return e
-        if e.args[1].is_plus() and e.args[0].is_const() and e.args[1].args[1].is_const():
-            # c1 ^ (a + c2) => c1 ^ c2 * c1 ^ a
-            return (e.args[0] ^ e.args[1].args[1]) * (e.args[0] ^ e.args[1].args[0])
-        elif e.args[1].is_minus() and e.args[0].is_const() and e.args[1].args[1].is_const():
-            # c1 ^ (a - c2) => c1 ^ -c2 * c1 ^ a
-            return (e.args[0] ^ e.args[1].args[0]) * (e.args[0] ^ (-(e.args[1].args[1])))
-        elif e.args[0].is_uminus() and e.args[1].is_const():
-            # (-a) ^ n = (-1) ^ n * a ^ n
-            return (Const(-1) ^ e.args[1]) * (e.args[0].args[0] ^ e.args[1])
-        elif e.args[0].is_minus() and e.args[0].args[0].is_uminus() and e.args[1].is_const():
-            # (-a - b) ^ n = (-1) ^ n * (a + b) ^ n
-            nega, negb = e.args[0].args
-            return (Const(-1) ^ e.args[1]) * ((nega.args[0] + negb) ^ e.args[1])
-        else:
-            return e
-
-
-class ReduceLimit(Rule):
-    """Reduce limit expressions."""
-
-    def __init__(self):
-        self.name = "ReduceLimit"
-
-    def __str__(self):
-        return "reduce limits"
-
-    def export(self):
-        return {
-            "name": self.name,
-            "str": str(self)
-        }
-
-    def eval(self, e: Expr, ctx: Context) -> Expr:
-        if not e.is_limit():
-            return e
-        if e.var not in e.body.get_vars():
-            return e.body
-
-        if e.lim == POS_INF:
-            return limits.reduce_inf_limit(e.body, e.var, ctx)
-        elif e.lim == NEG_INF:
-            raise limits.reduce_neg_inf_limit(e.body, e.var, ctx)
-        else:
-            return limits.reduce_finite_limit(e, ctx)
-
-
 class FullSimplify(Rule):
     """Perform simplification by applying the following rules repeatedly:
 
     - Simplify
-    - CommonIntegral
     - Linearity
     - DerivativeSimplify
-    - SimplifyPower
-    - ReduceLimit
 
     """
 
@@ -1019,16 +916,8 @@ class FullSimplify(Rule):
         current = e
         while True:
             s = OnSubterm(Linearity()).eval(current, ctx)
-            if ctx != None:
-                for b in ctx.get_conds().data:
-                    if b.is_equals() and b.args[0].is_var() and b.args[1].is_constant():
-                        s = s.subst(str(b.args[0]), b.args[1])
-            s = OnSubterm(CommonIntegral()).eval(s, ctx)
             s = Simplify().eval(s, ctx)
             s = OnSubterm(DerivativeSimplify()).eval(s, ctx)
-            s = OnSubterm(SimplifyPower()).eval(s, ctx)
-            s = OnSubterm(ReduceLimit()).eval(s, ctx)
-            s = OnSubterm(SimplifyIdentity()).eval(s, ctx)
             if s == current:
                 break
             current = s
@@ -1419,7 +1308,7 @@ class Equation(Rule):
         y = Symbol('y', [SUMMATION])
         p = x * y
         mapping = expr.match(e, p)
-        if mapping!=None:
+        if mapping is not None:
             sum = mapping[y.name]
             idx = sum.index_var
             out = mapping[x.name]
@@ -1527,6 +1416,7 @@ class SplitRegion(Rule):
                 return e
             else:
                 return OnLocation(self, sep_ints[0][1]).eval(e, ctx)
+
         x = Var("c")
         is_cpv = limits.reduce_inf_limit(e.body.subst(e.var, self.c + 1 / x), x.name, ctx) in [POS_INF, NEG_INF]
         if not is_cpv:

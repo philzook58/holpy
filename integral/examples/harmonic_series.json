@@ -23,11 +23,11 @@
                     "latex_cond": "n \\in\\mathbb{Z}"
                 }
             ],
-            "finished": true,
+            "finished": false,
             "goal": "I(n) = -(H(n) / n)",
             "latex_goal": "I{(n)} = -\\frac{H{(n)}}{n}",
             "proof": {
-                "finished": true,
+                "finished": false,
                 "goal": "I(n) = -(H(n) / n)",
                 "latex_goal": "I{(n)} = -\\frac{H{(n)}}{n}",
                 "lhs_calc": {
@@ -57,8 +57,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\int_{0}^{1} \\frac{x ^ {n} - 1}{-x + 1} \\,dx}{n}",
-                            "res": "(INT x:[0,1]. (x ^ n - 1) / (-x + 1)) / n",
+                            "latex_res": "\\frac{1}{n} (\\int_{0}^{1} \\frac{x ^ {n} - 1}{-x + 1} \\,dx)",
+                            "res": "1 / n * (INT x:[0,1]. (x ^ n - 1) / (-x + 1))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -66,8 +66,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\int_{0}^{1} -\\frac{1 - x ^ {n}}{1 - x} \\,dx}{n}",
-                            "res": "(INT x:[0,1]. -((1 - x ^ n) / (1 - x))) / n",
+                            "latex_res": "\\frac{1}{n} (\\int_{0}^{1} -\\frac{1 - x ^ {n}}{1 - x} \\,dx)",
+                            "res": "1 / n * (INT x:[0,1]. -((1 - x ^ n) / (1 - x)))",
                             "rule": {
                                 "latex_str": "rewriting \\(\\frac{x ^ {n} - 1}{-x + 1}\\) to \\(-\\frac{1 - x ^ {n}}{1 - x}\\)",
                                 "name": "Equation",
@@ -78,19 +78,19 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\int_{0}^{1} -\\sum_{k=1}^{n}{x ^ {k - 1}} \\,dx}{n}",
-                            "res": "(INT x:[0,1]. -SUM(k, 1, n, x ^ (k - 1))) / n",
+                            "latex_res": "\\frac{1}{n} (\\int_{0}^{1} -\\frac{1 - x ^ {n}}{1 - x} \\,dx)",
+                            "res": "1 / n * (INT x:[0,1]. -((1 - x ^ n) / (1 - x)))",
                             "rule": {
                                 "index_var": "k",
-                                "loc": "0.0.0",
+                                "loc": "1.0",
                                 "name": "SeriesExpansionIdentity",
-                                "str": "apply series expansion at 0.0.0"
+                                "str": "apply series expansion at 1.0"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{\\int_{0}^{1} \\sum_{k=1}^{n}{x ^ {k - 1}} \\,dx}{n}",
-                            "res": "-((INT x:[0,1]. SUM(k, 1, n, x ^ (k - 1))) / n)",
+                            "latex_res": "-\\frac{1}{n} (\\int_{0}^{1} \\frac{-x ^ {n} + 1}{-x + 1} \\,dx)",
+                            "res": "-(1 / n * (INT x:[0,1]. (-(x ^ n) + 1) / (-x + 1)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -98,8 +98,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{\\sum_{k=1}^{n}{\\int_{0}^{1} x ^ {k - 1} \\,dx}}{n}",
-                            "res": "-(SUM(k, 1, n, INT x:[0,1]. x ^ (k - 1)) / n)",
+                            "latex_res": "-\\frac{1}{n} (\\int_{0}^{1} \\frac{-x ^ {n} + 1}{-x + 1} \\,dx)",
+                            "res": "-(1 / n * (INT x:[0,1]. (-(x ^ n) + 1) / (-x + 1)))",
                             "rule": {
                                 "loc": "0.0",
                                 "name": "IntSumExchange",
@@ -108,8 +108,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{\\sum_{k=1}^{n}{\\left. \\frac{x ^ {k}}{k} \\right\\vert_{x=0}^{1}}}{n}",
-                            "res": "-(SUM(k, 1, n, [x ^ k / k]_x=0,1) / n)",
+                            "latex_res": "-\\frac{1}{n} (\\int_{0}^{1} \\frac{-x ^ {n} + 1}{-x + 1} \\,dx)",
+                            "res": "-(1 / n * (INT x:[0,1]. (-(x ^ n) + 1) / (-x + 1)))",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
@@ -117,8 +117,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{\\sum_{k=1}^{n}{\\frac{1}{k}}}{n}",
-                            "res": "-(SUM(k, 1, n, 1 / k) / n)",
+                            "latex_res": "-\\frac{1}{n} (\\int_{0}^{1} \\frac{-x ^ {n} + 1}{-x + 1} \\,dx)",
+                            "res": "-(1 / n * (INT x:[0,1]. (-(x ^ n) + 1) / (-x + 1)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -126,8 +126,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{H{(n)}}{n}",
-                            "res": "-(H(n) / n)",
+                            "latex_res": "-\\frac{1}{n} (\\int_{0}^{1} \\frac{-x ^ {n} + 1}{-x + 1} \\,dx)",
+                            "res": "-(1 / n * (INT x:[0,1]. (-(x ^ n) + 1) / (-x + 1)))",
                             "rule": {
                                 "func_name": "H",
                                 "loc": "0.0",

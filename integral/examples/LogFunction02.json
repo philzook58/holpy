@@ -109,8 +109,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{x}{1 - x ^ {2}} = \\frac{1}{2} \\sum_{k=0}^{\\infty}{(-1) ^ {k} (-x) ^ {k}} - \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}}",
-                            "res": "x / (1 - x ^ 2) = 1/2 * SUM(k, 0, oo, (-1) ^ k * (-x) ^ k) - 1/2 * SUM(k, 0, oo, x ^ k * (-1) ^ k)",
+                            "latex_res": "\\frac{x}{1 - x ^ {2}} = \\frac{\\sum_{k=0}^{\\infty}{(-1) ^ {k} (-x) ^ {k}} - \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}}}{2}",
+                            "res": "x / (1 - x ^ 2) = (SUM(k, 0, oo, (-1) ^ k * (-x) ^ k) - SUM(k, 0, oo, x ^ k * (-1) ^ k)) / 2",
                             "rule": {
                                 "latex_str": "solve equation for \\(\\frac{x}{1 - x ^ {2}}\\)",
                                 "name": "SolveEquation",
@@ -120,8 +120,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{x}{1 - x ^ {2}} = \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k}} - \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}}",
-                            "res": "x / (1 - x ^ 2) = 1/2 * SUM(k, 0, oo, x ^ k) - 1/2 * SUM(k, 0, oo, x ^ k * (-1) ^ k)",
+                            "latex_res": "\\frac{x}{1 - x ^ {2}} = \\frac{\\sum_{k=0}^{\\infty}{x ^ {k}} - \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}}}{2}",
+                            "res": "x / (1 - x ^ 2) = (SUM(k, 0, oo, x ^ k) - SUM(k, 0, oo, x ^ k * (-1) ^ k)) / 2",
                             "rule": {
                                 "latex_str": "rewrite \\((-1) ^ {k} (-x) ^ {k}\\) to \\(x ^ {k}\\) using identity",
                                 "name": "ApplyIdentity",
@@ -132,8 +132,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{x}{1 - x ^ {2}} = \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k}} - \\frac{1}{2} \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}}",
-                            "res": "x / (1 - x ^ 2) = 1/2 * SUM(k, 0, oo, x ^ k) - 1/2 * SUM(k, 0, oo, x ^ k * (-1) ^ k)",
+                            "latex_res": "\\frac{x}{1 - x ^ {2}} = -\\frac{\\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}}}{2} + \\frac{\\sum_{k=0}^{\\infty}{x ^ {k}}}{2}",
+                            "res": "x / (1 - x ^ 2) = -(SUM(k, 0, oo, x ^ k * (-1) ^ k) / 2) + SUM(k, 0, oo, x ^ k) / 2",
                             "rule": {
                                 "loc": "1",
                                 "name": "ExpandPolynomial",
@@ -239,8 +239,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-(\\int_{0}^{1} -\\frac{1}{2} \\log{x} \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}} + \\frac{1}{2} \\log{x} \\sum_{k=0}^{\\infty}{x ^ {k}} \\,dx)",
-                            "res": "-(INT x:[0,1]. -1/2 * log(x) * SUM(k, 0, oo, x ^ k * (-1) ^ k) + 1/2 * log(x) * SUM(k, 0, oo, x ^ k))",
+                            "latex_res": "-(\\int_{0}^{1} -\\frac{\\log{x} \\sum_{k=0}^{\\infty}{x ^ {k} (-1) ^ {k}}}{2} + \\frac{\\log{x} \\sum_{k=0}^{\\infty}{x ^ {k}}}{2} \\,dx)",
+                            "res": "-(INT x:[0,1]. -(log(x) * SUM(k, 0, oo, x ^ k * (-1) ^ k) / 2) + log(x) * SUM(k, 0, oo, x ^ k) / 2)",
                             "rule": {
                                 "loc": "0",
                                 "name": "ExpandPolynomial",
@@ -311,7 +311,7 @@
                         },
                         {
                             "latex_res": "-\\frac{1}{2} \\sum_{k=0}^{\\infty}{\\frac{(-1) ^ {k}}{(k + 1) ^ {2}}} + \\frac{1}{2} \\sum_{k=0}^{\\infty}{\\frac{1}{(k + 1) ^ {2}}}",
-                            "res": "-1/2 * SUM(k, 0, oo, (-1) ^ k / (k + 1) ^ 2) + 1/2 * SUM(k, 0, oo, 1 / (k + 1) ^ 2)",
+                            "res": "-(1/2 * SUM(k, 0, oo, (-1) ^ k / (k + 1) ^ 2)) + 1/2 * SUM(k, 0, oo, 1 / (k + 1) ^ 2)",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -320,7 +320,7 @@
                         },
                         {
                             "latex_res": "-\\frac{1}{2} (\\frac{\\pi ^ {2}}{12}) + \\frac{1}{2} (\\frac{\\pi ^ {2}}{6})",
-                            "res": "-1/2 * (pi ^ 2 / 12) + 1/2 * (pi ^ 2 / 6)",
+                            "res": "-(1/2 * (pi ^ 2 / 12)) + 1/2 * (pi ^ 2 / 6)",
                             "rule": {
                                 "loc": "subterms",
                                 "name": "SeriesEvaluationIdentity",

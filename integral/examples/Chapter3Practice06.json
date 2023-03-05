@@ -14,7 +14,7 @@
                     "steps": [
                         {
                             "latex_res": "-(\\int_{0}^{\\pi/2} (\\frac{1 + \\cos{(2 u)}}{1 - \\cos{(2 u)}}) ^ {1/2} (-2 \\sin{(2 u)}) \\,du)",
-                            "res": "-(INT u:[0,pi / 2]. ((1 + cos(2 * u)) / (1 - cos(2 * u))) ^ (1/2) * (-2 * sin(2 * u)))",
+                            "res": "-(INT u:[0,pi / 2]. ((1 + cos(2 * u)) / (1 - cos(2 * u))) ^ (1/2) * -(2 * sin(2 * u)))",
                             "rule": {
                                 "latex_str": "inverse substitution for \\(\\cos{(2 u)}\\)",
                                 "name": "SubstitutionInverse",
@@ -26,7 +26,7 @@
                         },
                         {
                             "latex_res": "-(\\int_{0}^{\\pi/2} (\\frac{1 + (2 \\cos^{2}(u) - 1)}{1 - \\cos{(2 u)}}) ^ {1/2} (-2 \\sin{(2 u)}) \\,du)",
-                            "res": "-(INT u:[0,pi / 2]. ((1 + (2 * cos(u) ^ 2 - 1)) / (1 - cos(2 * u))) ^ (1/2) * (-2 * sin(2 * u)))",
+                            "res": "-(INT u:[0,pi / 2]. ((1 + (2 * cos(u) ^ 2 - 1)) / (1 - cos(2 * u))) ^ (1/2) * -(2 * sin(2 * u)))",
                             "rule": {
                                 "latex_str": "rewrite \\(\\cos{(2 u)}\\) to \\(2 \\cos^{2}(u) - 1\\) using identity at 0.0.0.0.0.1",
                                 "loc": "0.0.0.0.0.1",
@@ -39,7 +39,7 @@
                         },
                         {
                             "latex_res": "-(\\int_{0}^{\\pi/2} (\\frac{1 + (2 \\cos^{2}(u) - 1)}{1 - (1 - 2 \\sin^{2}(u))}) ^ {1/2} (-2 \\sin{(2 u)}) \\,du)",
-                            "res": "-(INT u:[0,pi / 2]. ((1 + (2 * cos(u) ^ 2 - 1)) / (1 - (1 - 2 * sin(u) ^ 2))) ^ (1/2) * (-2 * sin(2 * u)))",
+                            "res": "-(INT u:[0,pi / 2]. ((1 + (2 * cos(u) ^ 2 - 1)) / (1 - (1 - 2 * sin(u) ^ 2))) ^ (1/2) * -(2 * sin(2 * u)))",
                             "rule": {
                                 "latex_str": "rewrite \\(\\cos{(2 u)}\\) to \\(1 - 2 \\sin^{2}(u)\\) using identity at 0.0.0.0.1.1",
                                 "loc": "0.0.0.0.1.1",
@@ -81,8 +81,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "4 (\\left. \\frac{1}{4} \\sin{(2 u)} + \\frac{1}{2} u \\right\\vert_{u=0}^{\\pi/2})",
-                            "res": "4 * ([1/4 * sin(2 * u) + 1/2 * u]_u=0,pi / 2)",
+                            "latex_res": "4 (\\left. \\frac{\\sin{(2 u)}}{4} + \\frac{u}{2} \\right\\vert_{u=0}^{\\pi/2})",
+                            "res": "4 * ([sin(2 * u) / 4 + u / 2]_u=0,pi / 2)",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"

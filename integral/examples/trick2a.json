@@ -5,8 +5,8 @@
             "start": "INT x:[0,pi / 2]. sqrt(sin(x)) / (sqrt(sin(x)) + sqrt(cos(x)))",
             "steps": [
                 {
-                    "latex_res": "\\int_{0}^{\\pi/2} \\frac{\\sqrt{\\sin{(\\frac{\\pi}{2} - y)}}}{\\sqrt{\\cos{(\\frac{\\pi}{2} - y)}} + \\sqrt{\\sin{(\\frac{\\pi}{2} - y)}}} \\,dy",
-                    "res": "INT y:[0,pi / 2]. sqrt(sin(pi / 2 - y)) / (sqrt(cos(pi / 2 - y)) + sqrt(sin(pi / 2 - y)))",
+                    "latex_res": "\\int_{0}^{\\pi/2} \\frac{\\sqrt{\\cos{y}}}{\\sqrt{\\cos{y}} + \\sqrt{\\sin{y}}} \\,dy",
+                    "res": "INT y:[0,pi / 2]. sqrt(cos(y)) / (sqrt(cos(y)) + sqrt(sin(y)))",
                     "rule": {
                         "latex_str": "substitute \\(y\\) for \\(\\frac{\\pi}{2} - x\\)",
                         "name": "Substitution",

@@ -85,8 +85,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\pi}{2} (\\frac{1}{a})",
-                            "res": "pi / 2 * (1 / a)",
+                            "latex_res": "\\frac{\\pi}{2 a}",
+                            "res": "pi / (2 * a)",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -101,8 +101,8 @@
                     "start": "pi / (2 * a)",
                     "steps": [
                         {
-                            "latex_res": "\\frac{\\pi}{2} (\\frac{1}{a})",
-                            "res": "pi / 2 * (1 / a)",
+                            "latex_res": "\\frac{\\pi}{2 a}",
+                            "res": "pi / (2 * a)",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -168,8 +168,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "I(a,b) = \\frac{\\pi}{2} \\log{a} + C(b)",
-                            "res": "I(a,b) = pi / 2 * log(a) + SKOLEM_FUNC(C(b))",
+                            "latex_res": "I(a,b) = \\frac{\\pi \\log{a}}{2} + C(b)",
+                            "res": "I(a,b) = pi * log(a) / 2 + SKOLEM_FUNC(C(b))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -224,8 +224,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "C(a) = (-\\frac{\\pi}{2}) \\log{a} + I(a,a)",
-                            "res": "SKOLEM_FUNC(C(a)) = -(pi / 2) * log(a) + I(a,a)",
+                            "latex_res": "C(a) = -\\frac{\\pi \\log{a}}{2} + I(a,a)",
+                            "res": "SKOLEM_FUNC(C(a)) = -(pi * log(a) / 2) + I(a,a)",
                             "rule": {
                                 "latex_str": "solve equation for \\(C(a)\\)",
                                 "name": "SolveEquation",
@@ -235,8 +235,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "C(a) = (-\\frac{\\pi}{2}) \\log{a} + (\\int_{0}^{\\infty} 0 \\,dx)",
-                            "res": "SKOLEM_FUNC(C(a)) = -(pi / 2) * log(a) + (INT x:[0,oo]. 0)",
+                            "latex_res": "C(a) = -\\frac{\\pi \\log{a}}{2} + (\\int_{0}^{\\infty} 0 \\,dx)",
+                            "res": "SKOLEM_FUNC(C(a)) = -(pi * log(a) / 2) + (INT x:[0,oo]. 0)",
                             "rule": {
                                 "func_name": "I",
                                 "loc": "subterms",
@@ -246,8 +246,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "C(a) = (-\\frac{\\pi}{2}) \\log{a}",
-                            "res": "SKOLEM_FUNC(C(a)) = -(pi / 2) * log(a)",
+                            "latex_res": "C(a) = -\\frac{\\pi \\log{a}}{2}",
+                            "res": "SKOLEM_FUNC(C(a)) = -(pi * log(a) / 2)",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -307,8 +307,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(-\\frac{\\pi}{2}) \\log{b} + \\frac{\\pi}{2} \\log{a}",
-                            "res": "-(pi / 2) * log(b) + pi / 2 * log(a)",
+                            "latex_res": "\\frac{\\pi \\log{a}}{2} - \\frac{\\pi \\log{b}}{2}",
+                            "res": "pi * log(a) / 2 - pi * log(b) / 2",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -323,8 +323,8 @@
                     "start": "1/2 * pi * log(a) - 1/2 * pi * log(b)",
                     "steps": [
                         {
-                            "latex_res": "(-\\frac{\\pi}{2}) \\log{b} + \\frac{\\pi}{2} \\log{a}",
-                            "res": "-(pi / 2) * log(b) + pi / 2 * log(a)",
+                            "latex_res": "\\frac{\\pi \\log{a}}{2} - \\frac{\\pi \\log{b}}{2}",
+                            "res": "pi * log(a) / 2 - pi * log(b) / 2",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"

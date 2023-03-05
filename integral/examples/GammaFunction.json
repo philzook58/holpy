@@ -240,8 +240,8 @@
             "start": "INT x:[0,oo]. exp(-(x ^ 3))",
             "steps": [
                 {
-                    "latex_res": "\\int_{0}^{\\infty} \\frac{1}{3} (\\frac{e^{-y}}{y ^ {2/3}}) \\,dy",
-                    "res": "INT y:[0,oo]. 1/3 * (exp(-y) / y ^ (2/3))",
+                    "latex_res": "\\int_{0}^{\\infty} \\frac{e^{-y}}{3 y ^ {2/3}} \\,dy",
+                    "res": "INT y:[0,oo]. exp(-y) / (3 * y ^ (2/3))",
                     "rule": {
                         "latex_str": "substitute \\(y\\) for \\(x ^ {3}\\)",
                         "name": "Substitution",
@@ -277,9 +277,9 @@
                     "res": "1/3 * Gamma(1/3)",
                     "rule": {
                         "func_name": "Gamma",
-                        "loc": "1",
+                        "loc": "subterms",
                         "name": "FoldDefinition",
-                        "str": "fold definition at 1"
+                        "str": "fold definition on subterms"
                     },
                     "type": "CalculationStep"
                 },

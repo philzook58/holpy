@@ -25,11 +25,11 @@
                     "latex_cond": "m \\in\\mathbb{Z}"
                 }
             ],
-            "finished": true,
+            "finished": false,
             "goal": "I(m,n) = -1 * I(m,n - 1) * (n / (m + 1))",
             "latex_goal": "I(m,n) = -1 I(m,n - 1) (\\frac{n}{m + 1})",
             "proof": {
-                "finished": true,
+                "finished": false,
                 "goal": "I(m,n) = -1 * I(m,n - 1) * (n / (m + 1))",
                 "latex_goal": "I(m,n) = -1 I(m,n - 1) (\\frac{n}{m + 1})",
                 "lhs_calc": {
@@ -59,8 +59,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{n (\\int_{0}^{1} x ^ {m} \\log^{n - 1}(x) \\,dx)}{m + 1}",
-                            "res": "-(n * (INT x:[0,1]. x ^ m * log(x) ^ (n - 1)) / (m + 1))",
+                            "latex_res": "-\\frac{n}{m + 1} (\\int_{0}^{1} x ^ {m} \\log^{n - 1}(x) \\,dx)",
+                            "res": "-(n / (m + 1) * (INT x:[0,1]. x ^ m * log(x) ^ (n - 1)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -68,8 +68,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{n I(m,n - 1)}{m + 1}",
-                            "res": "-(n * I(m,n - 1) / (m + 1))",
+                            "latex_res": "-\\frac{n}{m + 1} (\\int_{0}^{1} x ^ {m} \\log^{n - 1}(x) \\,dx)",
+                            "res": "-(n / (m + 1) * (INT x:[0,1]. x ^ m * log(x) ^ (n - 1)))",
                             "rule": {
                                 "func_name": "I",
                                 "loc": "0.0.1",
@@ -79,8 +79,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{n I(m,n - 1)}{m + 1}",
-                            "res": "-(n * I(m,n - 1) / (m + 1))",
+                            "latex_res": "-\\frac{n}{m + 1} (\\int_{0}^{1} x ^ {m} \\log^{n - 1}(x) \\,dx)",
+                            "res": "-(n / (m + 1) * (INT x:[0,1]. x ^ m * log(x) ^ (n - 1)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -200,12 +200,12 @@
                 "goal": "I(m,n) = (-1) ^ n * (factorial(n) / (m + 1) ^ (n + 1))",
                 "induct_case": {
                     "finished": true,
-                    "goal": "I(m,n + 1) = (-1) ^ (n + 1) * (m + 1) ^ (-n - 2) * factorial(n + 1)",
-                    "latex_goal": "I(m,n + 1) = (-1) ^ {n + 1} (m + 1) ^ {-n - 2} (n + 1)!",
+                    "goal": "I(m,n + 1) = -((-1) ^ n * (m + 1) ^ (-n - 2) * factorial(n + 1))",
+                    "latex_goal": "I(m,n + 1) = -(-1) ^ {n} (m + 1) ^ {-n - 2} (n + 1)!",
                     "proof": {
                         "finished": true,
-                        "goal": "I(m,n + 1) = (-1) ^ (n + 1) * (m + 1) ^ (-n - 2) * factorial(n + 1)",
-                        "latex_goal": "I(m,n + 1) = (-1) ^ {n + 1} (m + 1) ^ {-n - 2} (n + 1)!",
+                        "goal": "I(m,n + 1) = -((-1) ^ n * (m + 1) ^ (-n - 2) * factorial(n + 1))",
+                        "latex_goal": "I(m,n + 1) = -(-1) ^ {n} (m + 1) ^ {-n - 2} (n + 1)!",
                         "lhs_calc": {
                             "latex_start": "I(m,n + 1)",
                             "start": "I(m,n + 1)",
@@ -287,8 +287,8 @@
                             "type": "Calculation"
                         },
                         "rhs_calc": {
-                            "latex_start": "(-1) ^ {n + 1} (m + 1) ^ {-n - 2} (n + 1)!",
-                            "start": "(-1) ^ (n + 1) * (m + 1) ^ (-n - 2) * factorial(n + 1)",
+                            "latex_start": "-(-1) ^ {n} (m + 1) ^ {-n - 2} (n + 1)!",
+                            "start": "-((-1) ^ n * (m + 1) ^ (-n - 2) * factorial(n + 1))",
                             "steps": [
                                 {
                                     "latex_res": "-(-1) ^ {n} (m + 1) ^ {-n - 2} (n + 1)!",

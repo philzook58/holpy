@@ -154,8 +154,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(-1) ^ {n} (\\int_{0}^{\\infty} \\frac{(\\frac{t}{m + 1}) ^ {n} (e^{-t/(m + 1)}) ^ {m + 1}}{m + 1} \\,dt)",
-                            "res": "(-1) ^ n * (INT t:[0,oo]. (t / (m + 1)) ^ n * exp(-(t / (m + 1))) ^ (m + 1) / (m + 1))",
+                            "latex_res": "(-1) ^ {n} (\\int_{0}^{\\infty} \\frac{1}{m + 1} ((\\frac{t}{m + 1}) ^ {n} (e^{-t/(m + 1)}) ^ {m + 1}) \\,dt)",
+                            "res": "(-1) ^ n * (INT t:[0,oo]. 1 / (m + 1) * ((t / (m + 1)) ^ n * exp(-(t / (m + 1))) ^ (m + 1)))",
                             "rule": {
                                 "latex_str": "substitute \\(t\\) for \\((m + 1) u\\)",
                                 "name": "Substitution",
@@ -166,27 +166,25 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(-1) ^ {n} (\\int_{0}^{\\infty} \\frac{\\frac{t ^ {n}}{(m + 1) ^ {n}} (e^{-t/(m + 1)}) ^ {m + 1}}{m + 1} \\,dt)",
-                            "res": "(-1) ^ n * (INT t:[0,oo]. t ^ n / (m + 1) ^ n * exp(-(t / (m + 1))) ^ (m + 1) / (m + 1))",
+                            "latex_res": "(-1) ^ {n} (\\int_{0}^{\\infty} \\frac{1}{m + 1} (\\frac{t ^ {n}}{(m + 1) ^ {n}} (e^{-t/(m + 1)}) ^ {m + 1}) \\,dt)",
+                            "res": "(-1) ^ n * (INT t:[0,oo]. 1 / (m + 1) * (t ^ n / (m + 1) ^ n * exp(-(t / (m + 1))) ^ (m + 1)))",
                             "rule": {
-                                "latex_str": "rewrite \\((\\frac{t}{m + 1}) ^ {n}\\) to \\(\\frac{t ^ {n}}{(m + 1) ^ {n}}\\) using identity at 1.0.0",
-                                "loc": "1.0.0",
+                                "latex_str": "rewrite \\((\\frac{t}{m + 1}) ^ {n}\\) to \\(\\frac{t ^ {n}}{(m + 1) ^ {n}}\\) using identity",
                                 "name": "ApplyIdentity",
                                 "source": "(t / (m + 1)) ^ n",
-                                "str": "rewrite (t / (m + 1)) ^ n to t ^ n / (m + 1) ^ n using identity at 1.0.0",
+                                "str": "rewrite (t / (m + 1)) ^ n to t ^ n / (m + 1) ^ n using identity",
                                 "target": "t ^ n / (m + 1) ^ n"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(-1) ^ {n} (\\int_{0}^{\\infty} \\frac{\\frac{t ^ {n}}{(m + 1) ^ {n}} e^{(-t/(m + 1)) (m + 1)}}{m + 1} \\,dt)",
-                            "res": "(-1) ^ n * (INT t:[0,oo]. t ^ n / (m + 1) ^ n * exp(-(t / (m + 1)) * (m + 1)) / (m + 1))",
+                            "latex_res": "(-1) ^ {n} (\\int_{0}^{\\infty} \\frac{1}{m + 1} (\\frac{t ^ {n}}{(m + 1) ^ {n}} e^{(-t/(m + 1)) (m + 1)}) \\,dt)",
+                            "res": "(-1) ^ n * (INT t:[0,oo]. 1 / (m + 1) * (t ^ n / (m + 1) ^ n * exp(-(t / (m + 1)) * (m + 1))))",
                             "rule": {
-                                "latex_str": "rewrite \\((e^{-t/(m + 1)}) ^ {m + 1}\\) to \\(e^{(-t/(m + 1)) (m + 1)}\\) using identity at 1.0.0.1",
-                                "loc": "1.0.0.1",
+                                "latex_str": "rewrite \\((e^{-t/(m + 1)}) ^ {m + 1}\\) to \\(e^{(-t/(m + 1)) (m + 1)}\\) using identity",
                                 "name": "ApplyIdentity",
                                 "source": "exp(-(t / (m + 1))) ^ (m + 1)",
-                                "str": "rewrite exp(-(t / (m + 1))) ^ (m + 1) to exp(-(t / (m + 1)) * (m + 1)) using identity at 1.0.0.1",
+                                "str": "rewrite exp(-(t / (m + 1))) ^ (m + 1) to exp(-(t / (m + 1)) * (m + 1)) using identity",
                                 "target": "exp(-(t / (m + 1)) * (m + 1))"
                             },
                             "type": "CalculationStep"

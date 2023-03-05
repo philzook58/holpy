@@ -31,8 +31,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\int_{1}^{\\infty} \\frac{1}{u (u + 1)} \\,du}{a}",
-                            "res": "(INT u:[1,oo]. 1 / (u * (u + 1))) / a",
+                            "latex_res": "\\frac{1}{a} (\\int_{1}^{\\infty} \\frac{1}{u (u + 1)} \\,du)",
+                            "res": "1 / a * (INT u:[1,oo]. 1 / (u * (u + 1)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -40,8 +40,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{\\int_{1}^{\\infty} \\frac{1}{u} - \\frac{1}{u + 1} \\,du}{a}",
-                            "res": "(INT u:[1,oo]. 1 / u - 1 / (u + 1)) / a",
+                            "latex_res": "\\frac{1}{a} (\\int_{1}^{\\infty} \\frac{1}{u} - \\frac{1}{u + 1} \\,du)",
+                            "res": "1 / a * (INT u:[1,oo]. 1 / u - 1 / (u + 1))",
                             "rule": {
                                 "latex_str": "rewriting \\(\\frac{1}{u (u + 1)}\\) to \\(\\frac{1}{u} - \\frac{1}{u + 1}\\)",
                                 "name": "Equation",
@@ -52,8 +52,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{-(\\int_{1}^{\\infty} \\frac{1}{u + 1} \\,du) + (\\int_{1}^{\\infty} \\frac{1}{u} \\,du)}{a}",
-                            "res": "(-(INT u:[1,oo]. 1 / (u + 1)) + (INT u:[1,oo]. 1 / u)) / a",
+                            "latex_res": "\\frac{1}{a} (-(\\int_{1}^{\\infty} \\frac{1}{u + 1} \\,du) + (\\int_{1}^{\\infty} \\frac{1}{u} \\,du))",
+                            "res": "1 / a * (-(INT u:[1,oo]. 1 / (u + 1)) + (INT u:[1,oo]. 1 / u))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -61,8 +61,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{-(\\int_{2}^{\\infty} \\frac{1}{y} \\,dy) + (\\int_{1}^{\\infty} \\frac{1}{u} \\,du)}{a}",
-                            "res": "(-(INT y:[2,oo]. 1 / y) + (INT u:[1,oo]. 1 / u)) / a",
+                            "latex_res": "\\frac{1}{a} (-(\\int_{2}^{\\infty} \\frac{1}{y} \\,dy) + (\\int_{1}^{\\infty} \\frac{1}{u} \\,du))",
+                            "res": "1 / a * (-(INT y:[2,oo]. 1 / y) + (INT u:[1,oo]. 1 / u))",
                             "rule": {
                                 "latex_str": "substitute \\(y\\) for \\(u + 1\\)",
                                 "name": "Substitution",
@@ -73,8 +73,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{-(\\left. \\log{(\\left| y \\right|)} \\right\\vert_{y=2}^{\\infty}) + (\\left. \\log{(\\left| u \\right|)} \\right\\vert_{u=1}^{\\infty})}{a}",
-                            "res": "(-([log(abs(y))]_y=2,oo) + ([log(abs(u))]_u=1,oo)) / a",
+                            "latex_res": "\\frac{1}{a} (-(\\left. \\log{y} \\right\\vert_{y=2}^{\\infty}) + (\\left. \\log{u} \\right\\vert_{u=1}^{\\infty}))",
+                            "res": "1 / a * (-([log(y)]_y=2,oo) + ([log(u)]_u=1,oo))",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
@@ -82,8 +82,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\log{(2)} (\\frac{1}{a})",
-                            "res": "log(2) * (1 / a)",
+                            "latex_res": "\\frac{\\log{(2)}}{a}",
+                            "res": "log(2) / a",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -98,8 +98,8 @@
                     "start": "log(2) / a",
                     "steps": [
                         {
-                            "latex_res": "\\log{(2)} (\\frac{1}{a})",
-                            "res": "log(2) * (1 / a)",
+                            "latex_res": "\\frac{\\log{(2)}}{a}",
+                            "res": "log(2) / a",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"

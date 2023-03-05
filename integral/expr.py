@@ -1,6 +1,5 @@
 """Expressions."""
 
-import copy
 import math
 import functools
 from decimal import Decimal
@@ -593,6 +592,8 @@ class Expr:
             return self.body.has_symbol()
         elif isinstance(self, Limit):
             return self.body.has_symbol() or self.lim.has_symbol()
+        elif isinstance(self, Deriv):
+            return self.body.has_symbol()
         else:
             print(self)
             raise NotImplementedError
@@ -751,6 +752,8 @@ class Expr:
             return EvalAt(self.var, self.lower.inst_pat(mapping), self.upper.inst_pat(mapping),
                           self.body.inst_pat(mapping))
         elif self.is_deriv():
+            if self.var in mapping and mapping[self.var].is_var():
+                return Deriv(mapping[self.var].name, self.body.inst_pat(mapping))
             return Deriv(self.var, self.body.inst_pat(mapping))
         elif self.is_summation():
             return Summation(self.index_var, self.lower.inst_pat(mapping), self.upper.inst_pat(mapping), \
@@ -962,12 +965,13 @@ class Var(Expr):
 class Const(Expr):
     """Constants."""
 
-    def __init__(self, val: Union[int, Decimal, Fraction]):
-        assert isinstance(val, (int, Decimal, Fraction))
+    def __init__(self, val: Union[int, Fraction]):
+        assert isinstance(val, (int, Fraction))
         self.ty = CONST
-        if isinstance(val, Decimal):
-            val = Fraction(val)
-        self.val = val
+        if isinstance(val, Fraction) and val.denominator == 1:
+            self.val = val.numerator
+        else:
+            self.val = val
 
     def __hash__(self):
         return hash((CONST, self.val))

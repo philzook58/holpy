@@ -238,8 +238,8 @@
                     "start": "INT x:[0,4]. log(x) / sqrt(4 * x - x ^ 2)",
                     "steps": [
                         {
-                            "latex_res": "\\int_{0}^{1} 4 (\\frac{\\log{(4 y)}}{\\sqrt{-16 y ^ {2} + 16 y}}) \\,dy",
-                            "res": "INT y:[0,1]. 4 * (log(4 * y) / sqrt(-16 * y ^ 2 + 16 * y))",
+                            "latex_res": "\\int_{0}^{1} \\frac{4 \\log{(4 y)}}{\\sqrt{-16 y ^ {2} + 16 y}} \\,dy",
+                            "res": "INT y:[0,1]. 4 * log(4 * y) / sqrt(-(16 * y ^ 2) + 16 * y)",
                             "rule": {
                                 "latex_str": "substitute \\(y\\) for \\(\\frac{x}{4}\\)",
                                 "name": "Substitution",
@@ -250,8 +250,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\int_{0}^{1} 4 (\\frac{\\log{(4)} + \\log{y}}{\\sqrt{-16 y ^ {2} + 16 y}}) \\,dy",
-                            "res": "INT y:[0,1]. 4 * ((log(4) + log(y)) / sqrt(-16 * y ^ 2 + 16 * y))",
+                            "latex_res": "\\int_{0}^{1} \\frac{4 (\\log{(4)} + \\log{y})}{\\sqrt{-16 y ^ {2} + 16 y}} \\,dy",
+                            "res": "INT y:[0,1]. 4 * (log(4) + log(y)) / sqrt(-(16 * y ^ 2) + 16 * y)",
                             "rule": {
                                 "latex_str": "rewriting \\(\\log{(4 y)}\\) to \\(\\log{(4)} + \\log{y}\\)",
                                 "name": "Equation",
@@ -262,20 +262,20 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\int_{0}^{1} 4 (\\frac{\\log{(4)} + \\log{y}}{4 \\sqrt{-y ^ {2} + y}}) \\,dy",
-                            "res": "INT y:[0,1]. 4 * ((log(4) + log(y)) / (4 * sqrt(-(y ^ 2) + y)))",
+                            "latex_res": "\\int_{0}^{1} \\frac{4 (\\log{(4)} + \\log{y})}{4 \\sqrt{-y ^ {2} + y}} \\,dy",
+                            "res": "INT y:[0,1]. 4 * (log(4) + log(y)) / (4 * sqrt(-(y ^ 2) + y))",
                             "rule": {
                                 "latex_str": "rewriting \\(\\sqrt{-16 y ^ {2} + 16 y}\\) to \\(4 \\sqrt{-y ^ {2} + y}\\)",
                                 "name": "Equation",
                                 "new_expr": "4 * sqrt(-(y ^ 2) + y)",
-                                "old_expr": "sqrt(-16 * y ^ 2 + 16 * y)",
-                                "str": "rewriting sqrt(-16 * y ^ 2 + 16 * y) to 4 * sqrt(-(y ^ 2) + y)"
+                                "old_expr": "sqrt(-(16 * y ^ 2) + 16 * y)",
+                                "str": "rewriting sqrt(-(16 * y ^ 2) + 16 * y) to 4 * sqrt(-(y ^ 2) + y)"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\int_{0}^{1} 4 (\\frac{\\log{(4)} + \\log{y}}{4 (\\sqrt{y} \\sqrt{1 - y})}) \\,dy",
-                            "res": "INT y:[0,1]. 4 * ((log(4) + log(y)) / (4 * (sqrt(y) * sqrt(1 - y))))",
+                            "latex_res": "\\int_{0}^{1} \\frac{4 (\\log{(4)} + \\log{y})}{4 (\\sqrt{y} \\sqrt{1 - y})} \\,dy",
+                            "res": "INT y:[0,1]. 4 * (log(4) + log(y)) / (4 * (sqrt(y) * sqrt(1 - y)))",
                             "rule": {
                                 "latex_str": "rewriting \\(\\sqrt{-y ^ {2} + y}\\) to \\(\\sqrt{y} \\sqrt{1 - y}\\)",
                                 "name": "Equation",
@@ -286,8 +286,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\int_{0}^{1} 2 \\log{(2)} (\\frac{1}{\\sqrt{y} \\sqrt{-y + 1}}) + \\frac{\\log{y}}{\\sqrt{y} \\sqrt{-y + 1}} \\,dy",
-                            "res": "INT y:[0,1]. 2 * log(2) * (1 / (sqrt(y) * sqrt(-y + 1))) + log(y) / (sqrt(y) * sqrt(-y + 1))",
+                            "latex_res": "\\int_{0}^{1} \\frac{\\log{y}}{\\sqrt{y} \\sqrt{-y + 1}} + \\frac{\\log{(4)}}{\\sqrt{y} \\sqrt{-y + 1}} \\,dy",
+                            "res": "INT y:[0,1]. log(y) / (sqrt(y) * sqrt(-y + 1)) + log(4) / (sqrt(y) * sqrt(-y + 1))",
                             "rule": {
                                 "loc": "0",
                                 "name": "ExpandPolynomial",

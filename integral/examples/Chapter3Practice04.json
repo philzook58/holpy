@@ -440,8 +440,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{-b ^ {2} + x ^ {2}} \\,dx = \\cos{(a b)}\\cdot (\\frac{\\pi}{2})",
-                            "res": "(INT x:[0,oo]. x * sin(a * x) / (-(b ^ 2) + x ^ 2)) = cos(a * b) * (pi / 2)",
+                            "latex_res": "\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{-b ^ {2} + x ^ {2}} \\,dx = \\cos{(a b)}\\cdot (\\frac{1}{2} \\pi)",
+                            "res": "(INT x:[0,oo]. x * sin(a * x) / (-(b ^ 2) + x ^ 2)) = cos(a * b) * (1/2 * pi)",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
