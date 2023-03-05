@@ -28,9 +28,10 @@ def deriv(var: str, e: Expr, ctx: Context) -> Expr:
     """
     def normal(x):
         return normalize(x, ctx)
-
     def rec(e):
-        if e.is_var():
+        if var not in e.get_vars():
+            return Const(0)
+        elif e.is_var():
             if e.name == var:
                 # dx. x = 1
                 return Const(1)
@@ -133,6 +134,9 @@ def deriv(var: str, e: Expr, ctx: Context) -> Expr:
             else:
                 return Deriv(var, e)
         elif e.is_integral():
+            if e.lower.is_constant():
+                return normal(Integral(e.var, e.lower, e.upper, rec(e.body))
+                          + e.body.subst(e.var, e.upper) * rec(e.upper))
             return normal(Integral(e.var, e.lower, e.upper, rec(e.body))
                           + e.body.subst(e.var, e.upper) * rec(e.upper)
                           - e.body.subst(e.var, e.lower) * rec(e.lower))
@@ -148,33 +152,46 @@ def deriv(var: str, e: Expr, ctx: Context) -> Expr:
 
     return rec(e)
 
+class ProofObligationBranch:
+    def __init__(self, exprs:List[Expr]):
+        self.exprs = exprs # satisfy all expressions
+    def export(self):
+        res = {
+            'exprs': [str(e) for e in self.exprs]
+        }
+        return res
+
 class ProofObligation:
     """Represents a proof obligation to prove e using the conditions
     in conds.
     
     """
-    def __init__(self, e: Expr, conds: Conditions):
-        self.e = e
+    def __init__(self, branches: List['ProofObligationBranch'], conds: Conditions):
+        self.branches = branches # if any branch is satisfied then the proof obligation is carried out
         self.conds = conds
 
     def __eq__(self, other: "ProofObligation"):
-        return self.e == other.e and self.conds == other.conds
+        return self.branches == other.branches
 
     def __le__(self, other: "ProofObligation"):
-        return self.e <= other.e and self.conds <= other.conds
+        if len(self.branches) < other.branches:
+            return True
+        elif len(self.branches > other.branches):
+            return False
+        return all(a < b for a,b in zip(self.branches, other.branches))
 
     def __str__(self):
-        return "%s  [%s]" % (self.e, self.conds)
+        return "%s" % self.branches
 
     def __repr__(self):
         return str(self)
 
     def __hash__(self):
-        return hash((self.e, self.conds))
+        return hash(tuple(self.branches))
 
     def export(self):
         res = {
-            'expr': str(self.e),
+            'branches': [branch.export() for branch in self.branches],
             'conds': self.conds.export()
         }
         return res
@@ -187,11 +204,12 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
     """
     obligations: List[ProofObligation] = list()
 
-    def add_obligation(e: Expr, ctx: Context):
-        obligation = ProofObligation(e, ctx.get_conds())
+    def add_obligation(branches: Union[List[ProofObligationBranch], Expr], ctx: Context):
+        if isinstance(branches, Expr):
+            branches = [ProofObligationBranch([branches])]
+        obligation = ProofObligation(branches, ctx.get_conds())
         if obligation not in obligations:
             obligations.append(obligation)
-
     def rec(e: Expr, ctx: Context):
         if e.is_var() or e.is_const():
             pass
@@ -225,6 +243,24 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
                     pass
                 else:
                     add_obligation(Op(">=", e.args[0], Const(0)), ctx)
+            if e.func_name == 'gamma':
+                f1 = ctx.check_condition(Op(">", e.args[0], Const(0)))
+                f2 = ctx.check_condition(Op('<'), e.args[0], Const(0)) and \
+                     ctx.check_condition(Fun("notInt", e.args[0]))
+                if f1 or f2:
+                    pass
+                else:
+                    branch1 = ProofObligationBranch([Op(">", e.args[0], Const(0))])
+                    branch2 = ProofObligationBranch([Op("<", e.args[0], Const(0)), Fun("notInt", e.args[0])])
+                    add_obligation([branch1, branch2], ctx)
+            if e.func_name == "acos" or e.func_name == "asin":
+                f1 = ctx.check_condition(Op(">=", e.args[0], Const(-1)))
+                f2 = ctx.check_condition(Op("<=", e.args[0], Const(1)))
+                if f1 and f2:
+                    pass
+                else:
+                    add_obligation(Op(">=", e.args[0], Const(-1)), ctx)
+                    add_obligation(Op("<=", e.args[0], Const(1)), ctx)
             # TODO: add checks for other functions
         elif e.is_integral():
             ctx2 = Context(ctx)
@@ -249,7 +285,6 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
             rec(e.body, ctx2)
         else:
             pass
-
     rec(e, ctx)
     return obligations
 

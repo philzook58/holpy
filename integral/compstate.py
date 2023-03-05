@@ -869,9 +869,14 @@ def parse_item(parent, item) -> StateItem:
             if not res.wellformed and 'obligations' in item:
                 res.proof_obligations = list()
                 for obligation in item['obligations']:
-                    e = parser.parse_expr(obligation['expr'])
+                    branches = list()
+                    for b in obligation['branches']:
+                        tmp = list()
+                        for e in b['exprs']:
+                            tmp.append(parser.parse_expr(e))
+                        branches.append(rules.ProofObligationBranch(tmp))
                     c = parse_conds(obligation)
-                    res.proof_obligations.append(rules.ProofObligation(e, c))
+                    res.proof_obligations.append(rules.ProofObligation(branches, c))
         return res
     elif item['type'] == 'CalculationProof':
         goal = parser.parse_expr(item['goal'])

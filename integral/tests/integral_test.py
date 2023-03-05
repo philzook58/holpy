@@ -986,7 +986,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         self.assertTrue(proof.is_finished())
 
-        goal = file.add_goal("2*x^2*cos(2*a) + x^4 + 1 != 0", conds=["cos(a) != 0"])
+        goal = file.add_goal("x ^ 4 + 2 * x ^ 2 * cos(2 * a) + 1 != 0", conds=["cos(a) != 0"])
         proof = goal.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.FullSimplify())
@@ -3147,6 +3147,8 @@ class IntegralTest(unittest.TestCase):
         self.checkAndOutput(file)
 
     def testHarmonicSeries(self):
+        # Reference: Impossible, Integrals, Sums, and Series
+        # section 1.3
         file = compstate.CompFile("interesting", "harmonic_series")
         file.add_definition("H(n) = SUM(k, 1, n, 1/k)")
         file.add_definition("I(n) = (INT x:[0,1]. x^(n-1) * log(1-x))")
@@ -3169,6 +3171,153 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.OnLocation(rules.FoldDefinition("H"), "0.0"))
 
+        self.checkAndOutput(file)
+
+    def testUsefulLogIntegral(self):
+        # Reference: Impossible, Integrals, Sums, and Series
+        # section 1.4
+        file = compstate.CompFile("interesting", "useful_log")
+        file.add_definition("Li(s, x) = SUM(k, 1, oo, x^k /k^s)", conds=["abs(x) < 1"])
+        goal = file.add_goal("x/(1-x) = SUM(k, 1, oo, x^k)", conds=["abs(x) < 1"])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.Equation("x/(1-x)", "x * (1-x)^(-1)"))
+        calc.perform_rule(rules.OnLocation(rules.SeriesExpansionIdentity(), "1"))
+        s1 = "x * SUM(n, 0, oo, x ^ n)"
+        s2 = "SUM(n, 0, oo, x * x^n)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.Equation("x*x^n", "x^1 * x^n"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity("x^1 * x^n", "x^(n+1)"), "0"))
+        calc.perform_rule(rules.ChangeSummationIndex("1"))
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(goal.is_finished())
+        goal = file.add_goal("Li(0, x) = x/(1-x)", conds=["abs(x) < 1"])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.ExpandDefinition("Li"))
+        calc.perform_rule(rules.ApplyEquation("x/(1-x) = SUM(k, 1, oo, x^k)"))
+        self.assertTrue(goal.is_finished())
+
+        goal = file.add_goal("Li(s+1, x) = (INT t:[0, x]. Li(s, t) / t)", conds=["abs(x)<1", "s>=0", "isInt(s)"])
+        proof = goal.proof_by_induction("s")
+        proof_base = proof.base_case.proof_by_calculation()
+        calc = proof_base.lhs_calc
+        calc.perform_rule(rules.ExpandDefinition("Li"))
+        calc = proof_base.rhs_calc
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation("Li(0,x)=x/(1-x)"), "0.0"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation("x/(1-x) = SUM(k, 1, oo, x^k)"), "0.0"))
+        s1 = "SUM(k, 1, oo, t ^ k) / t"
+        s2 = "1/t * SUM(k, 1, oo, t ^ k)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "1/t * SUM(k, 1, oo, t ^ k)"
+        s2 = "SUM(k, 1, oo, 1/t * t ^ k)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "1/t * t ^ k"
+        s2 = "t^(-1) * t^k"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity("t^(-1)*t^k", "t^(-1+k)"),"0.0"))
+        calc.perform_rule(rules.IntSumExchange())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof_base.is_finished())
+        proof_induct = proof.induct_case.proof_by_calculation()
+        calc = proof_induct.lhs_calc
+        calc.perform_rule(rules.ExpandDefinition("Li"))
+        calc = proof_induct.rhs_calc
+        calc.perform_rule(rules.OnLocation(rules.ExpandDefinition("Li"), "0.0"))
+        s1 = "SUM(k, 1, oo, k ^ (-s - 1) * t ^ k) / t"
+        s2 = "t^-1 * SUM(k, 1, oo, k ^ (-s - 1) * t ^ k)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "t^-1 * SUM(k, 1, oo, k ^ (-s - 1) * t ^ k)"
+        s2 = "SUM(k, 1, oo, t^-1 * (k ^ (-s - 1) * t ^ k))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "t^-1 * (k ^ (-s - 1) * t ^ k)"
+        s2 = "t^-1 * t^k * k^(-s-1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "t^-1 * t^k"
+        s2 = "t^(-1 + k)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2),"0.0.0"))
+        calc.perform_rule(rules.IntSumExchange())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "k ^ (-s - 1) * x ^ k / k"
+        s2 = "k^-1 * k ^ (-s - 1) * x ^ k"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "k^-1 * k ^ (-s - 1)"
+        s2 = "k ^ (-1 + (-s - 1))"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0"))
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(goal.is_finished())
+
+        goal = file.add_goal("(D x. Li(2, 1-x)) = log(x)/(1-x)", conds=["x < 1", "x>0"])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.OnLocation(rules.ExpandDefinition("Li"),"0"))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "k * (-x + 1) ^ (k - 1) / k ^ 2"
+        s2 = "k^1 * k^-2 * (-x+1) ^ (k-1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "k^1 * k^-2"
+        s2 = "k^(1 + (-2))"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0.0"))
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.Equation("log(x)", "log(1-(1-x))"))
+        calc.perform_rule(rules.OnLocation(rules.SeriesExpansionIdentity(), "0"))
+        s1 = "SUM(n, 0, oo, (-1) ^ n * (-(1 - x)) ^ (n + 1) / (n + 1)) / (1 - x)"
+        s2 = "-(-(1-x))^(-1) * SUM(n, 0, oo, (-1) ^ n * (-(1 - x)) ^ (n + 1) / (n + 1))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "-(-(1-x))^(-1) * SUM(n, 0, oo, (-1) ^ n * (-(1 - x)) ^ (n + 1) / (n + 1))"
+        s2 = "SUM(n, 0, oo, -(-(1-x))^(-1) * ((-1) ^ n * (-(1 - x)) ^ (n + 1) / (n + 1)))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = " -(-(1-x))^(-1) * ((-1) ^ n * (-(1 - x)) ^ (n + 1) / (n + 1))"
+        s2 = "-1 * ((-(1-x))^(-1) * (-(1 - x)) ^ (n + 1)) * (-1) ^ n  / (n + 1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "(-(1 - x)) ^ (-1) * (-(1 - x)) ^ (n + 1)"
+        s2 = '(-(1-x))^(-1 + (n+1))'
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0.0.1"))
+        calc.perform_rule(rules.ChangeSummationIndex("1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Equation("x-1", "-1 * (-x+1)"))
+        s1 = "(-1 * (-x + 1)) ^ (n - 1)"
+        s2 = "(-1)^(n-1) * (-x+1)^(n-1)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(goal.is_finished())
+
+        goal = file.add_goal("(D x. -Li(3, 1-x)) = Li(2, -x+1) / (-x+1)",conds = ["x>0","x<1"])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.Equation("3", "2+1"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation("Li(s+1, x) = (INT t:[0, x]. Li(s, t) / t)"), "0.0"))
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+
+
+        s1 = "(INT t:[0,x]. log(1-t)^2 / t)"
+        s2 = "log(x) * log(1-x)^2 + 2 * log(1-x) * Li(2, 1-x) - 2*Li(3,1-x) + 2 * Li(3, 1)"
+        goal = file.add_goal(s1+"="+s2, conds=["x>0", "x<1"])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        u = "log(1-t)^2"
+        v = "log(t)"
+        calc.perform_rule(rules.IntegrationByParts(u, v))
+        calc.perform_rule(rules.FullSimplify())
+        # (D x. Li(2, 1-x)) = log(x)/(1-x)
+        s1 = " log(t) * log(-t + 1) / (-t + 1)"
+        s2 = "log(t) / (1-t) * log(-t+1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation("(D x. Li(2, 1-x)) = log(x)/(1-x)"), "0.1.0.0"))
+        u = "log(-t+1)"
+        v = "Li(2, 1-t)"
+        calc.perform_rule(rules.OnLocation(rules.IntegrationByParts(u,v), "0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation("(D x. -Li(3, 1-x)) = Li(2, -x+1) / (-x+1)"), "0.1.1.0"))
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(goal.is_finished())
         self.checkAndOutput(file)
 
 if __name__ == "__main__":
