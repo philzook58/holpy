@@ -87,8 +87,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{c ^ {k} (\\int_{0}^{1} x ^ {a k} \\log^{k}(x) \\,dx)}{k!}}",
-                            "res": "SUM(k, 0, oo, c ^ k * (INT x:[0,1]. x ^ (a * k) * log(x) ^ k) / factorial(k))",
+                            "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{c ^ {k}}{k!} (\\int_{0}^{1} x ^ {a k} \\log^{k}(x) \\,dx)}",
+                            "res": "SUM(k, 0, oo, c ^ k / factorial(k) * (INT x:[0,1]. x ^ (a * k) * log(x) ^ k))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -96,8 +96,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{c ^ {k} ((-1) ^ {k} k! (a k + 1) ^ {-k - 1})}{k!}}",
-                            "res": "SUM(k, 0, oo, c ^ k * ((-1) ^ k * factorial(k) * (a * k + 1) ^ (-k - 1)) / factorial(k))",
+                            "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{c ^ {k}}{k!} ((-1) ^ {k} k! (a k + 1) ^ {-k - 1})}",
+                            "res": "SUM(k, 0, oo, c ^ k / factorial(k) * ((-1) ^ k * factorial(k) * (a * k + 1) ^ (-k - 1)))",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
@@ -355,8 +355,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\sum_{k=0}^{\\infty}{(-1) ^ {k} (\\frac{1}{2} k + 1) ^ {-k - 1}}",
-                            "res": "SUM(k, 0, oo, (-1) ^ k * (1/2 * k + 1) ^ (-k - 1))",
+                            "latex_res": "\\sum_{k=0}^{\\infty}{(-1) ^ {k} (\\frac{k}{2} + 1) ^ {-k - 1}}",
+                            "res": "SUM(k, 0, oo, (-1) ^ k * (k / 2 + 1) ^ (-k - 1))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -367,11 +367,11 @@
                             "latex_res": "\\sum_{k=0}^{\\infty}{(-1) ^ {k} ((\\frac{2}{k + 2}) ^ {-1}) ^ {-k - 1}}",
                             "res": "SUM(k, 0, oo, (-1) ^ k * (2 / (k + 2)) ^ (-1) ^ (-k - 1))",
                             "rule": {
-                                "latex_str": "rewriting \\(\\frac{1}{2} k + 1\\) to \\((\\frac{2}{k + 2}) ^ {-1}\\)",
+                                "latex_str": "rewriting \\(\\frac{k}{2} + 1\\) to \\((\\frac{2}{k + 2}) ^ {-1}\\)",
                                 "name": "Equation",
                                 "new_expr": "(2 / (k + 2)) ^ (-1)",
-                                "old_expr": "1/2 * k + 1",
-                                "str": "rewriting 1/2 * k + 1 to (2 / (k + 2)) ^ (-1)"
+                                "old_expr": "k / 2 + 1",
+                                "str": "rewriting k / 2 + 1 to (2 / (k + 2)) ^ (-1)"
                             },
                             "type": "CalculationStep"
                         },
@@ -389,8 +389,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\sum_{k=0}^{\\infty}{(-1) ^ {k} (2 (\\frac{1}{k + 2})) ^ {k + 1}}",
-                            "res": "SUM(k, 0, oo, (-1) ^ k * (2 * (1 / (k + 2))) ^ (k + 1))",
+                            "latex_res": "\\sum_{k=0}^{\\infty}{(-1) ^ {k} (\\frac{2}{k + 2}) ^ {k + 1}}",
+                            "res": "SUM(k, 0, oo, (-1) ^ k * (2 / (k + 2)) ^ (k + 1))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -405,8 +405,8 @@
                     "start": "SUM(k, 0, oo, (-1) ^ k * (2 / (k + 2)) ^ (k + 1))",
                     "steps": [
                         {
-                            "latex_res": "\\sum_{k=0}^{\\infty}{(-1) ^ {k} (2 (\\frac{1}{k + 2})) ^ {k + 1}}",
-                            "res": "SUM(k, 0, oo, (-1) ^ k * (2 * (1 / (k + 2))) ^ (k + 1))",
+                            "latex_res": "\\sum_{k=0}^{\\infty}{(-1) ^ {k} (\\frac{2}{k + 2}) ^ {k + 1}}",
+                            "res": "SUM(k, 0, oo, (-1) ^ k * (2 / (k + 2)) ^ (k + 1))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
