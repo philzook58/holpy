@@ -746,48 +746,6 @@ def to_const_poly(e: expr.Expr) -> ConstantPolynomial:
         else:
             return const_singleton(expr.log(from_const_poly(a)))
 
-    elif e.is_fun() and e.func_name in ('sin', 'cos', 'tan', 'cot', 'csc', 'sec'):
-        a = to_const_poly(e.args[0])
-        norm_a = from_const_poly(a)
-
-        c = expr.Symbol('c', [expr.CONST])
-        d = expr.Symbol('d', [expr.CONST])
-        if expr.match(norm_a, c * expr.pi):
-            x = norm_a.args[0]
-            n = int(x.val)
-            if n % 2 == 0:
-                norm_a = expr.Const(x.val - n) * expr.pi
-            else:
-                if n > 0:
-                    norm_a = expr.Const(x.val - (n + 1)) * expr.pi
-                else:
-                    norm_a = expr.Const(x.val - (n - 1)) * expr.pi
-        elif expr.match(norm_a, c * expr.pi / d):
-            x = norm_a.args[0].args[0]
-            y = norm_a.args[1]
-            val = Fraction(x.val, y.val)
-            n = int(val)
-            if n % 2 == 0:
-                norm_a = expr.Const(val - n) * expr.pi
-            else:
-                if n > 0:
-                    norm_a = expr.Const(val - (n + 1)) * expr.pi
-                else:
-                    norm_a = expr.Const(val - (n - 1)) * expr.pi
-        elif norm_a == -expr.pi:
-            norm_a = expr.pi
-
-        norm_a = normalize_constant(norm_a)
-        if expr.match(norm_a, c * expr.pi) and norm_a.args[0].val < 0:
-            neg_norm_a = expr.Const(-norm_a.args[0].val) * expr.pi
-            if e.func_name in ('sin', 'tan', 'cot', 'csc'):
-                val = -expr.Fun(e.func_name, neg_norm_a)
-            else:
-                val = expr.Fun(e.func_name, neg_norm_a)
-            return to_const_poly(val)
-        else:
-            return const_singleton(expr.Fun(e.func_name, norm_a))
-
     elif e.is_fun():
         args_norm = [normalize_constant(arg) for arg in e.args]
         return const_singleton(expr.Fun(e.func_name, *args_norm))
@@ -1063,6 +1021,60 @@ def simplify_power(e: expr.Expr, ctx: Context) -> expr.Expr:
     else:
         return e
 
+def simplify_trig(e: expr.Expr, ctx: Context) -> expr.Expr:
+    if not (e.is_fun() and e.func_name in ('sin', 'cos', 'tan', 'cot', 'csc', 'sec')):
+        return e
+
+    a = e.args[0]
+    c = expr.Symbol('c', [expr.CONST])
+    d = expr.Symbol('d', [expr.CONST])
+
+    # Find constant coefficient of a
+    coeff = None
+    if expr.match(a, c * expr.pi):
+        coeff = a.args[0].val
+    elif expr.match(a, c * expr.pi / d):
+        coeff = Fraction(a.args[0].args[0].val, a.args[1].val)
+    elif expr.match(a, expr.pi / d):
+        coeff = Fraction(1, a.args[1].val)
+    elif expr.match(a, -(c * expr.pi)):
+        coeff = -a.args[0].args[0].val
+    elif expr.match(a, -(c * expr.pi / d)):
+        coeff = Fraction(-a.args[0].args[0].args[0].val, a.args[0].args[1].val)
+    elif expr.match(a, -(expr.pi / d)):
+        coeff = Fraction(-1, a.args[0].args[1].val)
+    elif a == -expr.pi:
+        coeff = -1
+
+    if coeff is None:
+        return e
+
+    # Normalize coefficient to the interval (-1, 1]
+    n = int(coeff)
+    if n % 2 == 0:
+        coeff = coeff - n
+    elif n > 0:
+        coeff = coeff - (n + 1)
+    else:
+        coeff = coeff - (n - 1)
+
+    def build(val):
+        if isinstance(val, int):
+            return expr.Fun(e.func_name, expr.Const(val) * expr.pi)
+        elif isinstance(val, Fraction):
+            return expr.Fun(e.func_name, expr.Const(val.numerator) * expr.pi / expr.Const(val.denominator))
+        else:
+            raise TypeError
+
+    # Further normalize to [0, pi]
+    if coeff < 0:
+        if e.func_name in ('sin', 'tan', 'cot', 'csc'):
+            return -build(-coeff)
+        else:  # cos, sec: does not change sign
+            return build(-coeff)
+    else:
+        return build(coeff)
+
 def normalize(e: expr.Expr, ctx: Context) -> expr.Expr:
     if e.is_equals():
         return expr.Eq(normalize(e.lhs, ctx), normalize(e.rhs, ctx))
@@ -1077,6 +1089,7 @@ def normalize(e: expr.Expr, ctx: Context) -> expr.Expr:
         e = apply_subterm(e, simplify_limit, ctx)
         e = apply_subterm(e, simplify_integral, ctx)
         e = apply_subterm(e, simplify_power, ctx)
+        e = apply_subterm(e, simplify_trig, ctx)
         if e == old_e:
             break
 
