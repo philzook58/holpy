@@ -567,7 +567,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.OnSubterm(rules.ApplyInductHyp()))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.Equation("-((2 * m + 1) / 2) - 1", "-m - 3/2"))
-        calc.perform_rule(rules.Equation(None, "b ^ (-m - 3/2) * 2 ^ -(2 * m) * pi * (2 * m + 1) * binom(2 * m,m) / (4 * m + 4)"))
+        calc.perform_rule(rules.Equation(None, "b ^ (-m - 3/2) * 2 ^ -(2 * m) * pi * (2 * m + 1) / (4 * m + 4) * binom(2 * m,m)"))
 
         # Induction step, RHS
         calc = proof_induct.rhs_calc
@@ -3083,12 +3083,12 @@ class IntegralTest(unittest.TestCase):
         proof = goal03.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.SubstitutionInverse("y", "a*y"))
-        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity("(a * y) ^ m", "a^m * y^m"), "0.0.0"))
+        calc.perform_rule(rules.ApplyIdentity("(a * y) ^ m", "a^m * y^m"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.Equation("a*y", "y*a"))
         s1 = "log(y*a)"
         s2 = "log(y) + log(a)"
-        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "1.0.1.0"))
+        calc.perform_rule(rules.ApplyIdentity(s1, s2))
         s1 = "(log(y) + log(a))^n"
         s2 = "SUM(k, 0, n, binom(n, k)*log(y)^k*log(a)^(n-k))"
         calc.perform_rule(rules.OnLocation(rules.SeriesExpansionIdentity(index_var = "k"), "1.0.1"))
@@ -3097,8 +3097,8 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.Equation(s1, s2))
         calc.perform_rule(rules.OnLocation(rules.IntSumExchange(), "1"))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("I"), "1.0.1"))
-        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal02.goal), "1.0.1"))
+        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("I"), "1.0.1.1"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal02.goal), "1.0.1.1"))
         calc.perform_rule(rules.FullSimplify())
         calc = proof.rhs_calc
         calc.perform_rule(rules.FullSimplify())
@@ -3131,7 +3131,6 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
 
         self.checkAndOutput(file)
-
 
     def testUsefulLogIntegral(self):
         # Reference: Impossible, Integrals, Sums, and Series

@@ -216,12 +216,12 @@
                 "goal": "I(m,b) = pi / 2 ^ (2 * m + 1) * binom(2 * m,m) * (1 / b ^ ((2 * m + 1) / 2))",
                 "induct_case": {
                     "finished": true,
-                    "goal": "I(m + 1,b) = 2 ^ -(2 * m) * pi * binom(2 * m + 2,m + 1) / 8 * b ^ -((2 * m + 3) / 2)",
-                    "latex_goal": "I(m + 1,b) = \\frac{2 ^ {-2 m}\\cdot \\pi \\binom{2 m + 2}{m + 1}}{8} b ^ {-(2 m + 3)/2}",
+                    "goal": "I(m + 1,b) = 2 ^ -(2 * m) * pi / 8 * (b ^ -((2 * m + 3) / 2) * binom(2 * m + 2,m + 1))",
+                    "latex_goal": "I(m + 1,b) = \\frac{2 ^ {-2 m}\\cdot \\pi}{8} (b ^ {-(2 m + 3)/2} \\binom{2 m + 2}{m + 1})",
                     "proof": {
                         "finished": true,
-                        "goal": "I(m + 1,b) = 2 ^ -(2 * m) * pi * binom(2 * m + 2,m + 1) / 8 * b ^ -((2 * m + 3) / 2)",
-                        "latex_goal": "I(m + 1,b) = \\frac{2 ^ {-2 m}\\cdot \\pi \\binom{2 m + 2}{m + 1}}{8} b ^ {-(2 m + 3)/2}",
+                        "goal": "I(m + 1,b) = 2 ^ -(2 * m) * pi / 8 * (b ^ -((2 * m + 3) / 2) * binom(2 * m + 2,m + 1))",
+                        "latex_goal": "I(m + 1,b) = \\frac{2 ^ {-2 m}\\cdot \\pi}{8} (b ^ {-(2 m + 3)/2} \\binom{2 m + 2}{m + 1})",
                         "lhs_calc": {
                             "latex_start": "I(m + 1,b)",
                             "start": "I(m + 1,b)",
@@ -248,8 +248,8 @@
                                     "type": "CalculationStep"
                                 },
                                 {
-                                    "latex_res": "-\\frac{2 ^ {-2 m}\\cdot \\pi (2 m + 1) \\binom{2 m}{m}}{-4 m - 4} b ^ {-(2 m + 1)/2 - 1}",
-                                    "res": "-(2 ^ -(2 * m) * pi * (2 * m + 1) * binom(2 * m,m) / (-(4 * m) - 4) * b ^ (-((2 * m + 1) / 2) - 1))",
+                                    "latex_res": "-\\frac{2 ^ {-2 m}\\cdot \\pi (2 m + 1)}{-4 m - 4} (b ^ {-(2 m + 1)/2 - 1} \\binom{2 m}{m})",
+                                    "res": "-(2 ^ -(2 * m) * pi * (2 * m + 1) / (-(4 * m) - 4) * (b ^ (-((2 * m + 1) / 2) - 1) * binom(2 * m,m)))",
                                     "rule": {
                                         "name": "FullSimplify",
                                         "str": "full simplify"
@@ -257,8 +257,8 @@
                                     "type": "CalculationStep"
                                 },
                                 {
-                                    "latex_res": "-\\frac{2 ^ {-2 m}\\cdot \\pi (2 m + 1) \\binom{2 m}{m}}{-4 m - 4} b ^ {-m - 3/2}",
-                                    "res": "-(2 ^ -(2 * m) * pi * (2 * m + 1) * binom(2 * m,m) / (-(4 * m) - 4) * b ^ (-m - 3/2))",
+                                    "latex_res": "-\\frac{2 ^ {-2 m}\\cdot \\pi (2 m + 1)}{-4 m - 4} (b ^ {-m - 3/2} \\binom{2 m}{m})",
+                                    "res": "-(2 ^ -(2 * m) * pi * (2 * m + 1) / (-(4 * m) - 4) * (b ^ (-m - 3/2) * binom(2 * m,m)))",
                                     "rule": {
                                         "latex_str": "rewriting \\(-\\frac{2 m + 1}{2} - 1\\) to \\(-m - \\frac{3}{2}\\)",
                                         "name": "Equation",
@@ -269,13 +269,13 @@
                                     "type": "CalculationStep"
                                 },
                                 {
-                                    "latex_res": "\\frac{b ^ {-m - 3/2} 2 ^ {-2 m}\\cdot \\pi (2 m + 1) \\binom{2 m}{m}}{4 m + 4}",
-                                    "res": "b ^ (-m - 3/2) * 2 ^ -(2 * m) * pi * (2 * m + 1) * binom(2 * m,m) / (4 * m + 4)",
+                                    "latex_res": "\\frac{b ^ {-m - 3/2} 2 ^ {-2 m}\\cdot \\pi (2 m + 1)}{4 m + 4} \\binom{2 m}{m}",
+                                    "res": "b ^ (-m - 3/2) * 2 ^ -(2 * m) * pi * (2 * m + 1) / (4 * m + 4) * binom(2 * m,m)",
                                     "rule": {
-                                        "latex_str": "rewriting to \\(\\frac{b ^ {-m - 3/2} 2 ^ {-2 m}\\cdot \\pi (2 m + 1) \\binom{2 m}{m}}{4 m + 4}\\)",
+                                        "latex_str": "rewriting to \\(\\frac{b ^ {-m - 3/2} 2 ^ {-2 m}\\cdot \\pi (2 m + 1)}{4 m + 4} \\binom{2 m}{m}\\)",
                                         "name": "Equation",
-                                        "new_expr": "b ^ (-m - 3/2) * 2 ^ -(2 * m) * pi * (2 * m + 1) * binom(2 * m,m) / (4 * m + 4)",
-                                        "str": "rewriting to b ^ (-m - 3/2) * 2 ^ -(2 * m) * pi * (2 * m + 1) * binom(2 * m,m) / (4 * m + 4)"
+                                        "new_expr": "b ^ (-m - 3/2) * 2 ^ -(2 * m) * pi * (2 * m + 1) / (4 * m + 4) * binom(2 * m,m)",
+                                        "str": "rewriting to b ^ (-m - 3/2) * 2 ^ -(2 * m) * pi * (2 * m + 1) / (4 * m + 4) * binom(2 * m,m)"
                                     },
                                     "type": "CalculationStep"
                                 }
@@ -283,12 +283,12 @@
                             "type": "Calculation"
                         },
                         "rhs_calc": {
-                            "latex_start": "\\frac{2 ^ {-2 m}\\cdot \\pi \\binom{2 m + 2}{m + 1}}{8} b ^ {-(2 m + 3)/2}",
-                            "start": "2 ^ -(2 * m) * pi * binom(2 * m + 2,m + 1) / 8 * b ^ -((2 * m + 3) / 2)",
+                            "latex_start": "\\frac{2 ^ {-2 m}\\cdot \\pi}{8} (b ^ {-(2 m + 3)/2} \\binom{2 m + 2}{m + 1})",
+                            "start": "2 ^ -(2 * m) * pi / 8 * (b ^ -((2 * m + 3) / 2) * binom(2 * m + 2,m + 1))",
                             "steps": [
                                 {
-                                    "latex_res": "\\frac{2 ^ {-2 m}\\cdot \\pi (2 \\binom{2 m}{m} (\\frac{2 m + 1}{m + 1}))}{8} b ^ {-(2 m + 3)/2}",
-                                    "res": "2 ^ -(2 * m) * pi * (2 * binom(2 * m,m) * ((2 * m + 1) / (m + 1))) / 8 * b ^ -((2 * m + 3) / 2)",
+                                    "latex_res": "\\frac{2 ^ {-2 m}\\cdot \\pi}{8} (b ^ {-(2 m + 3)/2} (2 \\binom{2 m}{m} (\\frac{2 m + 1}{m + 1})))",
+                                    "res": "2 ^ -(2 * m) * pi / 8 * (b ^ -((2 * m + 3) / 2) * (2 * binom(2 * m,m) * ((2 * m + 1) / (m + 1))))",
                                     "rule": {
                                         "latex_str": "rewrite \\(\\binom{2 m + 2}{m + 1}\\) to \\(2 \\binom{2 m}{m} (\\frac{2 m + 1}{m + 1})\\) using identity",
                                         "name": "ApplyIdentity",
@@ -299,8 +299,8 @@
                                     "type": "CalculationStep"
                                 },
                                 {
-                                    "latex_res": "\\frac{2 ^ {-2 m}\\cdot \\pi (2 \\binom{2 m}{m} (\\frac{2 m + 1}{m + 1}))}{8} b ^ {-m - 3/2}",
-                                    "res": "2 ^ -(2 * m) * pi * (2 * binom(2 * m,m) * ((2 * m + 1) / (m + 1))) / 8 * b ^ (-m - 3/2)",
+                                    "latex_res": "\\frac{2 ^ {-2 m}\\cdot \\pi}{8} (b ^ {-m - 3/2} (2 \\binom{2 m}{m} (\\frac{2 m + 1}{m + 1})))",
+                                    "res": "2 ^ -(2 * m) * pi / 8 * (b ^ (-m - 3/2) * (2 * binom(2 * m,m) * ((2 * m + 1) / (m + 1))))",
                                     "rule": {
                                         "latex_str": "rewriting \\(-\\frac{2 m + 3}{2}\\) to \\(-m - \\frac{3}{2}\\)",
                                         "name": "Equation",
@@ -311,8 +311,8 @@
                                     "type": "CalculationStep"
                                 },
                                 {
-                                    "latex_res": "\\frac{b ^ {-m - 3/2} 2 ^ {-2 m}\\cdot \\pi (2 m + 1) \\binom{2 m}{m}}{4 m + 4}",
-                                    "res": "b ^ (-m - 3/2) * 2 ^ -(2 * m) * pi * (2 * m + 1) * binom(2 * m,m) / (4 * m + 4)",
+                                    "latex_res": "\\frac{b ^ {-m - 3/2} 2 ^ {-2 m}\\cdot \\pi (2 m + 1)}{4 m + 4} \\binom{2 m}{m}",
+                                    "res": "b ^ (-m - 3/2) * 2 ^ -(2 * m) * pi * (2 * m + 1) / (4 * m + 4) * binom(2 * m,m)",
                                     "rule": {
                                         "name": "FullSimplify",
                                         "str": "full simplify"

@@ -808,7 +808,7 @@ def rsize(e: expr.Expr) -> int:
 def display_large(e: expr.Expr) -> bool:
     """Determine whether the expression requires large display."""
     def pred(e: expr.Expr) -> bool:
-        return e.is_integral() or e.is_divides()
+        return e.is_integral() or e.is_divides() or (e.is_fun() and e.func_name == "binom")
     return len(e.find_subexpr_pred(pred)) > 0
 
 def from_mono(m: Monomial) -> expr.Expr:

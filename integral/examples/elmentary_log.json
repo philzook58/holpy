@@ -335,11 +335,10 @@
                             "latex_res": "\\int_{0}^{1} a ^ {m} y ^ {m} \\log^{n}(a y) a \\,dy",
                             "res": "INT y:[0,1]. a ^ m * y ^ m * log(a * y) ^ n * a",
                             "rule": {
-                                "latex_str": "rewrite \\((a y) ^ {m}\\) to \\(a ^ {m} y ^ {m}\\) using identity at 0.0.0",
-                                "loc": "0.0.0",
+                                "latex_str": "rewrite \\((a y) ^ {m}\\) to \\(a ^ {m} y ^ {m}\\) using identity",
                                 "name": "ApplyIdentity",
                                 "source": "(a * y) ^ m",
-                                "str": "rewrite (a * y) ^ m to a ^ m * y ^ m using identity at 0.0.0",
+                                "str": "rewrite (a * y) ^ m to a ^ m * y ^ m using identity",
                                 "target": "a ^ m * y ^ m"
                             },
                             "type": "CalculationStep"
@@ -369,11 +368,10 @@
                             "latex_res": "a ^ {m + 1} (\\int_{0}^{1} y ^ {m} (\\log{y} + \\log{a}) ^ {n} \\,dy)",
                             "res": "a ^ (m + 1) * (INT y:[0,1]. y ^ m * (log(y) + log(a)) ^ n)",
                             "rule": {
-                                "latex_str": "rewrite \\(\\log{(y a)}\\) to \\(\\log{y} + \\log{a}\\) using identity at 1.0.1.0",
-                                "loc": "1.0.1.0",
+                                "latex_str": "rewrite \\(\\log{(y a)}\\) to \\(\\log{y} + \\log{a}\\) using identity",
                                 "name": "ApplyIdentity",
                                 "source": "log(y * a)",
-                                "str": "rewrite log(y * a) to log(y) + log(a) using identity at 1.0.1.0",
+                                "str": "rewrite log(y * a) to log(y) + log(a) using identity",
                                 "target": "log(y) + log(a)"
                             },
                             "type": "CalculationStep"
@@ -412,8 +410,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "a ^ {m + 1} \\sum_{k=0}^{n}{\\log^{-k + n}(a) \\binom{n}{k} (\\int_{0}^{1} y ^ {m} \\log^{k}(y) \\,dy)}",
-                            "res": "a ^ (m + 1) * SUM(k, 0, n, log(a) ^ (-k + n) * binom(n,k) * (INT y:[0,1]. y ^ m * log(y) ^ k))",
+                            "latex_res": "a ^ {m + 1} \\sum_{k=0}^{n}{\\log^{-k + n}(a) (\\binom{n}{k} (\\int_{0}^{1} y ^ {m} \\log^{k}(y) \\,dy))}",
+                            "res": "a ^ (m + 1) * SUM(k, 0, n, log(a) ^ (-k + n) * (binom(n,k) * (INT y:[0,1]. y ^ m * log(y) ^ k)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -421,25 +419,25 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "a ^ {m + 1} \\sum_{k=0}^{n}{\\log^{-k + n}(a) \\binom{n}{k} I(m,k)}",
-                            "res": "a ^ (m + 1) * SUM(k, 0, n, log(a) ^ (-k + n) * binom(n,k) * I(m,k))",
+                            "latex_res": "a ^ {m + 1} \\sum_{k=0}^{n}{\\log^{-k + n}(a) (\\binom{n}{k} I(m,k))}",
+                            "res": "a ^ (m + 1) * SUM(k, 0, n, log(a) ^ (-k + n) * (binom(n,k) * I(m,k)))",
                             "rule": {
                                 "func_name": "I",
-                                "loc": "1.0.1",
+                                "loc": "1.0.1.1",
                                 "name": "FoldDefinition",
-                                "str": "fold definition at 1.0.1"
+                                "str": "fold definition at 1.0.1.1"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "a ^ {m + 1} \\sum_{k=0}^{n}{\\log^{-k + n}(a) \\binom{n}{k} ((-1) ^ {k} (\\frac{k!}{(m + 1) ^ {k + 1}}))}",
-                            "res": "a ^ (m + 1) * SUM(k, 0, n, log(a) ^ (-k + n) * binom(n,k) * ((-1) ^ k * (factorial(k) / (m + 1) ^ (k + 1))))",
+                            "latex_res": "a ^ {m + 1} \\sum_{k=0}^{n}{\\log^{-k + n}(a) (\\binom{n}{k} ((-1) ^ {k} (\\frac{k!}{(m + 1) ^ {k + 1}})))}",
+                            "res": "a ^ (m + 1) * SUM(k, 0, n, log(a) ^ (-k + n) * (binom(n,k) * ((-1) ^ k * (factorial(k) / (m + 1) ^ (k + 1)))))",
                             "rule": {
                                 "eq": "I(m,n) = (-1) ^ n * (factorial(n) / (m + 1) ^ (n + 1))",
-                                "latex_str": "apply equation \\(I(m,n) = (-1) ^ {n} (\\frac{n!}{(m + 1) ^ {n + 1}})\\) at 1.0.1",
-                                "loc": "1.0.1",
+                                "latex_str": "apply equation \\(I(m,n) = (-1) ^ {n} (\\frac{n!}{(m + 1) ^ {n + 1}})\\) at 1.0.1.1",
+                                "loc": "1.0.1.1",
                                 "name": "ApplyEquation",
-                                "str": "apply equation: I(m,n) = (-1) ^ n * (factorial(n) / (m + 1) ^ (n + 1)) at 1.0.1"
+                                "str": "apply equation: I(m,n) = (-1) ^ n * (factorial(n) / (m + 1) ^ (n + 1)) at 1.0.1.1"
                             },
                             "type": "CalculationStep"
                         },
