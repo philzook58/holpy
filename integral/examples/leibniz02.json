@@ -102,11 +102,11 @@
                     "latex_cond": "t > 0"
                 }
             ],
-            "finished": false,
+            "finished": true,
             "goal": "(D t. g(t) + 2 * (INT y:[0,1]. exp(-(1 + y ^ 2) * t ^ 2 / 2) / (1 + y ^ 2))) = 0",
             "latex_goal": "\\frac{d}{dt} (g{(t)} + 2 (\\int_{0}^{1} \\frac{e^{(-(1 + y ^ {2})) t ^ {2}/2}}{1 + y ^ {2}} \\,dy)) = 0",
             "proof": {
-                "finished": false,
+                "finished": true,
                 "goal": "(D t. g(t) + 2 * (INT y:[0,1]. exp(-(1 + y ^ 2) * t ^ 2 / 2) / (1 + y ^ 2))) = 0",
                 "latex_goal": "\\frac{d}{dt} (g{(t)} + 2 (\\int_{0}^{1} \\frac{e^{(-(1 + y ^ {2})) t ^ {2}/2}}{1 + y ^ {2}} \\,dy)) = 0",
                 "lhs_calc": {
@@ -199,6 +199,27 @@
                                 "str": "full simplify"
                             },
                             "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "2 t (e^{-t ^ {2}/2} (\\int_{0}^{1} -1 e^{-t ^ {2} y ^ {2}/2} \\,dy)) + 2 t (e^{-t ^ {2}/2} (\\int_{0}^{1} e^{-t ^ {2} y ^ {2}/2} \\,dy))",
+                            "res": "2 * t * (exp(-(t ^ 2 / 2)) * (INT y:[0,1]. -1 * exp(-(t ^ 2 * y ^ 2 / 2)))) + 2 * t * (exp(-(t ^ 2 / 2)) * (INT y:[0,1]. exp(-(t ^ 2 * y ^ 2 / 2))))",
+                            "rule": {
+                                "latex_str": "rewriting \\(\\frac{-y ^ {2} - 1}{y ^ {2} + 1}\\) to \\(-1\\)",
+                                "name": "Equation",
+                                "new_expr": "-1",
+                                "old_expr": "(-(y ^ 2) - 1) / (y ^ 2 + 1)",
+                                "str": "rewriting (-(y ^ 2) - 1) / (y ^ 2 + 1) to -1"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "0",
+                            "res": "0",
+                            "rule": {
+                                "name": "FullSimplify",
+                                "str": "full simplify"
+                            },
+                            "type": "CalculationStep"
                         }
                     ],
                     "type": "Calculation"
@@ -246,6 +267,15 @@
                             "rule": {
                                 "name": "IndefiniteIntegralIdentity",
                                 "str": "apply indefinite integral"
+                            },
+                            "type": "CalculationStep"
+                        },
+                        {
+                            "latex_res": "g{(t)} + 2 (\\int_{0}^{1} \\frac{e^{(-(1 + y ^ {2})) t ^ {2}/2}}{1 + y ^ {2}} \\,dy) = 0 t + C",
+                            "res": "g(t) + 2 * (INT y:[0,1]. exp(-(1 + y ^ 2) * t ^ 2 / 2) / (1 + y ^ 2)) = 0 * t + SKOLEM_CONST(C)",
+                            "rule": {
+                                "name": "DefiniteIntegralIdentity",
+                                "str": "apply definite integral"
                             },
                             "type": "CalculationStep"
                         },
@@ -310,17 +340,18 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "2 (\\left. \\tan^{-1}{y} \\right\\vert_{y=0}^{1}) + (\\int_{0}^{0} e^{-x ^ {2}/2} \\,dx) ^ {2} = C",
-                            "res": "2 * ([atan(y)]_y=0,1) + (INT x:[0,0]. exp(-(x ^ 2 / 2))) ^ 2 = SKOLEM_CONST(C)",
+                            "latex_res": "2 (\\int_{0}^{1} \\frac{1}{y ^ {2} + 1} \\,dy) + (\\int_{0}^{0} e^{-x ^ {2}/2} \\,dx) ^ {2} = C",
+                            "res": "2 * (INT y:[0,1]. 1 / (y ^ 2 + 1)) + (INT x:[0,0]. exp(-(x ^ 2 / 2))) ^ 2 = SKOLEM_CONST(C)",
                             "rule": {
+                                "loc": "0.1.0",
                                 "name": "DefiniteIntegralIdentity",
-                                "str": "apply definite integral"
+                                "str": "apply definite integral at 0.1.0"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(\\int_{0}^{0} e^{-x ^ {2}/2} \\,dx) ^ {2} + \\frac{\\pi}{2} = C",
-                            "res": "(INT x:[0,0]. exp(-(x ^ 2 / 2))) ^ 2 + pi / 2 = SKOLEM_CONST(C)",
+                            "latex_res": "(\\int_{0}^{0} e^{-x ^ {2}/2} \\,dx) ^ {2} + 2 (\\int_{0}^{1} \\frac{1}{y ^ {2} + 1} \\,dy) = C",
+                            "res": "(INT x:[0,0]. exp(-(x ^ 2 / 2))) ^ 2 + 2 * (INT y:[0,1]. 1 / (y ^ 2 + 1)) = SKOLEM_CONST(C)",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"

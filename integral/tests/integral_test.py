@@ -1165,62 +1165,65 @@ class IntegralTest(unittest.TestCase):
             "exp(-(t ^ 2 * y ^ 2 / 2) - t ^ 2 / 2)",
             "exp(-1/2 * t ^ 2 * y ^ 2) * exp(-1/2 * t ^ 2)"))
         calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Equation("(-(y ^ 2) - 1) / (y ^ 2 + 1)", "-1"))
+        calc.perform_rule(rules.FullSimplify())
 
         Eq3 = file.add_goal("2 * (INT y:[0,1]. exp(1/2 * t ^ 2 * (-(y ^ 2) - 1)) * (y ^ 2 + 1) ^ -1) + g(t) = SKOLEM_CONST(C)")
         Eq3_proof = Eq3.proof_by_rewrite_goal(begin=Eq2)
         calc = Eq3_proof.begin
         calc.perform_rule(rules.IntegralEquation())
         calc.perform_rule(rules.IndefiniteIntegralIdentity())
-        calc.perform_rule(rules.FullSimplify())
-
-        Eq5 = file.add_goal("pi/2 = SKOLEM_CONST(C)")
-        proof_of_Eq5 = Eq5.proof_by_rewrite_goal(begin = Eq3)
-        calc = proof_of_Eq5.begin
-        calc.perform_rule(rules.LimitEquation('t', expr.Const(0)))
-        calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnSubterm(rules.ExpandDefinition("g")))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
 
-        Eq6 = file.add_goal("g(t) = -2 * (INT y:[0,1]. exp(1/2 * t ^ 2 * (-(y ^ 2) - 1)) / (y ^ 2 + 1)) + pi / 2")
+        Eq4 = file.add_goal("pi/2 = SKOLEM_CONST(C)")
+        proof_of_Eq4 = Eq4.proof_by_rewrite_goal(begin = Eq3)
+        calc = proof_of_Eq4.begin
+        calc.perform_rule(rules.LimitEquation('t', expr.Const(0)))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnSubterm(rules.ExpandDefinition("g")))
+        calc.perform_rule(rules.OnLocation(rules.DefiniteIntegralIdentity(), "0.1.0"))
+        calc.perform_rule(rules.FullSimplify())
+
+        Eq5 = file.add_goal("g(t) = -2 * (INT y:[0,1]. exp(1/2 * t ^ 2 * (-(y ^ 2) - 1)) / (y ^ 2 + 1)) + pi / 2")
+        proof_of_Eq5 = Eq5.proof_by_calculation()
+        calc = proof_of_Eq5.lhs_calc
+        calc.perform_rule(rules.ApplyEquation(Eq3.goal))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(Eq4.goal), '0'))
+        calc.perform_rule(rules.FullSimplify())
+
+        Eq6 = file.add_goal("(INT x:[-oo,oo]. exp(-x^2/2)) = sqrt(2*pi)")
         proof_of_Eq6 = Eq6.proof_by_calculation()
         calc = proof_of_Eq6.lhs_calc
-        calc.perform_rule(rules.ApplyEquation(Eq3.goal))
-        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(Eq5.goal), '0'))
-        calc.perform_rule(rules.FullSimplify())
-
-        Eq7 = file.add_goal("(INT x:[-oo,oo]. exp(-x^2/2)) = sqrt(2*pi)")
-        proof_of_Eq7 = Eq7.proof_by_calculation()
-        calc = proof_of_Eq7.lhs_calc
 
         calc.perform_rule(rules.ApplyEquation(Eq1.goal))
-        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(Eq6.goal), "1.0.0"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(Eq5.goal), "1.0.0"))
         calc.perform_rule(rules.FullSimplify())
-        calc = proof_of_Eq7.rhs_calc
+        calc = proof_of_Eq6.rhs_calc
         calc.perform_rule(rules.FullSimplify())
 
-        Eq8 = file.add_goal("(INT x:[0,oo]. exp(-x^2/2)) = sqrt(2) * sqrt(pi) / 2")
-        proof_of_Eq8 = Eq8.proof_by_rewrite_goal(begin=Eq7)
-        calc = proof_of_Eq8.begin
+        Eq7 = file.add_goal("(INT x:[0,oo]. exp(-x^2/2)) = sqrt(2) * sqrt(pi) / 2")
+        proof_of_Eq7 = Eq7.proof_by_rewrite_goal(begin=Eq6)
+        calc = proof_of_Eq7.begin
         calc.perform_rule(rules.OnLocation(rules.SplitRegion(expr.Const(0)), "0"))
         calc.perform_rule(rules.OnLocation(rules.Substitution('y', parser.parse_expr("-x")), '0'))
         calc.perform_rule(rules.OnLocation(rules.Substitution('x', parser.parse_expr("y")), '0'))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.SolveEquation(parser.parse_expr("INT x:[0,oo]. exp(-(x ^ 2 / 2))")))
 
-        Eq9 = file.add_goal("(INT x:[-oo,oo]. exp(-(a*x^2))) = sqrt(pi / a)", conds=["a > 0"])
-        proof_of_Eq9 = Eq9.proof_by_calculation()
-        calc = proof_of_Eq9.lhs_calc
+        Eq8 = file.add_goal("(INT x:[-oo,oo]. exp(-(a*x^2))) = sqrt(pi / a)", conds=["a > 0"])
+        proof_of_Eq8 = Eq8.proof_by_calculation()
+        calc = proof_of_Eq8.lhs_calc
 
         calc.perform_rule(rules.Substitution("u", parser.parse_expr("sqrt(2*a) * x")))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.Equation("-(u ^ 2 / 2)", "-u^2 / 2"))
         calc.perform_rule(rules.Substitution('x', parser.parse_expr("u")))
         calc.perform_rule(rules.Equation("-(x ^ 2 / 2)", "-x^2 / 2"))
-        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(Eq7.goal), "1"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(Eq6.goal), "1"))
         calc.perform_rule(rules.FullSimplify())
 
-        calc = proof_of_Eq9.rhs_calc
+        calc = proof_of_Eq8.rhs_calc
         calc.perform_rule(rules.FullSimplify())
 
         self.checkAndOutput(file)
@@ -3076,7 +3079,7 @@ class IntegralTest(unittest.TestCase):
         file = compstate.CompFile("interesting", "elmentary_log")
         file.add_definition("I(m,n) = (INT x:[0,1]. x^m * log(x)^n)")
         s1 = "I(m,n)"
-        s2 = "(-1) * I(m,n-1) * (n / (m+1))"
+        s2 = "-(n / (m + 1)) * I(m, n - 1)"
         goal01 = file.add_goal(s1 + "=" + s2, conds=["m >= 0", "n >= 0", "isInt(n)", "isInt(m)"])
         proof = goal01.proof_by_calculation()
         calc = proof.lhs_calc
@@ -3085,10 +3088,9 @@ class IntegralTest(unittest.TestCase):
         v = "x^(m+1) / (m+1)"
         calc.perform_rule(rules.IntegrationByParts(u, v))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("I"), "0.0.1"))
-        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("I"), "0.1"))
+        calc.perform_rule(rules.Equation("-(n / (m + 1) * I(m,n - 1))", "-(n / (m + 1)) * I(m, n - 1)"))
         calc = proof.rhs_calc
-        calc.perform_rule(rules.FullSimplify())
 
         s1 = "I(m,n)"
         s2 = "(-1)^n * (factorial(n) / (m+1)^(n+1))"
@@ -3284,7 +3286,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         self.assertTrue(goal.is_finished())
 
-        goal = file.add_goal("(D x. -Li(3, 1-x)) = Li(2, -x+1) / (-x+1)",conds = ["x>0","x<1"])
+        goal = file.add_goal("(D x. -Li(3, 1-x)) = Li(2, -x+1) / (-x+1)", conds = ["x>0","x<1"])
         proof = goal.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.Equation("3", "2+1"))
@@ -3310,7 +3312,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation("(D x. Li(2, 1-x)) = log(x)/(1-x)"), "0.1.0.0"))
         u = "log(-t+1)"
         v = "Li(2, 1-t)"
-        calc.perform_rule(rules.OnLocation(rules.IntegrationByParts(u,v), "0.1"))
+        calc.perform_rule(rules.OnLocation(rules.IntegrationByParts(u, v), "0.1"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation("(D x. -Li(3, 1-x)) = Li(2, -x+1) / (-x+1)"), "0.1.1.0"))
         calc.perform_rule(rules.FullSimplify())

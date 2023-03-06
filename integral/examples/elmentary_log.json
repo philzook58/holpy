@@ -25,13 +25,13 @@
                     "latex_cond": "m \\in\\mathbb{Z}"
                 }
             ],
-            "finished": false,
-            "goal": "I(m,n) = -1 * I(m,n - 1) * (n / (m + 1))",
-            "latex_goal": "I(m,n) = -1 I(m,n - 1) (\\frac{n}{m + 1})",
+            "finished": true,
+            "goal": "I(m,n) = -(n / (m + 1)) * I(m,n - 1)",
+            "latex_goal": "I(m,n) = (-\\frac{n}{m + 1}) I(m,n - 1)",
             "proof": {
-                "finished": false,
-                "goal": "I(m,n) = -1 * I(m,n - 1) * (n / (m + 1))",
-                "latex_goal": "I(m,n) = -1 I(m,n - 1) (\\frac{n}{m + 1})",
+                "finished": true,
+                "goal": "I(m,n) = -(n / (m + 1)) * I(m,n - 1)",
+                "latex_goal": "I(m,n) = (-\\frac{n}{m + 1}) I(m,n - 1)",
                 "lhs_calc": {
                     "latex_start": "I(m,n)",
                     "start": "I(m,n)",
@@ -68,22 +68,25 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{n}{m + 1} (\\int_{0}^{1} x ^ {m} \\log^{n - 1}(x) \\,dx)",
-                            "res": "-(n / (m + 1) * (INT x:[0,1]. x ^ m * log(x) ^ (n - 1)))",
+                            "latex_res": "-\\frac{n}{m + 1} I(m,n - 1)",
+                            "res": "-(n / (m + 1) * I(m,n - 1))",
                             "rule": {
                                 "func_name": "I",
-                                "loc": "0.0.1",
+                                "loc": "0.1",
                                 "name": "FoldDefinition",
-                                "str": "fold definition at 0.0.1"
+                                "str": "fold definition at 0.1"
                             },
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{n}{m + 1} (\\int_{0}^{1} x ^ {m} \\log^{n - 1}(x) \\,dx)",
-                            "res": "-(n / (m + 1) * (INT x:[0,1]. x ^ m * log(x) ^ (n - 1)))",
+                            "latex_res": "(-\\frac{n}{m + 1}) I(m,n - 1)",
+                            "res": "-(n / (m + 1)) * I(m,n - 1)",
                             "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
+                                "latex_str": "rewriting \\(-\\frac{n}{m + 1} I(m,n - 1)\\) to \\((-\\frac{n}{m + 1}) I(m,n - 1)\\)",
+                                "name": "Equation",
+                                "new_expr": "-(n / (m + 1)) * I(m,n - 1)",
+                                "old_expr": "-(n / (m + 1) * I(m,n - 1))",
+                                "str": "rewriting -(n / (m + 1) * I(m,n - 1)) to -(n / (m + 1)) * I(m,n - 1)"
                             },
                             "type": "CalculationStep"
                         }
@@ -91,19 +94,9 @@
                     "type": "Calculation"
                 },
                 "rhs_calc": {
-                    "latex_start": "-1 I(m,n - 1) (\\frac{n}{m + 1})",
-                    "start": "-1 * I(m,n - 1) * (n / (m + 1))",
-                    "steps": [
-                        {
-                            "latex_res": "-\\frac{n I(m,n - 1)}{m + 1}",
-                            "res": "-(n * I(m,n - 1) / (m + 1))",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
+                    "latex_start": "(-\\frac{n}{m + 1}) I(m,n - 1)",
+                    "start": "-(n / (m + 1)) * I(m,n - 1)",
+                    "steps": [],
                     "type": "Calculation"
                 },
                 "type": "CalculationProof"
@@ -211,13 +204,13 @@
                             "start": "I(m,n + 1)",
                             "steps": [
                                 {
-                                    "latex_res": "-1 I(m,n + 1 - 1) (\\frac{n + 1}{m + 1})",
-                                    "res": "-1 * I(m,n + 1 - 1) * ((n + 1) / (m + 1))",
+                                    "latex_res": "(-\\frac{n + 1}{m + 1}) I(m,n + 1 - 1)",
+                                    "res": "-((n + 1) / (m + 1)) * I(m,n + 1 - 1)",
                                     "rule": {
-                                        "eq": "I(m,n) = -1 * I(m,n - 1) * (n / (m + 1))",
-                                        "latex_str": "apply equation \\(I(m,n) = -1 I(m,n - 1) (\\frac{n}{m + 1})\\)",
+                                        "eq": "I(m,n) = -(n / (m + 1)) * I(m,n - 1)",
+                                        "latex_str": "apply equation \\(I(m,n) = (-\\frac{n}{m + 1}) I(m,n - 1)\\)",
                                         "name": "ApplyEquation",
-                                        "str": "apply equation: I(m,n) = -1 * I(m,n - 1) * (n / (m + 1))"
+                                        "str": "apply equation: I(m,n) = -(n / (m + 1)) * I(m,n - 1)"
                                     },
                                     "type": "CalculationStep"
                                 },
