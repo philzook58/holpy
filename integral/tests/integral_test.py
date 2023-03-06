@@ -3165,14 +3165,16 @@ class IntegralTest(unittest.TestCase):
         s1 = "(x ^ n - 1) / (-x + 1)"
         s2 = "-((1-x^n)/(1-x))"
         calc.perform_rule(rules.Equation(s1, s2))
-        calc.perform_rule(rules.OnLocation(rules.SeriesExpansionIdentity(index_var="k"), "1.0"))
+        calc.perform_rule(rules.OnLocation(rules.SeriesExpansionIdentity(index_var="k"), "1.0.0"))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnLocation(rules.IntSumExchange(), "0.0"))
+        calc.perform_rule(rules.OnLocation(rules.IntSumExchange(), "0.1"))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("H"), "0.0"))
+        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("H"), "0.1"))
+        calc.perform_rule(rules.FullSimplify())
 
         self.checkAndOutput(file)
+
 
     def testUsefulLogIntegral(self):
         # Reference: Impossible, Integrals, Sums, and Series
