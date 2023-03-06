@@ -89,6 +89,8 @@ class Expr:
     def __truediv__(self, other):
         if isinstance(other, (int, Fraction)):
             other = Const(other)
+        if self.is_const() and other.is_const() and isinstance(self.val, int) and isinstance(other.val, int):
+            return Const(Fraction(self.val, other.val))
         return Op("/", self, other)
 
     def __rtruediv__(self, other):
@@ -111,6 +113,8 @@ class Expr:
             return NEG_INF
         elif self == NEG_INF:
             return POS_INF
+        elif self.is_const() and self.val > 0:
+            return Const(-self.val)
         return Op("-", self)
 
     def size(self):

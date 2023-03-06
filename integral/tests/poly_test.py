@@ -26,12 +26,15 @@ class PolynomialTest(unittest.TestCase):
             ("exp(2)", "exp(2)"),
             ("-1/2", "-1/2"),
             ("4 ^ (5/6)", "2 * 2 ^ (2/3)"),
+            ("1/4 * (INT x:[0,oo]. x)", "1/4 * (INT x:[0,oo]. x)"),
+            ("sqrt(-log(exp(-y)))", "sqrt(-log(exp(-y)))"),
         ]
 
         for e, res in test_data:
             e = parse_expr(e)
             ctx = Context()
             self.assertEqual(str(normalize(e, ctx)), res)
+            self.assertEqual(normalize(e, ctx), parse_expr(res))
 
 
 if __name__ == "__main__":
