@@ -105,15 +105,6 @@
                     "start": "1 / (k - 1) ^ 2",
                     "steps": [
                         {
-                            "latex_res": "\\frac{1}{(k - 1) ^ {2}}",
-                            "res": "1 / (k - 1) ^ 2",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        },
-                        {
                             "latex_res": "\\frac{1}{(-k + 1) ^ {2}}",
                             "res": "1 / (-k + 1) ^ 2",
                             "rule": {

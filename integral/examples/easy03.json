@@ -123,17 +123,7 @@
                 "rhs_calc": {
                     "latex_start": "\\frac{\\pi \\log{b}}{2 b}",
                     "start": "pi * log(b) / (2 * b)",
-                    "steps": [
-                        {
-                            "latex_res": "\\frac{\\pi \\log{b}}{2 b}",
-                            "res": "pi * log(b) / (2 * b)",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
+                    "steps": [],
                     "type": "Calculation"
                 },
                 "type": "CalculationProof"

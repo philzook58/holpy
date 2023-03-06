@@ -67,15 +67,6 @@
                                 "str": "apply definite integral"
                             },
                             "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "-\\frac{a}{a ^ {2} + y ^ {2}}",
-                            "res": "-(a / (a ^ 2 + y ^ 2))",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
                         }
                     ],
                     "type": "Calculation"
@@ -412,17 +403,7 @@
                 "rhs_calc": {
                     "latex_start": "\\int_{0}^{\\infty} \\frac{\\sin{(a x)}}{x} \\,dx",
                     "start": "INT x:[0,oo]. sin(a * x) / x",
-                    "steps": [
-                        {
-                            "latex_res": "\\int_{0}^{\\infty} \\frac{\\sin{(a x)}}{x} \\,dx",
-                            "res": "INT x:[0,oo]. sin(a * x) / x",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
+                    "steps": [],
                     "type": "Calculation"
                 },
                 "type": "CalculationProof"

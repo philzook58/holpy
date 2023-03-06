@@ -96,17 +96,7 @@
                 "rhs_calc": {
                     "latex_start": "\\frac{\\log{(2)}}{a}",
                     "start": "log(2) / a",
-                    "steps": [
-                        {
-                            "latex_res": "\\frac{\\log{(2)}}{a}",
-                            "res": "log(2) / a",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
+                    "steps": [],
                     "type": "Calculation"
                 },
                 "type": "CalculationProof"

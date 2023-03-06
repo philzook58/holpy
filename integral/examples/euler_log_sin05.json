@@ -158,15 +158,6 @@
                                 "str": "full simplify"
                             },
                             "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "(\\int_{0}^{\\infty} \\frac{\\log{(u ^ {a} + 1)}}{-b u + u ^ {2} + 1} \\,du) - a (\\int_{0}^{\\infty} \\frac{\\log{u}}{-b u + u ^ {2} + 1} \\,du)",
-                            "res": "(INT u:[0,oo]. log(u ^ a + 1) / (-(b * u) + u ^ 2 + 1)) - a * (INT u:[0,oo]. log(u) / (-(b * u) + u ^ 2 + 1))",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
                         }
                     ],
                     "type": "Calculation"

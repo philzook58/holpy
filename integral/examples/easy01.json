@@ -87,17 +87,7 @@
                 "rhs_calc": {
                     "latex_start": "\\frac{\\pi}{\\sqrt{a + 1}}",
                     "start": "pi / sqrt(a + 1)",
-                    "steps": [
-                        {
-                            "latex_res": "\\frac{\\pi}{\\sqrt{a + 1}}",
-                            "res": "pi / sqrt(a + 1)",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
+                    "steps": [],
                     "type": "Calculation"
                 },
                 "type": "CalculationProof"

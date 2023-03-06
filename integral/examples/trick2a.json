@@ -17,15 +17,6 @@
                     "type": "CalculationStep"
                 },
                 {
-                    "latex_res": "\\int_{0}^{\\pi/2} \\frac{\\sqrt{\\cos{y}}}{\\sqrt{\\cos{y}} + \\sqrt{\\sin{y}}} \\,dy",
-                    "res": "INT y:[0,pi / 2]. sqrt(cos(y)) / (sqrt(cos(y)) + sqrt(sin(y)))",
-                    "rule": {
-                        "name": "FullSimplify",
-                        "str": "full simplify"
-                    },
-                    "type": "CalculationStep"
-                },
-                {
                     "latex_res": "\\int_{0}^{\\pi/2} 1 - \\frac{\\sqrt{\\sin{y}}}{\\sqrt{\\cos{y}} + \\sqrt{\\sin{y}}} \\,dy",
                     "res": "INT y:[0,pi / 2]. 1 - sqrt(sin(y)) / (sqrt(cos(y)) + sqrt(sin(y)))",
                     "rule": {

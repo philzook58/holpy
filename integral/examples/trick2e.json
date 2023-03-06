@@ -131,15 +131,6 @@
                                 "str": "expand polynomial"
                             },
                             "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "a (\\int_{0}^{a} \\frac{\\log{(a + t)}}{a ^ {2} + t ^ {2}} \\,dt) - \\frac{\\pi \\log{a}}{4}",
-                            "res": "a * (INT t:[0,a]. log(a + t) / (a ^ 2 + t ^ 2)) - pi * log(a) / 4",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
                         }
                     ],
                     "type": "Calculation"

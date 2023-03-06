@@ -30,15 +30,6 @@
                                 "str": "apply definite integral"
                             },
                             "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "\\frac{\\pi (-e^{-a m} + 1)}{2 a ^ {2}}",
-                            "res": "pi * (-exp(-(a * m)) + 1) / (2 * a ^ 2)",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
                         }
                     ],
                     "type": "Calculation"
@@ -95,17 +86,6 @@
                     "latex_start": "\\int_{0}^{\\infty} \\frac{\\sin{(m x)}}{x (a ^ {2} + x ^ {2})} \\,dx = \\frac{\\pi (1 - e^{(-a) m})}{2 a ^ {2}}",
                     "start": "(INT x:[0,oo]. sin(m * x) / (x * (a ^ 2 + x ^ 2))) = pi * (1 - exp(-a * m)) / (2 * a ^ 2)",
                     "steps": [
-                        {
-                            "latex_res": "\\int_{0}^{\\infty} \\frac{\\sin{(m x)}}{x (a ^ {2} + x ^ {2})} \\,dx = \\frac{\\pi (1 - e^{(-a) m})}{2 a ^ {2}}",
-                            "res": "(INT x:[0,oo]. sin(m * x) / (x * (a ^ 2 + x ^ 2))) = pi * (1 - exp(-a * m)) / (2 * a ^ 2)",
-                            "rule": {
-                                "func_name": "I",
-                                "loc": "subterms",
-                                "name": "ExpandDefinition",
-                                "str": "expand definition on subterms"
-                            },
-                            "type": "CalculationStep"
-                        },
                         {
                             "latex_res": "\\frac{d}{da} \\int_{0}^{\\infty} \\frac{\\sin{(m x)}}{x (a ^ {2} + x ^ {2})} \\,dx = \\frac{d}{da} \\frac{\\pi (1 - e^{(-a) m})}{2 a ^ {2}}",
                             "res": "(D a. INT x:[0,oo]. sin(m * x) / (x * (a ^ 2 + x ^ 2))) = (D a. pi * (1 - exp(-a * m)) / (2 * a ^ 2))",

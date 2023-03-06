@@ -205,17 +205,7 @@
                         "rhs_calc": {
                             "latex_start": "\\frac{\\pi}{2 \\sqrt{b}}",
                             "start": "pi / (2 * sqrt(b))",
-                            "steps": [
-                                {
-                                    "latex_res": "\\frac{\\pi}{2 \\sqrt{b}}",
-                                    "res": "pi / (2 * sqrt(b))",
-                                    "rule": {
-                                        "name": "FullSimplify",
-                                        "str": "full simplify"
-                                    },
-                                    "type": "CalculationStep"
-                                }
-                            ],
+                            "steps": [],
                             "type": "Calculation"
                         },
                         "type": "CalculationProof"

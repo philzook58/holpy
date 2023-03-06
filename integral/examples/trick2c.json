@@ -23,15 +23,6 @@
                                 "var_subst": "pi / 2 - x"
                             },
                             "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "\\int_{0}^{\\pi/2} \\frac{\\cos^{2}(y)}{\\cos{y} + \\sin{y}} \\,dy",
-                            "res": "INT y:[0,pi / 2]. cos(y) ^ 2 / (cos(y) + sin(y))",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
                         }
                     ],
                     "type": "Calculation"

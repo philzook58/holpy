@@ -953,15 +953,6 @@
                                 "var_subst": "x + sin(a)"
                             },
                             "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "I{(a)} = \\frac{1}{4} (\\int_{-\\infty}^{\\infty} \\frac{1}{\\cos^{2}(a) + u ^ {2}} \\,du)",
-                            "res": "I(a) = 1/4 * (INT u:[-oo,oo]. 1 / (cos(a) ^ 2 + u ^ 2))",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
                         }
                     ],
                     "type": "Calculation"
@@ -1023,17 +1014,7 @@
                 "rhs_calc": {
                     "latex_start": "\\frac{\\pi}{4 \\cos{a}}",
                     "start": "pi / (4 * cos(a))",
-                    "steps": [
-                        {
-                            "latex_res": "\\frac{\\pi}{4 \\cos{a}}",
-                            "res": "pi / (4 * cos(a))",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
+                    "steps": [],
                     "type": "Calculation"
                 },
                 "type": "CalculationProof"
@@ -1093,17 +1074,7 @@
                 "rhs_calc": {
                     "latex_start": "-\\frac{\\pi}{4 \\cos{a}}",
                     "start": "-(pi / (4 * cos(a)))",
-                    "steps": [
-                        {
-                            "latex_res": "-\\frac{\\pi}{4 \\cos{a}}",
-                            "res": "-(pi / (4 * cos(a)))",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
+                    "steps": [],
                     "type": "Calculation"
                 },
                 "type": "CalculationProof"

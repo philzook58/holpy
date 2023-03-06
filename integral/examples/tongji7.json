@@ -704,15 +704,6 @@
                         "str": "expand polynomial"
                     },
                     "type": "CalculationStep"
-                },
-                {
-                    "latex_res": "\\sqrt{2} \\pi + 2 \\sqrt{2}",
-                    "res": "sqrt(2) * pi + 2 * sqrt(2)",
-                    "rule": {
-                        "name": "FullSimplify",
-                        "str": "full simplify"
-                    },
-                    "type": "CalculationStep"
                 }
             ],
             "type": "Calculation"
@@ -1245,15 +1236,6 @@
                         "str": "substitute u for 2 * x",
                         "var_name": "u",
                         "var_subst": "2 * x"
-                    },
-                    "type": "CalculationStep"
-                },
-                {
-                    "latex_res": "\\int_{-\\pi}^{\\pi} \\frac{\\cos^{2}(u)}{8} + \\frac{\\cos{u}}{4} + \\frac{1}{8} \\,du",
-                    "res": "INT u:[-pi,pi]. cos(u) ^ 2 / 8 + cos(u) / 4 + 1/8",
-                    "rule": {
-                        "name": "ExpandPolynomial",
-                        "str": "expand polynomial"
                     },
                     "type": "CalculationStep"
                 },

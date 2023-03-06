@@ -30,15 +30,6 @@
                         },
                         {
                             "latex_res": "\\int_{0}^{\\infty} e^{-x ^ {2}/2} \\,dx",
-                            "res": "INT x:[0,oo]. exp(-(x ^ 2 / 2))",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "\\int_{0}^{\\infty} e^{-x ^ {2}/2} \\,dx",
                             "res": "INT x:[0,oo]. exp(-(x ^ 2) / 2)",
                             "rule": {
                                 "latex_str": "rewriting \\(-\\frac{x ^ {2}}{2}\\) to \\(\\frac{-x ^ {2}}{2}\\)",
@@ -55,15 +46,6 @@
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
-                            },
-                            "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "\\frac{\\sqrt{2} \\sqrt{\\pi}}{2}",
-                            "res": "sqrt(2) * sqrt(pi) / 2",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
                             },
                             "type": "CalculationStep"
                         }

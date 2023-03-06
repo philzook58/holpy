@@ -271,15 +271,6 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "g{(t)} + 2 (\\int_{0}^{1} \\frac{e^{(-(1 + y ^ {2})) t ^ {2}/2}}{1 + y ^ {2}} \\,dy) = 0 t + C",
-                            "res": "g(t) + 2 * (INT y:[0,1]. exp(-(1 + y ^ 2) * t ^ 2 / 2) / (1 + y ^ 2)) = 0 * t + SKOLEM_CONST(C)",
-                            "rule": {
-                                "name": "DefiniteIntegralIdentity",
-                                "str": "apply definite integral"
-                            },
-                            "type": "CalculationStep"
-                        },
-                        {
                             "latex_res": "2 (\\int_{0}^{1} \\frac{1}{y ^ {2} + 1} e^{t ^ {2} (-y ^ {2} - 1)/2} \\,dy) + g{(t)} = C",
                             "res": "2 * (INT y:[0,1]. 1 / (y ^ 2 + 1) * exp(t ^ 2 * (-(y ^ 2) - 1) / 2)) + g(t) = SKOLEM_CONST(C)",
                             "rule": {
