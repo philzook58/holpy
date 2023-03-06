@@ -132,7 +132,6 @@ def extract_frac(ps: Tuple[Tuple[expr.Expr, "Polynomial"]]) -> Tuple[Tuple[Tuple
 
     return tuple(res), coeff
 
-empty_context = Context()
 
 class Monomial:
     """Represents a monomial."""
@@ -161,7 +160,6 @@ class Monomial:
             assert isinstance(power, Polynomial), "Unexpected power: %s" % str(power)
             self.factors.append((base, power))
         self.factors = tuple(self.factors)
-        self.reduce(empty_context)
 
     def reduce(self, ctx: Context) -> "Monomial":
         # Reduce power in factors
@@ -291,7 +289,6 @@ class Polynomial:
     def __init__(self, monomials: Tuple[Monomial]):
         self.monomials = tuple(monomials)
         assert all(isinstance(mono, Monomial) for mono in self.monomials)
-        self.reduce(empty_context)
 
     def reduce(self, ctx: Context) -> "Polynomial":
         for mono in self.monomials:

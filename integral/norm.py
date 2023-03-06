@@ -14,18 +14,17 @@ def unfold_power(p: Polynomial, n: int, ctx: Context) -> Polynomial:
     """Unfold power of a polynomial."""
     assert n >= 0
     if n == 0:
-        return poly.constant(1, ctx)
+        return poly.constant(1)
 
     res = p
     for i in range(n-1):
-        res = p * res
+        res = (p * res).reduce(ctx)
     return res
 
 class NormalQuotient:
     def __init__(self, num: Polynomial, denom: Polynomial, ctx: Context):
         self.num = to_poly(from_poly(num), ctx)
         self.denom = to_poly(from_poly(denom), ctx)
-        self.ctx = ctx
     
     def __str__(self):
         return "(%s, %s)" % (from_poly(self.num), from_poly(self.denom))
@@ -37,63 +36,63 @@ class NormalQuotient:
         else:
             return from_poly(self.num) / denom
 
-def add_normal_quotient(n1: NormalQuotient, n2: NormalQuotient) -> NormalQuotient:
-    num = n1.num * n2.denom + n1.denom * n2.num
-    denom = n1.denom * n2.denom
-    return NormalQuotient(num, denom, n1.ctx)
+def add_normal_quotient(n1: NormalQuotient, n2: NormalQuotient, ctx: NormalQuotient) -> NormalQuotient:
+    num = (n1.num * n2.denom + n1.denom * n2.num).reduce(ctx)
+    denom = (n1.denom * n2.denom).reduce(ctx)
+    return NormalQuotient(num, denom, ctx)
 
-def uminus_normal_quotient(n: NormalQuotient) -> NormalQuotient:
-    return NormalQuotient(-n.num, n.denom, n.ctx)
+def uminus_normal_quotient(n: NormalQuotient, ctx: Context) -> NormalQuotient:
+    return NormalQuotient((-n.num).reduce(ctx), n.denom, ctx)
 
-def minus_normal_quotient(n1: NormalQuotient, n2: NormalQuotient) -> NormalQuotient:
-    return add_normal_quotient(n1, uminus_normal_quotient(n2))
+def minus_normal_quotient(n1: NormalQuotient, n2: NormalQuotient, ctx: Context) -> NormalQuotient:
+    return add_normal_quotient(n1, uminus_normal_quotient(n2, ctx), ctx)
 
-def mult_normal_quotient(n1: NormalQuotient, n2: NormalQuotient) -> NormalQuotient:
-    return NormalQuotient(n1.num * n2.num, n1.denom * n2.denom, n1.ctx)
+def mult_normal_quotient(n1: NormalQuotient, n2: NormalQuotient, ctx: Context) -> NormalQuotient:
+    return NormalQuotient((n1.num * n2.num).reduce(ctx), (n1.denom * n2.denom).reduce(ctx), ctx)
 
-def inverse_normal_quotient(n: NormalQuotient) -> NormalQuotient:
-    return NormalQuotient(n.denom, n.num, n.ctx)
+def inverse_normal_quotient(n: NormalQuotient, ctx: Context) -> NormalQuotient:
+    return NormalQuotient(n.denom, n.num, ctx)
 
-def divide_normal_quotient(n1: NormalQuotient, n2: NormalQuotient) -> NormalQuotient:
-    return mult_normal_quotient(n1, inverse_normal_quotient(n2))
+def divide_normal_quotient(n1: NormalQuotient, n2: NormalQuotient, ctx: Context) -> NormalQuotient:
+    return mult_normal_quotient(n1, inverse_normal_quotient(n2, ctx), ctx)
 
-def exp_normal_quotient(base: NormalQuotient, val: int):
+def exp_normal_quotient(base: NormalQuotient, val: int, ctx: Context):
     if val == 1:
         return base
     elif val == -1:
-        return inverse_normal_quotient(base)
+        return inverse_normal_quotient(base, ctx)
     elif isinstance(val, int):
         if val >= 0:
-            return NormalQuotient(unfold_power(base.num, val, base.ctx),
-                                  unfold_power(base.denom, val, base.ctx), base.ctx)
+            return NormalQuotient(unfold_power(base.num, val, ctx),
+                                  unfold_power(base.denom, val, ctx), ctx)
         else:
-            return NormalQuotient(unfold_power(base.denom, -val, base.ctx),
-                                  unfold_power(base.num, -val, base.ctx), base.ctx)
+            return NormalQuotient(unfold_power(base.denom, -val, ctx),
+                                  unfold_power(base.num, -val, ctx), ctx)
     elif isinstance(val, Fraction):
         if val >= 0:
             return NormalQuotient(poly.singleton(from_poly(base.num) ** val),
-                                  poly.singleton(from_poly(base.denom) ** val), base.ctx)
+                                  poly.singleton(from_poly(base.denom) ** val), ctx)
         else:
             return NormalQuotient(poly.singleton(from_poly(base.denom) ** -val),
-                                  poly.singleton(from_poly(base.num) ** -val), base.ctx)
+                                  poly.singleton(from_poly(base.num) ** -val), ctx)
     else:
         raise TypeError
 
-def equal_normal_quotient(n1: NormalQuotient, n2: NormalQuotient) -> bool:
-    e1 = from_poly((n1.num * n2.denom).reduce(n1.ctx))
-    e2 = from_poly((n1.denom * n2.num).reduce(n1.ctx))
+def equal_normal_quotient(n1: NormalQuotient, n2: NormalQuotient, ctx: Context) -> bool:
+    e1 = from_poly((n1.num * n2.denom).reduce(ctx))
+    e2 = from_poly((n1.denom * n2.num).reduce(ctx))
     return e1 == e2
 
 def normalize_quotient(e: Expr, ctx: Context) -> NormalQuotient:
     def rec(e: Expr) -> NormalQuotient:
         if e.is_plus():
-            return add_normal_quotient(rec(e.args[0]), rec(e.args[1]))
+            return add_normal_quotient(rec(e.args[0]), rec(e.args[1]), ctx)
         elif e.is_uminus():
-            return uminus_normal_quotient(rec(e.args[0]))
+            return uminus_normal_quotient(rec(e.args[0]), ctx)
         elif e.is_minus():
-            return minus_normal_quotient(rec(e.args[0]), rec(e.args[1]))
+            return minus_normal_quotient(rec(e.args[0]), rec(e.args[1]), ctx)
         elif e.is_times():
-            return mult_normal_quotient(rec(e.args[0]), rec(e.args[1]))
+            return mult_normal_quotient(rec(e.args[0]), rec(e.args[1]), ctx)
         elif e.is_divides():
             if all(isinstance(arg, expr.Fun) and arg.func_name == "factorial" for arg in e.args):
                 f1,f2 = e.args
@@ -106,22 +105,22 @@ def normalize_quotient(e: Expr, ctx: Context) -> NormalQuotient:
                         res = Const(1)
                         for i in range(1, v+1):
                             res *= Const(i)
-                        res_e = divide_normal_quotient(rec(res), rec(Const(1)))
+                        res_e = divide_normal_quotient(rec(res), rec(Const(1)), ctx)
                     else:
                         v = abs(v)
                         res = Const(1)
                         for i in range(1, v+1):
                             res *= (n1 + Const(i))
-                        res_e = divide_normal_quotient(rec(Const(1)), rec(res))
+                        res_e = divide_normal_quotient(rec(Const(1)), rec(res), ctx)
                 except NotImplementedError as e:
                     res = expr.Fun("factorial", n1 - n2)
-                    res_e = divide_normal_quotient(rec(res), rec(Const(1)))
+                    res_e = divide_normal_quotient(rec(res), rec(Const(1)), ctx)
                 finally:
                     return res_e
-            return divide_normal_quotient(rec(e.args[0]), rec(e.args[1]))
+            return divide_normal_quotient(rec(e.args[0]), rec(e.args[1]), ctx)
         elif e.is_power():
             if e.args[1].is_const():
-                return exp_normal_quotient(rec(e.args[0]), e.args[1].val)
+                return exp_normal_quotient(rec(e.args[0]), e.args[1].val, ctx)
         elif e.is_fun():
             if e.func_name == 'sqrt':
                 return rec(e.args[0] ** Const(Fraction(1,2)))
@@ -139,7 +138,7 @@ def quotient_normalize(t: Expr, ctx: Context) -> Expr:
 def eq_quotient(t1: Expr, t2: Expr, ctx: Context) -> bool:
     n1 = normalize_quotient(t1, ctx)
     n2 = normalize_quotient(t2, ctx)
-    return equal_normal_quotient(n1, n2)
+    return equal_normal_quotient(n1, n2, ctx)
 
 
 class NormalPower:
@@ -259,8 +258,8 @@ def exp_normal_power(base: NormalPower, val: Union[int, Fraction]) -> NormalPowe
         raise TypeError
 
 def equal_normal_power(n1: NormalPower, n2: NormalPower) -> bool:
-    e1 = from_poly(n1.num * n2.denom)
-    e2 = from_poly(n1.denom * n2.num)
+    e1 = from_poly((n1.num * n2.denom).reduce(n1.ctx))
+    e2 = from_poly((n1.denom * n2.num).reduce(n1.ctx))
     return n1.root == n2.root and e1 == e2
 
 def normalize_power(e: Expr, ctx: Context) -> NormalPower:
