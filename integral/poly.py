@@ -104,7 +104,8 @@ def reduce_power(n: expr.Expr, e: "Polynomial"):
     else:
         return ((n, e),)
 
-def extract_frac(ps: Tuple[Tuple[expr.Expr, "Polynomial"]]):
+def extract_frac(ps: Tuple[Tuple[expr.Expr, "Polynomial"], ...], ctx: Context) -> \
+                    Tuple[Tuple[Tuple[expr.Expr, "Polynomial"], ...], Fraction]:
     """Reduce (n_1 ^ e_1) * ... * (n_k ^ e_k) by extracting fractions.
     
     Collects the integer part of e_i into a separate coefficient. E.g.
@@ -124,7 +125,7 @@ def extract_frac(ps: Tuple[Tuple[expr.Expr, "Polynomial"]]):
             if val < 0:
                 coeff *= Fraction(1, bval ** (-math.floor(val)))
             if val - math.floor(val) != 0:
-                res.append((n, val - math.floor(val)))
+                res.append((n, constant(val - math.floor(val), ctx)))
         else:
             res.append((n, e))
 
@@ -167,7 +168,7 @@ class Monomial:
         self.factors = tuple((i, j) for i, j in collect_pairs_power(reduced_factors, ctx))
 
         # Extract fractions
-        self.factors, coeff2 = extract_frac(self.factors)
+        self.factors, coeff2 = extract_frac(self.factors, ctx)
         self.coeff = coeff * coeff2
 
     def __hash__(self):
@@ -396,6 +397,8 @@ Conversion from expressions to polynomials.
 
 def to_poly(e: expr.Expr, ctx: Context) -> Polynomial:
     """Convert expression to polynomial."""
+    if e == expr.Op("^", expr.Const(3), expr.Const(Fraction(2, 3))):
+        e
     if e.is_var():
         return singleton(e, ctx)
 
