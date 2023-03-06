@@ -340,7 +340,7 @@ class ElimAbsRule(AlgorithmRule):
 # TrigIdentity must execute before HalfAngleIndetity
 algorithm_rules = [
     AlgoNonLinearSubstitution,
-    DividePolynomial,
+    # DividePolynomial,
     LinearSubstitution,
     TrigIdentity,
     # ElimAbsRule,

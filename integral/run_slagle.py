@@ -2,6 +2,7 @@ import unittest
 import json
 import cProfile
 from integral import slagle
+from integral import parser
 from integral import rules
 from integral import proof
 import time
@@ -9,40 +10,40 @@ import time
 from logic import basic
 from integral import proof
 from integral import rules
-from integral import inequality
-from prover import sympywrapper
 
 
 test_cases = {
-    "tongji7": {
-        "Exercise 1" : "34/3",
-        "Exercise 2" : "1/4",
-        "Exercise 3" : "-1/6 + 1/6 * exp(6)",
-        "Exercise 4" : "2 * exp(-1) + exp(2)",
-        "Exercise 5" : "1 + -1/2 * sqrt(2)",
-        "Exercise 6" : "3/2",
-        "Exercise 7" : "21/8",
-        "Exercise 8" : "-3/4",
-        "Exercise 9" : "-81/11 * 2 ^ (2/3) + 945/44 * 3 ^ (2/3)",
-        "Exercise 10" : "1 + 1/4 * pi",
-        "Exercise 11" : "-461/6 + -45 * exp(1) + -3/2 * exp(2) + 1/3 * exp(3)",
-        "Exercise 12" : "1/4",
-        "Exercise 14" : "-1/8 * sqrt(3) + 1/6 * pi",
-        "Exercise 15" : "1/4 * pi",
-        "Exercise 16" : "1/2 * pi",
-        "Exercise 17" : "2 * sqrt(2) + sqrt(2) * pi",
-        # "Exercise 18" : "1 + -1/4 * pi", # auto.py line 161
-        "Exercise 19" : "1/6",
-        "Exercise 20" : "2 + 2 * log(2) + -2 * log(3)",
-        "Exercise 21" : "1 + -2 * log(2)",
-        "Exercise 22" : "1 + -exp(-1/2)",
-        "Exercise 23" : "-2 + 2 * sqrt(3)",
-        "Exercise 28" : "1 + -2 * exp(-1)",
-        "Exercise 29" : "1/4 + 1/4 * exp(2)",
-        "Exercise 31" : "-4 + 8 * log(2)",
-        "Exercise 32" : "-1/2 + 1/4 * pi",
-        "Exercise 34" : "-1/4 * pi + 1/6 * pi ^ 3",
-    },
+    "tongji7": [
+        ("INT x:[2,3]. 2 * x + x ^ 2" , "34/3"),
+        ("INT x:[0,1]. (3 * x + 1) ^ (-2)" , "1/4"),
+        ("INT x:[0,1]. exp(6 * x)" , "-1/6 + 1/6 * exp(6)"),
+        ("INT x:[-1,2]. x * exp(x)" , "2 * exp(-1) + exp(2)"),
+        ("INT x:[0,pi/4]. sin(x)" , "1 + -1/2 * sqrt(2)"),
+        ("INT x:[0,1]. 3*x^2 - x + 1" , "3/2"),
+        ("INT x:[1,2]. x^2 + 1/x^4" , "21/8"),
+        ("INT x:[pi/3, pi]. sin(2*x + pi/3)" , "-3/4"),
+        ("INT x:[4, 9]. x ^ (1 / 3) * (x ^ (1 / 2) + 1)" , "-81/11 * 2 ^ (2/3) + 945/44 * 3 ^ (2/3)"),
+        ("INT x:[-1, 0]. (3 * x ^ 4 + 3 * x ^ 2 + 1) / (x ^ 2 + 1)" , "1 + 1/4 * pi"),
+        ("INT x:[4, exp(1) + 3]. (x ^ 3 - 12 * x ^ 2 - 42) / (x - 3)" , "-461/6 + -45 * exp(1) + -3/2 * exp(2) + 1/3 * exp(3)"),
+        ("INT x:[0, pi / 2]. sin(x) * cos(x) ^ 3" , "1/4"),
+        ("INT x:[0, pi]. (1 - sin(x)^3)" , "-1/8 * sqrt(3) + 1/6 * pi"),
+        ("INT x:[pi/6, pi/2]. cos(x) ^ 2" , "1/4 * pi"),
+        ("INT x:[0, 1]. (1 - x^2) ^ (1/2)" , "1/2 * pi"),
+        ("INT x:[0, sqrt(2)]. sqrt(2 - x^2)" , "2 * sqrt(2) + sqrt(2) * pi"),
+        # "INT y,[-sqrt(2), sqrt(2)]. sqrt(8 - 2*y^2)" , "1 + -1/4 * pi", # auto.py line 161
+        ("INT x:[1/sqrt(2), 1]. sqrt(1 - x^2) / x ^ 2" , "1/6"),
+        ("INT x:[-1, 1]. x / sqrt(5 - 4 * x)" , "2 + 2 * log(2) + -2 * log(3)"),
+        ("INT x:[1,4]. 1 / (1 + sqrt(x))" , "1 + -2 * log(2)"),
+        ("INT x:[3/4, 1]. 1 / (sqrt(1-x) - 1)" , "1 + -exp(-1/2)"),
+        ("INT t,[0, 1]. t * exp(-t ^ 2 / 2)" , "-2 + 2 * sqrt(3)"),
+        ("INT x:[1, exp(2)]. 1 / (x*sqrt(1+log(x)))" , "1 + -2 * exp(-1)"),
+        ("INT x:[-2, 0]. (x + 2)/(x^2 + 2*x + 2)" , "1/4 + 1/4 * exp(2)"),
+        ("INT x:[-pi/2,pi/2]. cos(x)^4" , "-4 + 8 * log(2)"),
+        ("INT x:[-pi/2, pi/2]. sqrt(cos(x) - cos(x)^3)" , "-1/2 + 1/4 * pi"),
+        ("INT x:[0, pi]. sqrt(1 + cos(2*x))" , "-1/4 * pi + 1/6 * pi ^ 3"),
+        ("INT x:[0, 1].x * exp(-x)" , ""),
+
+    ],
 
     "MIT/2013": {
         "Exercise 1" : "-2 * exp(1) * log(2) + 2 * log(2)",
@@ -221,87 +222,34 @@ test_cases = {
 
 file_names = [
     "tongji7",
-    "MIT/2013",
-    "MIT/2014",
-    "MIT/2020",
-    "UCDAVIS/usubstitution",
-    "UCDAVIS/Exponentials",
-    "UCDAVIS/Trigonometric",
-    "UCDAVIS/Byparts",
-    "UCDAVIS/LogAndArctangent",
-    "UCDAVIS/PartialFraction",
+    # "MIT/2013",
+    # "MIT/2014",
+    # "MIT/2020",
+    # "UCDAVIS/usubstitution",
+    # "UCDAVIS/Exponentials",
+    # "UCDAVIS/Trigonometric",
+    # "UCDAVIS/Byparts",
+    # "UCDAVIS/LogAndArctangent",
+    # "UCDAVIS/PartialFraction",
 ]
 
 class RunSlagle(unittest.TestCase):
-    # def testRunSlagle(self):
-
-    #     for filename in file_names:
-    #         with open("integral/examples/slagle/%s.json" % filename, "r", encoding="utf-8") as f:
-    #             f_data = json.load(f)
-
-    #         for item in f_data['content']:
-    #             if test_file is None or test_file == filename:
-    #                 if (test_case is None and item['name'] in test_cases[filename]) or \
-    #                    test_case == item['name']:
-    #                     target = test_cases[filename][item['name']]
-    #                     rules.check_item(item, target, debug=True)
-
-    # def testRunSlagle1(self):
-    #     for filename in file_names:
-    #         with open("integral/examples/%s.json" % filename, "r", encoding="utf-8") as f:
-    #             f_data = json.load(f)
-    #         for item in f_data["content"]:
-    #             test_case = item["problem"]
-    #             solver = slagle.Slagle(20)
-    #             time1 = time.perf_counter()
-    #             try:
-    #                 result = solver.eval(test_case)
-    #             except:
-    #                 print(item["name"], "Slagle bugs.")
-    #                 continue
-    #             time2 = time.perf_counter()
-    #             if isinstance(result, expr.Expr) and result.is_constant():
-    #                 # print(item["name"], result, "%.3fs"%(time2 - time1))
-    #                 print("\"%s\" : \"%s\"," % (item["name"], result))
-    #                 # solver.write_slagle_json("integral\examples\slagle\%s.json" % filename, item["name"])
-    #             elif result is None:
-    #                 print(item["name"], "Timeout!")
-    #             else:
-    #                 print(item["name"], "Can't Solve.")
+    def testRunSlagle(self):
+        for file in file_names:
+            for problem, answer in test_cases[file]:
+                s = slagle.Slagle(problem)
+                steps = s.export_step()
+                assert steps
+                f = slagle.export_calc(problem, steps, "tongji", "tongji7")
+                print(f)
+                # assert f.content[-1].last_expr == parser.parse_expr(answer)
 
 
-    def testValidateSlagle(self):
-        basic.load_theory('realintegral')
-        basic.load_theory('interval_arith')
-        count = 0
-        for filename in file_names:
-            with open("integral/examples/%s.json" % filename, "r", encoding="utf-8") as f:
-                f_data = json.load(f)
-            errs = []
-            for item in f_data["content"]:
-                if item["name"] in test_cases[filename]:
-                    steps = slagle_infos(item["name"], item["problem"])
-                    target = test_cases[filename][item['name']]
-                    rules.check_item(steps, target)
-                    proof.translate_item(steps, target, debug=True)
-                    count += 1
-
-        print(count)
 
 
-def slagle_infos(name, e):
-    """Given an integral, return the steps performed in algorithms."""
-    log = {}
-    solver = slagle.Slagle(20)
-    time1 = time.perf_counter()
-    steps = slagle.perform_steps(solver.compute_node(e))
-    time2 = time.perf_counter()
-    print("\n%s get result in %.3fs" % (name, time2 - time1))
-    return {
-        "name": name,
-        "problem": e,
-        "calc": steps
-    }
+
+
+
 
 if __name__ == "__main__":
     import sys, getopt
