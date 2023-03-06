@@ -200,7 +200,7 @@
                             "steps": [
                                 {
                                     "latex_res": "-4 x ^ {2} \\sin^{2}(a) + 2 x ^ {2} + x ^ {4} + 1",
-                                    "res": "-4 * x ^ 2 * sin(a) ^ 2 + 2 * x ^ 2 + x ^ 4 + 1",
+                                    "res": "-(4 * x ^ 2 * sin(a) ^ 2) + 2 * x ^ 2 + x ^ 4 + 1",
                                     "rule": {
                                         "name": "ExpandPolynomial",
                                         "str": "expand polynomial"
@@ -209,7 +209,7 @@
                                 },
                                 {
                                     "latex_res": "-4 x ^ {2} (1 - \\cos^{2}(a)) + 2 x ^ {2} + x ^ {4} + 1",
-                                    "res": "-4 * x ^ 2 * (1 - cos(a) ^ 2) + 2 * x ^ 2 + x ^ 4 + 1",
+                                    "res": "-(4 * x ^ 2 * (1 - cos(a) ^ 2)) + 2 * x ^ 2 + x ^ 4 + 1",
                                     "rule": {
                                         "latex_str": "rewrite \\(\\sin^{2}(a)\\) to \\(1 - \\cos^{2}(a)\\) using identity",
                                         "name": "ApplyIdentity",
@@ -221,7 +221,7 @@
                                 },
                                 {
                                     "latex_res": "-4 x ^ {2} (-\\cos^{2}(a) + 1) + 2 x ^ {2} + x ^ {4} + 1",
-                                    "res": "-4 * x ^ 2 * (-(cos(a) ^ 2) + 1) + 2 * x ^ 2 + x ^ 4 + 1",
+                                    "res": "-(4 * x ^ 2 * (-(cos(a) ^ 2) + 1)) + 2 * x ^ 2 + x ^ 4 + 1",
                                     "rule": {
                                         "name": "FullSimplify",
                                         "str": "full simplify"
@@ -585,8 +585,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "(\\int_{0}^{\\infty} 2 (\\frac{x \\sin{a}}{(-2 x \\sin{a} + x ^ {2} + 1) (2 x \\sin{a} + x ^ {2} + 1)}) \\,dx) + (\\int_{0}^{\\infty} \\frac{-2 x \\sin{a}}{(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1)} \\,dx)",
-                            "res": "(INT x:[0,oo]. 2 * (x * sin(a) / ((-2 * x * sin(a) + x ^ 2 + 1) * (2 * x * sin(a) + x ^ 2 + 1)))) + (INT x:[0,oo]. -2 * x * sin(a) / ((x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1)))",
+                            "latex_res": "(\\int_{0}^{\\infty} \\frac{2 x \\sin{a}}{(2 x \\sin{a} + x ^ {2} + 1) (-2 x \\sin{a} + x ^ {2} + 1)} \\,dx) + (\\int_{0}^{\\infty} \\frac{-2 x \\sin{a}}{(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1)} \\,dx)",
+                            "res": "(INT x:[0,oo]. 2 * x * sin(a) / ((2 * x * sin(a) + x ^ 2 + 1) * (-(2 * x * sin(a)) + x ^ 2 + 1))) + (INT x:[0,oo]. -2 * x * sin(a) / ((x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1)))",
                             "rule": {
                                 "latex_str": "substitute \\(x\\) for \\(-x\\)",
                                 "name": "Substitution",
@@ -771,11 +771,12 @@
                             "latex_res": "I{(a)} = \\frac{1}{4} (\\int_{-\\infty}^{\\infty} \\frac{1}{2 x \\sin{a} + x ^ {2} + (\\sin^{2}(a) + \\cos^{2}(a))} \\,dx)",
                             "res": "I(a) = 1/4 * (INT x:[-oo,oo]. 1 / (2 * x * sin(a) + x ^ 2 + (sin(a) ^ 2 + cos(a) ^ 2)))",
                             "rule": {
-                                "latex_str": "rewriting to \\(\\sin^{2}(a) + \\cos^{2}(a)\\) at 1.1.0.1.1",
+                                "latex_str": "rewriting \\(1\\) to \\(\\sin^{2}(a) + \\cos^{2}(a)\\) at 1.1.0.1.1",
                                 "loc": "1.1.0.1.1",
                                 "name": "Equation",
                                 "new_expr": "sin(a) ^ 2 + cos(a) ^ 2",
-                                "str": "rewriting to sin(a) ^ 2 + cos(a) ^ 2 at 1.1.0.1.1"
+                                "old_expr": "1",
+                                "str": "rewriting 1 to sin(a) ^ 2 + cos(a) ^ 2 at 1.1.0.1.1"
                             },
                             "type": "CalculationStep"
                         },
@@ -849,8 +850,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{1}{4} (\\left. \\frac{\\tan^{-1}{(\\frac{x}{\\cos{a}})}}{\\cos{a}} \\right\\vert_{x=-\\infty}^{\\infty})",
-                            "res": "1/4 * ([atan(x / cos(a)) / cos(a)]_x=-oo,oo)",
+                            "latex_res": "\\frac{1}{4} (\\left. \\frac{1}{\\cos{a}} \\tan^{-1}{(\\frac{x}{\\cos{a}})} \\right\\vert_{x=-\\infty}^{\\infty})",
+                            "res": "1/4 * ([1 / cos(a) * atan(x / cos(a))]_x=-oo,oo)",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
@@ -858,8 +859,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{1}{4} (\\frac{\\pi}{\\cos{a}})",
-                            "res": "1/4 * (pi / cos(a))",
+                            "latex_res": "\\frac{\\pi}{4 \\cos{a}}",
+                            "res": "pi / (4 * cos(a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -874,8 +875,8 @@
                     "start": "pi / (4 * cos(a))",
                     "steps": [
                         {
-                            "latex_res": "\\frac{1}{4} (\\frac{\\pi}{\\cos{a}})",
-                            "res": "1/4 * (pi / cos(a))",
+                            "latex_res": "\\frac{\\pi}{4 \\cos{a}}",
+                            "res": "pi / (4 * cos(a))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -919,8 +920,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{1}{4} (\\left. \\frac{\\tan^{-1}{(\\frac{x}{\\cos{a}})}}{\\cos{a}} \\right\\vert_{x=-\\infty}^{\\infty})",
-                            "res": "1/4 * ([atan(x / cos(a)) / cos(a)]_x=-oo,oo)",
+                            "latex_res": "\\frac{1}{4} (\\left. \\frac{1}{\\cos{a}} \\tan^{-1}{(\\frac{x}{\\cos{a}})} \\right\\vert_{x=-\\infty}^{\\infty})",
+                            "res": "1/4 * ([1 / cos(a) * atan(x / cos(a))]_x=-oo,oo)",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
                                 "str": "apply definite integral"
@@ -928,8 +929,8 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{1}{4} (\\frac{\\pi}{\\cos{a}})",
-                            "res": "-1/4 * (pi / cos(a))",
+                            "latex_res": "-\\frac{\\pi}{4 \\cos{a}}",
+                            "res": "-(pi / (4 * cos(a)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
@@ -944,8 +945,8 @@
                     "start": "-(pi / (4 * cos(a)))",
                     "steps": [
                         {
-                            "latex_res": "-\\frac{1}{4} (\\frac{\\pi}{\\cos{a}})",
-                            "res": "-1/4 * (pi / cos(a))",
+                            "latex_res": "-\\frac{\\pi}{4 \\cos{a}}",
+                            "res": "-(pi / (4 * cos(a)))",
                             "rule": {
                                 "name": "FullSimplify",
                                 "str": "full simplify"
