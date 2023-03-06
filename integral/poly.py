@@ -243,6 +243,11 @@ class Monomial:
                     sqrt_factors.append((n, e * exp))
             if self.coeff == 1:
                 return Monomial(1, sqrt_factors, self.ctx)
+            elif self.coeff < 0 and len(sqrt_factors) > 0:
+                # Avoid taking square root of negative coefficient, move the negation
+                # to the first sqrt_factor
+                sqrt_factors = [(-sqrt_factors[0][0], sqrt_factors[0][1])] + sqrt_factors[1:]
+                return Monomial(1, [(expr.Const(-self.coeff), exp)] + sqrt_factors, self.ctx)
             else:
                 return Monomial(1, [(expr.Const(self.coeff), exp)] + sqrt_factors, self.ctx)
         elif isinstance(exp, Fraction) and exp.denominator % 2 == 1:
