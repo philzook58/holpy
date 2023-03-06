@@ -70,6 +70,11 @@ class Expr:
         if isinstance(other, (int, Fraction)):
             other = Const(other)
         return Op("-", self, other)
+    
+    def __rsub__(self, other):
+        if isinstance(other, (int, Fraction)):
+            other = Const(other)
+        return Op("-", other, self)
 
     def __mul__(self, other):
         if isinstance(other, (int, Fraction)):
