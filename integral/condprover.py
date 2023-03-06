@@ -402,6 +402,8 @@ def get_standard_inequalities() -> List[Identity]:
         (["x >= -pi", "x <= 0"], "sin(x) <= 0"),
         (["x > -pi / 2", "x < pi / 4"], "tan(x) < 1"),
         (["x > 0", "x < pi / 2"], "tan(x) > 0"),
+        (["cos(x) != 0"], "sin(x) > -1"),
+        (["cos(x) != 0"], "sin(x) < 1"),
 
         # Hyperbolic
         ([], "cosh(x) > 0"),

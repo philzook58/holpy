@@ -17,109 +17,111 @@
             "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
             "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
             "proof": {
-                "case_1": {
-                    "conds": [
-                        {
-                            "cond": "x != 0",
-                            "latex_cond": "x \\neq 0"
-                        }
-                    ],
-                    "finished": true,
-                    "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
-                    "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
-                    "proof": {
+                "cases": [
+                    {
+                        "conds": [
+                            {
+                                "cond": "x != 0",
+                                "latex_cond": "x \\neq 0"
+                            }
+                        ],
                         "finished": true,
                         "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
                         "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
-                        "lhs_calc": {
-                            "latex_start": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1",
-                            "start": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1",
-                            "steps": [
-                                {
-                                    "latex_res": "(x ^ {2} - 1) ^ {2} + 2 x ^ {2} (1 + \\cos{(2 a)})",
-                                    "res": "(x ^ 2 - 1) ^ 2 + 2 * x ^ 2 * (1 + cos(2 * a))",
-                                    "rule": {
-                                        "latex_str": "rewriting to \\((x ^ {2} - 1) ^ {2} + 2 x ^ {2} (1 + \\cos{(2 a)})\\)",
-                                        "name": "Equation",
-                                        "new_expr": "(x ^ 2 - 1) ^ 2 + 2 * x ^ 2 * (1 + cos(2 * a))",
-                                        "str": "rewriting to (x ^ 2 - 1) ^ 2 + 2 * x ^ 2 * (1 + cos(2 * a))"
+                        "proof": {
+                            "finished": true,
+                            "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
+                            "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
+                            "lhs_calc": {
+                                "latex_start": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1",
+                                "start": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1",
+                                "steps": [
+                                    {
+                                        "latex_res": "(x ^ {2} - 1) ^ {2} + 2 x ^ {2} (1 + \\cos{(2 a)})",
+                                        "res": "(x ^ 2 - 1) ^ 2 + 2 * x ^ 2 * (1 + cos(2 * a))",
+                                        "rule": {
+                                            "latex_str": "rewriting to \\((x ^ {2} - 1) ^ {2} + 2 x ^ {2} (1 + \\cos{(2 a)})\\)",
+                                            "name": "Equation",
+                                            "new_expr": "(x ^ 2 - 1) ^ 2 + 2 * x ^ 2 * (1 + cos(2 * a))",
+                                            "str": "rewriting to (x ^ 2 - 1) ^ 2 + 2 * x ^ 2 * (1 + cos(2 * a))"
+                                        },
+                                        "type": "CalculationStep"
                                     },
-                                    "type": "CalculationStep"
-                                },
-                                {
-                                    "latex_res": "(x ^ {2} - 1) ^ {2} + 2 x ^ {2} (1 + (2 \\cos^{2}(a) - 1))",
-                                    "res": "(x ^ 2 - 1) ^ 2 + 2 * x ^ 2 * (1 + (2 * cos(a) ^ 2 - 1))",
-                                    "rule": {
-                                        "latex_str": "rewrite \\(\\cos{(2 a)}\\) to \\(2 \\cos^{2}(a) - 1\\) using identity",
-                                        "name": "ApplyIdentity",
-                                        "source": "cos(2 * a)",
-                                        "str": "rewrite cos(2 * a) to 2 * cos(a) ^ 2 - 1 using identity",
-                                        "target": "2 * cos(a) ^ 2 - 1"
+                                    {
+                                        "latex_res": "(x ^ {2} - 1) ^ {2} + 2 x ^ {2} (1 + (2 \\cos^{2}(a) - 1))",
+                                        "res": "(x ^ 2 - 1) ^ 2 + 2 * x ^ 2 * (1 + (2 * cos(a) ^ 2 - 1))",
+                                        "rule": {
+                                            "latex_str": "rewrite \\(\\cos{(2 a)}\\) to \\(2 \\cos^{2}(a) - 1\\) using identity",
+                                            "name": "ApplyIdentity",
+                                            "source": "cos(2 * a)",
+                                            "str": "rewrite cos(2 * a) to 2 * cos(a) ^ 2 - 1 using identity",
+                                            "target": "2 * cos(a) ^ 2 - 1"
+                                        },
+                                        "type": "CalculationStep"
                                     },
-                                    "type": "CalculationStep"
-                                },
-                                {
-                                    "latex_res": "4 x ^ {2} \\cos^{2}(a) + (x ^ {2} - 1) ^ {2}",
-                                    "res": "4 * x ^ 2 * cos(a) ^ 2 + (x ^ 2 - 1) ^ 2",
-                                    "rule": {
-                                        "name": "FullSimplify",
-                                        "str": "full simplify"
-                                    },
-                                    "type": "CalculationStep"
-                                }
-                            ],
-                            "type": "Calculation"
+                                    {
+                                        "latex_res": "4 x ^ {2} \\cos^{2}(a) + (x ^ {2} - 1) ^ {2}",
+                                        "res": "4 * x ^ 2 * cos(a) ^ 2 + (x ^ 2 - 1) ^ 2",
+                                        "rule": {
+                                            "name": "FullSimplify",
+                                            "str": "full simplify"
+                                        },
+                                        "type": "CalculationStep"
+                                    }
+                                ],
+                                "type": "Calculation"
+                            },
+                            "rhs_calc": {
+                                "latex_start": "0",
+                                "start": "0",
+                                "steps": [],
+                                "type": "Calculation"
+                            },
+                            "type": "CalculationProof"
                         },
-                        "rhs_calc": {
-                            "latex_start": "0",
-                            "start": "0",
-                            "steps": [],
-                            "type": "Calculation"
-                        },
-                        "type": "CalculationProof"
+                        "type": "Goal"
                     },
-                    "type": "Goal"
-                },
-                "case_2": {
-                    "conds": [
-                        {
-                            "cond": "x = 0",
-                            "latex_cond": "x = 0"
-                        }
-                    ],
-                    "finished": true,
-                    "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
-                    "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
-                    "proof": {
+                    {
+                        "conds": [
+                            {
+                                "cond": "x = 0",
+                                "latex_cond": "x = 0"
+                            }
+                        ],
                         "finished": true,
                         "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
                         "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
-                        "lhs_calc": {
-                            "latex_start": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1",
-                            "start": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1",
-                            "steps": [
-                                {
-                                    "latex_res": "1",
-                                    "res": "1",
-                                    "rule": {
-                                        "name": "FullSimplify",
-                                        "str": "full simplify"
-                                    },
-                                    "type": "CalculationStep"
-                                }
-                            ],
-                            "type": "Calculation"
+                        "proof": {
+                            "finished": true,
+                            "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
+                            "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
+                            "lhs_calc": {
+                                "latex_start": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1",
+                                "start": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1",
+                                "steps": [
+                                    {
+                                        "latex_res": "1",
+                                        "res": "1",
+                                        "rule": {
+                                            "name": "FullSimplify",
+                                            "str": "full simplify"
+                                        },
+                                        "type": "CalculationStep"
+                                    }
+                                ],
+                                "type": "Calculation"
+                            },
+                            "rhs_calc": {
+                                "latex_start": "0",
+                                "start": "0",
+                                "steps": [],
+                                "type": "Calculation"
+                            },
+                            "type": "CalculationProof"
                         },
-                        "rhs_calc": {
-                            "latex_start": "0",
-                            "start": "0",
-                            "steps": [],
-                            "type": "Calculation"
-                        },
-                        "type": "CalculationProof"
-                    },
-                    "type": "Goal"
-                },
+                        "type": "Goal"
+                    }
+                ],
                 "finished": true,
                 "goal": "2 * x ^ 2 * cos(2 * a) + x ^ 4 + 1 != 0",
                 "latex_goal": "2 x ^ {2} \\cos{(2 a)} + x ^ {4} + 1 \\neq 0",
@@ -180,123 +182,271 @@
             "goal": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0",
             "latex_goal": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1) \\neq 0",
             "proof": {
-                "case_1": {
-                    "conds": [
-                        {
-                            "cond": "x != 0",
-                            "latex_cond": "x \\neq 0"
-                        }
-                    ],
-                    "finished": true,
-                    "goal": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0",
-                    "latex_goal": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1) \\neq 0",
-                    "proof": {
+                "cases": [
+                    {
+                        "conds": [
+                            {
+                                "cond": "x != 0",
+                                "latex_cond": "x \\neq 0"
+                            }
+                        ],
                         "finished": true,
                         "goal": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0",
                         "latex_goal": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1) \\neq 0",
-                        "lhs_calc": {
-                            "latex_start": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1)",
-                            "start": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1)",
-                            "steps": [
-                                {
-                                    "latex_res": "-4 x ^ {2} \\sin^{2}(a) + 2 x ^ {2} + x ^ {4} + 1",
-                                    "res": "-(4 * x ^ 2 * sin(a) ^ 2) + 2 * x ^ 2 + x ^ 4 + 1",
-                                    "rule": {
-                                        "name": "ExpandPolynomial",
-                                        "str": "expand polynomial"
+                        "proof": {
+                            "finished": true,
+                            "goal": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0",
+                            "latex_goal": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1) \\neq 0",
+                            "lhs_calc": {
+                                "latex_start": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1)",
+                                "start": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1)",
+                                "steps": [
+                                    {
+                                        "latex_res": "-4 x ^ {2} \\sin^{2}(a) + 2 x ^ {2} + x ^ {4} + 1",
+                                        "res": "-(4 * x ^ 2 * sin(a) ^ 2) + 2 * x ^ 2 + x ^ 4 + 1",
+                                        "rule": {
+                                            "name": "ExpandPolynomial",
+                                            "str": "expand polynomial"
+                                        },
+                                        "type": "CalculationStep"
                                     },
-                                    "type": "CalculationStep"
-                                },
-                                {
-                                    "latex_res": "-4 x ^ {2} (1 - \\cos^{2}(a)) + 2 x ^ {2} + x ^ {4} + 1",
-                                    "res": "-(4 * x ^ 2 * (1 - cos(a) ^ 2)) + 2 * x ^ 2 + x ^ 4 + 1",
-                                    "rule": {
-                                        "latex_str": "rewrite \\(\\sin^{2}(a)\\) to \\(1 - \\cos^{2}(a)\\) using identity",
-                                        "name": "ApplyIdentity",
-                                        "source": "sin(a) ^ 2",
-                                        "str": "rewrite sin(a) ^ 2 to 1 - cos(a) ^ 2 using identity",
-                                        "target": "1 - cos(a) ^ 2"
+                                    {
+                                        "latex_res": "-4 x ^ {2} (1 - \\cos^{2}(a)) + 2 x ^ {2} + x ^ {4} + 1",
+                                        "res": "-(4 * x ^ 2 * (1 - cos(a) ^ 2)) + 2 * x ^ 2 + x ^ 4 + 1",
+                                        "rule": {
+                                            "latex_str": "rewrite \\(\\sin^{2}(a)\\) to \\(1 - \\cos^{2}(a)\\) using identity",
+                                            "name": "ApplyIdentity",
+                                            "source": "sin(a) ^ 2",
+                                            "str": "rewrite sin(a) ^ 2 to 1 - cos(a) ^ 2 using identity",
+                                            "target": "1 - cos(a) ^ 2"
+                                        },
+                                        "type": "CalculationStep"
                                     },
-                                    "type": "CalculationStep"
-                                },
-                                {
-                                    "latex_res": "-4 x ^ {2} (-\\cos^{2}(a) + 1) + 2 x ^ {2} + x ^ {4} + 1",
-                                    "res": "-(4 * x ^ 2 * (-(cos(a) ^ 2) + 1)) + 2 * x ^ 2 + x ^ 4 + 1",
-                                    "rule": {
-                                        "name": "FullSimplify",
-                                        "str": "full simplify"
+                                    {
+                                        "latex_res": "-4 x ^ {2} (-\\cos^{2}(a) + 1) + 2 x ^ {2} + x ^ {4} + 1",
+                                        "res": "-(4 * x ^ 2 * (-(cos(a) ^ 2) + 1)) + 2 * x ^ 2 + x ^ 4 + 1",
+                                        "rule": {
+                                            "name": "FullSimplify",
+                                            "str": "full simplify"
+                                        },
+                                        "type": "CalculationStep"
                                     },
-                                    "type": "CalculationStep"
-                                },
-                                {
-                                    "latex_res": "(x ^ {2} - 1) ^ {2} + 4 x ^ {2} \\cos^{2}(a)",
-                                    "res": "(x ^ 2 - 1) ^ 2 + 4 * x ^ 2 * cos(a) ^ 2",
-                                    "rule": {
-                                        "latex_str": "rewriting to \\((x ^ {2} - 1) ^ {2} + 4 x ^ {2} \\cos^{2}(a)\\)",
-                                        "name": "Equation",
-                                        "new_expr": "(x ^ 2 - 1) ^ 2 + 4 * x ^ 2 * cos(a) ^ 2",
-                                        "str": "rewriting to (x ^ 2 - 1) ^ 2 + 4 * x ^ 2 * cos(a) ^ 2"
-                                    },
-                                    "type": "CalculationStep"
-                                }
-                            ],
-                            "type": "Calculation"
+                                    {
+                                        "latex_res": "(x ^ {2} - 1) ^ {2} + 4 x ^ {2} \\cos^{2}(a)",
+                                        "res": "(x ^ 2 - 1) ^ 2 + 4 * x ^ 2 * cos(a) ^ 2",
+                                        "rule": {
+                                            "latex_str": "rewriting to \\((x ^ {2} - 1) ^ {2} + 4 x ^ {2} \\cos^{2}(a)\\)",
+                                            "name": "Equation",
+                                            "new_expr": "(x ^ 2 - 1) ^ 2 + 4 * x ^ 2 * cos(a) ^ 2",
+                                            "str": "rewriting to (x ^ 2 - 1) ^ 2 + 4 * x ^ 2 * cos(a) ^ 2"
+                                        },
+                                        "type": "CalculationStep"
+                                    }
+                                ],
+                                "type": "Calculation"
+                            },
+                            "rhs_calc": {
+                                "latex_start": "0",
+                                "start": "0",
+                                "steps": [],
+                                "type": "Calculation"
+                            },
+                            "type": "CalculationProof"
                         },
-                        "rhs_calc": {
-                            "latex_start": "0",
-                            "start": "0",
-                            "steps": [],
-                            "type": "Calculation"
-                        },
-                        "type": "CalculationProof"
+                        "type": "Goal"
                     },
-                    "type": "Goal"
-                },
-                "case_2": {
-                    "conds": [
-                        {
-                            "cond": "x = 0",
-                            "latex_cond": "x = 0"
-                        }
-                    ],
-                    "finished": true,
-                    "goal": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0",
-                    "latex_goal": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1) \\neq 0",
-                    "proof": {
+                    {
+                        "conds": [
+                            {
+                                "cond": "x = 0",
+                                "latex_cond": "x = 0"
+                            }
+                        ],
                         "finished": true,
                         "goal": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0",
                         "latex_goal": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1) \\neq 0",
-                        "lhs_calc": {
-                            "latex_start": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1)",
-                            "start": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1)",
-                            "steps": [
-                                {
-                                    "latex_res": "1",
-                                    "res": "1",
-                                    "rule": {
-                                        "name": "FullSimplify",
-                                        "str": "full simplify"
-                                    },
-                                    "type": "CalculationStep"
-                                }
-                            ],
-                            "type": "Calculation"
+                        "proof": {
+                            "finished": true,
+                            "goal": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0",
+                            "latex_goal": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1) \\neq 0",
+                            "lhs_calc": {
+                                "latex_start": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1)",
+                                "start": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1)",
+                                "steps": [
+                                    {
+                                        "latex_res": "1",
+                                        "res": "1",
+                                        "rule": {
+                                            "name": "FullSimplify",
+                                            "str": "full simplify"
+                                        },
+                                        "type": "CalculationStep"
+                                    }
+                                ],
+                                "type": "Calculation"
+                            },
+                            "rhs_calc": {
+                                "latex_start": "0",
+                                "start": "0",
+                                "steps": [],
+                                "type": "Calculation"
+                            },
+                            "type": "CalculationProof"
                         },
-                        "rhs_calc": {
-                            "latex_start": "0",
-                            "start": "0",
-                            "steps": [],
-                            "type": "Calculation"
-                        },
-                        "type": "CalculationProof"
-                    },
-                    "type": "Goal"
-                },
+                        "type": "Goal"
+                    }
+                ],
                 "finished": true,
                 "goal": "(x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1) != 0",
                 "latex_goal": "(x ^ {2} - 2 x \\sin{a} + 1) (x ^ {2} + 2 x \\sin{a} + 1) \\neq 0",
                 "latex_split_cond": "x \\neq 0",
                 "split_cond": "x != 0",
+                "type": "CaseProof"
+            },
+            "type": "Goal"
+        },
+        {
+            "conds": [
+                {
+                    "cond": "cos(a) != 0",
+                    "latex_cond": "\\cos{a} \\neq 0"
+                }
+            ],
+            "finished": true,
+            "goal": "-(2 * x * sin(a)) + x ^ 2 + 1 > 0",
+            "latex_goal": "-2 x \\sin{a} + x ^ {2} + 1 > 0",
+            "proof": {
+                "cases": [
+                    {
+                        "conds": [
+                            {
+                                "cond": "x < 0",
+                                "latex_cond": "x < 0"
+                            }
+                        ],
+                        "finished": true,
+                        "goal": "-(2 * x * sin(a)) + x ^ 2 + 1 > 0",
+                        "latex_goal": "-2 x \\sin{a} + x ^ {2} + 1 > 0",
+                        "proof": {
+                            "finished": true,
+                            "goal": "-(2 * x * sin(a)) + x ^ 2 + 1 > 0",
+                            "latex_goal": "-2 x \\sin{a} + x ^ {2} + 1 > 0",
+                            "lhs_calc": {
+                                "latex_start": "-2 x \\sin{a} + x ^ {2} + 1",
+                                "start": "-(2 * x * sin(a)) + x ^ 2 + 1",
+                                "steps": [
+                                    {
+                                        "latex_res": "(x + 1) ^ {2} - 2 x (1 + \\sin{a})",
+                                        "res": "(x + 1) ^ 2 - 2 * x * (1 + sin(a))",
+                                        "rule": {
+                                            "latex_str": "rewriting to \\((x + 1) ^ {2} - 2 x (1 + \\sin{a})\\)",
+                                            "name": "Equation",
+                                            "new_expr": "(x + 1) ^ 2 - 2 * x * (1 + sin(a))",
+                                            "str": "rewriting to (x + 1) ^ 2 - 2 * x * (1 + sin(a))"
+                                        },
+                                        "type": "CalculationStep"
+                                    }
+                                ],
+                                "type": "Calculation"
+                            },
+                            "rhs_calc": {
+                                "latex_start": "0",
+                                "start": "0",
+                                "steps": [],
+                                "type": "Calculation"
+                            },
+                            "type": "CalculationProof"
+                        },
+                        "type": "Goal"
+                    },
+                    {
+                        "conds": [
+                            {
+                                "cond": "x = 0",
+                                "latex_cond": "x = 0"
+                            }
+                        ],
+                        "finished": true,
+                        "goal": "-(2 * x * sin(a)) + x ^ 2 + 1 > 0",
+                        "latex_goal": "-2 x \\sin{a} + x ^ {2} + 1 > 0",
+                        "proof": {
+                            "finished": true,
+                            "goal": "-(2 * x * sin(a)) + x ^ 2 + 1 > 0",
+                            "latex_goal": "-2 x \\sin{a} + x ^ {2} + 1 > 0",
+                            "lhs_calc": {
+                                "latex_start": "-2 x \\sin{a} + x ^ {2} + 1",
+                                "start": "-(2 * x * sin(a)) + x ^ 2 + 1",
+                                "steps": [
+                                    {
+                                        "latex_res": "1",
+                                        "res": "1",
+                                        "rule": {
+                                            "name": "FullSimplify",
+                                            "str": "full simplify"
+                                        },
+                                        "type": "CalculationStep"
+                                    }
+                                ],
+                                "type": "Calculation"
+                            },
+                            "rhs_calc": {
+                                "latex_start": "0",
+                                "start": "0",
+                                "steps": [],
+                                "type": "Calculation"
+                            },
+                            "type": "CalculationProof"
+                        },
+                        "type": "Goal"
+                    },
+                    {
+                        "conds": [
+                            {
+                                "cond": "x > 0",
+                                "latex_cond": "x > 0"
+                            }
+                        ],
+                        "finished": true,
+                        "goal": "-(2 * x * sin(a)) + x ^ 2 + 1 > 0",
+                        "latex_goal": "-2 x \\sin{a} + x ^ {2} + 1 > 0",
+                        "proof": {
+                            "finished": true,
+                            "goal": "-(2 * x * sin(a)) + x ^ 2 + 1 > 0",
+                            "latex_goal": "-2 x \\sin{a} + x ^ {2} + 1 > 0",
+                            "lhs_calc": {
+                                "latex_start": "-2 x \\sin{a} + x ^ {2} + 1",
+                                "start": "-(2 * x * sin(a)) + x ^ 2 + 1",
+                                "steps": [
+                                    {
+                                        "latex_res": "(x - 1) ^ {2} + 2 x (1 - \\sin{a})",
+                                        "res": "(x - 1) ^ 2 + 2 * x * (1 - sin(a))",
+                                        "rule": {
+                                            "latex_str": "rewriting to \\((x - 1) ^ {2} + 2 x (1 - \\sin{a})\\)",
+                                            "name": "Equation",
+                                            "new_expr": "(x - 1) ^ 2 + 2 * x * (1 - sin(a))",
+                                            "str": "rewriting to (x - 1) ^ 2 + 2 * x * (1 - sin(a))"
+                                        },
+                                        "type": "CalculationStep"
+                                    }
+                                ],
+                                "type": "Calculation"
+                            },
+                            "rhs_calc": {
+                                "latex_start": "0",
+                                "start": "0",
+                                "steps": [],
+                                "type": "Calculation"
+                            },
+                            "type": "CalculationProof"
+                        },
+                        "type": "Goal"
+                    }
+                ],
+                "finished": true,
+                "goal": "-(2 * x * sin(a)) + x ^ 2 + 1 > 0",
+                "latex_goal": "-2 x \\sin{a} + x ^ {2} + 1 > 0",
+                "latex_split_cond": "x",
+                "split_cond": "x",
                 "type": "CaseProof"
             },
             "type": "Goal"

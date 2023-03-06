@@ -219,10 +219,6 @@ class Goal(StateItem):
         return self.proof
 
     def proof_by_case(self, cond_str: str):
-        # cond_str: b = 0
-        # goal is f(b) = C for b>=0
-        # case1: f(b) = C for b>=0 and b=0
-        # case2: f(b) = C for b>=0 and b!=0
         e1 = parser.parse_expr(cond_str)
         self.proof = CaseProof(self, self.goal, split_cond=e1)
         return self.proof
@@ -510,7 +506,11 @@ class InductionProof(StateItem):
 class CaseProof(StateItem):
     """Prove an equation by cases.
     
-    The two cases correspond to split_cond being true and false, respectively.
+    If split_cond is a condition, the two cases correspond to split_cond
+    being true and false, respectively.
+
+    If split_cond is an expression a, the three cases correspond to
+    a > 0, a = 0, and a < 0.
     
     """
     def __init__(self, parent, goal: Expr, *, split_cond: Expr):
@@ -518,54 +518,74 @@ class CaseProof(StateItem):
         self.goal = goal
         self.ctx = parent.ctx
         self.split_cond = split_cond
+        self.split_type = ""
+        self.cases: List[Goal] = []
 
-        # Case 1:
-        conds1 = Conditions()
-        conds1.add_condition(split_cond)
-        self.case_1 = Goal(self, self.ctx, goal, conds=conds1)
+        if split_cond.is_compare():
+            self.split_type = "two-way"
+            # Case 1:
+            conds1 = Conditions()
+            conds1.add_condition(split_cond)
+            self.cases.append(Goal(self, self.ctx, goal, conds=conds1))
 
-        # Case 2:
-        conds2 = Conditions()
-        conds2.add_condition(expr.neg_expr(split_cond))
-        self.case_2 = Goal(self, self.ctx, goal, conds=conds2)
+            # Case 2:
+            conds2 = Conditions()
+            conds2.add_condition(expr.neg_expr(split_cond))
+            self.cases.append(Goal(self, self.ctx, goal, conds=conds2))
+
+        else:
+            self.split_type = "three-way"
+            # Case 1:
+            conds1 = Conditions()
+            conds1.add_condition(expr.Op("<", split_cond, Const(0)))
+            self.cases.append(Goal(self, self.ctx, goal, conds=conds1))
+
+            # Case 2:
+            conds2 = Conditions()
+            conds2.add_condition(expr.Op("=", split_cond, Const(0)))
+            self.cases.append(Goal(self, self.ctx, goal, conds=conds2))
+
+            # Case 3:
+            conds3 = Conditions()
+            conds3.add_condition(expr.Op(">", split_cond, Const(0)))
+            self.cases.append(Goal(self, self.ctx, goal, conds=conds3))
 
     def __str__(self):
         if self.is_finished():
             res = "Proof by cases (finished)\n"
         else:
             res = "Proof by cases\n"
-        res += "case1: %s for %s\n" % (self.case_1.goal, self.split_cond)
-        res += str(self.case_1)
-        res += "case2: %s for %s\n" % (self.case_2.goal, expr.neg_expr(self.split_cond))
-        res += str(self.case_2)
+        for i, case in enumerate(self.cases):
+            res += "case%d: %s for %s\n" % (i+1, case.goal, case.conds)
+            res += str(case)
         return res
 
     def is_finished(self):
-        return self.case_1.is_finished() and self.case_2.is_finished()
+        for case in self.cases:
+            if not case.is_finished():
+                return False
+        return True
 
     def export(self):
         return {
             "type": "CaseProof",
             "goal": str(self.goal),
             "latex_goal": latex.convert_expr(self.goal),
-            "case_1": self.case_1.export(),
-            "case_2": self.case_2.export(),
+            "cases": [case.export() for case in self.cases],
             "split_cond": str(self.split_cond),
             "latex_split_cond": latex.convert_expr(self.split_cond),
             "finished": self.is_finished()
         }
 
     def clear(self):
-        self.case_1.clear()
-        self.case_2.clear()
+        for case in self.cases:
+            case.clear()
 
     def get_by_label(self, label: Label):
         if label.empty():
             return self
-        elif label.head == 0:
-            return self.case_1.get_by_label(label.tail)
-        elif label.head == 1:
-            return self.case_2.get_by_label(label.tail)
+        elif label.head < len(self.cases):
+            return self.cases[label.head].get_by_label(label.tail)
         else:
             raise AssertionError("get_by_label: invalid label")
 
@@ -903,8 +923,9 @@ def parse_item(parent, item) -> StateItem:
         goal = parser.parse_expr(item['goal'])
         split_cond = parser.parse_expr(item['split_cond'])
         res = CaseProof(parent, goal, split_cond=split_cond)
-        res.case_1 = parse_item(res, item['case_1'])
-        res.case_2 = parse_item(res, item['case_2'])
+        assert len(res.cases) == len(item['cases'])
+        for i, case in enumerate(item['cases']):
+            res.cases[i] = parse_item(res, case)
         return res
     elif item['type'] == 'RewriteGoalProof':
         goal = parser.parse_expr(item['goal'])

@@ -212,7 +212,7 @@ class Expr:
     def is_greater_eq(self):
         return self.ty == OP and self.op == ">="
     
-    def is_compare(self):
+    def is_compare(self) -> bool:
         return self.ty == OP and self.op in ('=', '!=', '<', '<=', '>', '>=')
 
     def is_inf(self):
