@@ -1192,10 +1192,10 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.LimitEquation('t', expr.Const(0)))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.OnSubterm(rules.ExpandDefinition("g")))
-        calc.perform_rule(rules.OnLocation(rules.DefiniteIntegralIdentity(), "0.1.0"))
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
 
-        Eq5 = file.add_goal("g(t) = -2 * (INT y:[0,1]. exp(1/2 * t ^ 2 * (-(y ^ 2) - 1)) / (y ^ 2 + 1)) + pi / 2")
+        Eq5 = file.add_goal("g(t) = -(2 * (INT y:[0,1]. 1 / (y ^ 2 + 1) * exp(t ^ 2 * (-(y ^ 2) - 1) / 2))) + pi / 2")
         proof_of_Eq5 = Eq5.proof_by_calculation()
         calc = proof_of_Eq5.lhs_calc
         calc.perform_rule(rules.ApplyEquation(Eq3.goal))

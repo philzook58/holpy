@@ -640,8 +640,13 @@ def simplify_limit(e: expr.Expr, ctx: Context) -> expr.Expr:
         return limits.reduce_finite_limit(e, ctx)
 
 def simplify_integral(e: expr.Expr, ctx: Context) -> expr.Expr:
-    if e.is_integral() and e.body.is_deriv() and e.body.var == e.var:
+    if not e.is_integral():
+        return e
+
+    if e.body.is_deriv() and e.body.var == e.var:
         return expr.EvalAt(e.var, e.lower, e.upper, e.body.body)
+    elif e.lower == e.upper:
+        return expr.Const(0)
     else:
         return e
 
