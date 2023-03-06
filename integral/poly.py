@@ -788,9 +788,6 @@ def display_large(e: expr.Expr) -> bool:
 
 def from_mono(m: Monomial) -> expr.Expr:
     """Convert a monomial to an expression."""
-    if len(m.factors) == 0:
-        return expr.Const(m.coeff)
-
     sign = 1
     num_factors = []
     denom_factors = []

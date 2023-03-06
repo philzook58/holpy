@@ -319,7 +319,7 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{1}{2} (\\frac{\\pi ^ {2}}{12}) + \\frac{1}{2} (\\frac{\\pi ^ {2}}{6})",
+                            "latex_res": "-\\frac{1}{2}\\cdot (\\frac{\\pi ^ {2}}{12}) + \\frac{1}{2}\\cdot (\\frac{\\pi ^ {2}}{6})",
                             "res": "-(1/2 * (pi ^ 2 / 12)) + 1/2 * (pi ^ 2 / 6)",
                             "rule": {
                                 "loc": "subterms",

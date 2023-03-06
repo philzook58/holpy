@@ -3,11 +3,11 @@
         {
             "finished": true,
             "goal": "(INT x:[0,pi / 2]. log(sin(x) / x)) = pi / 2 * (1 - log(pi))",
-            "latex_goal": "\\int_{0}^{\\pi/2} \\log{(\\frac{\\sin{x}}{x})} \\,dx = \\frac{\\pi}{2} (1 - \\log{(\\pi)})",
+            "latex_goal": "\\int_{0}^{\\pi/2} \\log{(\\frac{\\sin{x}}{x})} \\,dx = \\frac{\\pi}{2}\\cdot (1 - \\log{(\\pi)})",
             "proof": {
                 "finished": true,
                 "goal": "(INT x:[0,pi / 2]. log(sin(x) / x)) = pi / 2 * (1 - log(pi))",
-                "latex_goal": "\\int_{0}^{\\pi/2} \\log{(\\frac{\\sin{x}}{x})} \\,dx = \\frac{\\pi}{2} (1 - \\log{(\\pi)})",
+                "latex_goal": "\\int_{0}^{\\pi/2} \\log{(\\frac{\\sin{x}}{x})} \\,dx = \\frac{\\pi}{2}\\cdot (1 - \\log{(\\pi)})",
                 "lhs_calc": {
                     "latex_start": "\\int_{0}^{\\pi/2} \\log{(\\frac{\\sin{x}}{x})} \\,dx",
                     "start": "INT x:[0,pi / 2]. log(sin(x) / x)",
@@ -78,7 +78,7 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "-\\frac{\\pi (-\\log{(2)} + \\log{(\\pi)})}{2} - \\frac{\\pi \\log{(2)}}{2} + \\frac{\\pi}{2}",
+                            "latex_res": "-\\frac{\\pi\\cdot (-\\log{(2)} + \\log{(\\pi)})}{2} - \\frac{\\pi \\log{(2)}}{2} + \\frac{\\pi}{2}",
                             "res": "-(pi * (-log(2) + log(pi)) / 2) - pi * log(2) / 2 + pi / 2",
                             "rule": {
                                 "name": "FullSimplify",
@@ -109,7 +109,7 @@
                     "type": "Calculation"
                 },
                 "rhs_calc": {
-                    "latex_start": "\\frac{\\pi}{2} (1 - \\log{(\\pi)})",
+                    "latex_start": "\\frac{\\pi}{2}\\cdot (1 - \\log{(\\pi)})",
                     "start": "pi / 2 * (1 - log(pi))",
                     "steps": [
                         {

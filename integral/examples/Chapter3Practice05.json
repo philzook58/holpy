@@ -154,7 +154,7 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{1}{2} (\\frac{\\pi}{2}) + \\frac{1}{2} (\\frac{\\pi}{2})",
+                            "latex_res": "\\frac{1}{2}\\cdot (\\frac{\\pi}{2}) + \\frac{1}{2}\\cdot (\\frac{\\pi}{2})",
                             "res": "1/2 * (pi / 2) + 1/2 * (pi / 2)",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
@@ -222,7 +222,7 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{1}{2} (\\frac{\\pi}{2}) + \\frac{1}{2} (-\\frac{\\pi}{2})",
+                            "latex_res": "\\frac{1}{2}\\cdot (\\frac{\\pi}{2}) + \\frac{1}{2}\\cdot (-\\frac{\\pi}{2})",
                             "res": "1/2 * (pi / 2) + 1/2 * -(pi / 2)",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
@@ -290,7 +290,7 @@
                             "type": "CalculationStep"
                         },
                         {
-                            "latex_res": "\\frac{1}{2} (\\frac{\\pi}{2}) + \\frac{1}{2}\\cdot 0",
+                            "latex_res": "\\frac{1}{2}\\cdot (\\frac{\\pi}{2}) + \\frac{1}{2}\\cdot 0",
                             "res": "1/2 * (pi / 2) + 1/2 * 0",
                             "rule": {
                                 "name": "DefiniteIntegralIdentity",
