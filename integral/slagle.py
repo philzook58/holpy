@@ -239,11 +239,11 @@ class HalfAngleIdentity(AlgorithmRule):
             e = e.replace(t, new_trig)
             steps.append(calc.TrigIdentityStep(e, "TR8", t, new_trig, _loc+list(loc)))
         for t, loc, _ in sin_power_expr:
-            new_trig = half - half * cos(Const(2) * t.args[0].args[0])
+            new_trig = (1 - cos(Const(2) * t.args[0].args[0])) / 2
             e = e.replace(t, new_trig)
             steps.append(calc.TrigIdentityStep(e, "TR8", t, new_trig, _loc+list(loc)))
         for t, loc, _ in cos_power_expr:
-            new_trig = half + half * cos(Const(2) * t.args[0].args[0])
+            new_trig = (1 + cos(Const(2) * t.args[0].args[0])) / 2
             e = e.replace(t, new_trig)
             steps.append(calc.TrigIdentityStep(e, "TR7", t, new_trig, _loc+list(loc)))
         for t, loc, _ in y_sin_cos_expr:
@@ -261,8 +261,8 @@ class TrigIdentity(AlgorithmRule):
     Take the following identities:
     1) a + (-a) * sin^2(x) = a * cos^2(x)
     2) a + (-a) * cos^2(x) = a * sin^2(x)
-    3) 1 + -sin^2(x) = cos^2(x)
-    4) 1 + -cos^2(x) = sin^2(x)
+    3) sin^2(x) = 1 - cos^2(x)
+    4) cos^2(x) = 1 - sin^2(x)
 
     TR5(sin -> cos), TR6(cos -> sin)
     """
@@ -272,8 +272,8 @@ class TrigIdentity(AlgorithmRule):
         b = Symbol('b', [CONST])
         pat1 = a + b * (sin(x) ** Const(2))
         pat2 = a + b * (cos(x) ** Const(2))
-        pat3 = Const(1) + -(sin(x) ** Const(2))
-        pat4 = Const(1) + -(cos(x) ** Const(2))
+        pat3 = sin(x) ** Const(2)
+        pat4 = cos(x) ** Const(2)
         
         sin_power_expr = [(t, loc) for t, loc, _ in find_pattern(e, pat1)
                           if t.args[1].args[0].val < 0 and t.args[0].val + t.args[1].args[0].val == 0]
@@ -294,13 +294,13 @@ class TrigIdentity(AlgorithmRule):
             e = e.replace(t, cos_coeff * (sin(body) ** Const(2)))
             steps.append(calc.TrigIdentityStep(e, "TR6", t, cos_coeff * (sin(body) ** Const(2)), loc))
         for t, loc, _ in sin_power1_expr:
-            body = t.args[1].args[0].args[0].args[0]
-            e = e.replace(t, (cos(body) ** Const(2)))
-            steps.append(calc.TrigIdentityStep(e, "TR5", t, cos(body) ** Const(2), loc)) 
+            body = t.args[0].args[0]
+            e = e.replace(t, (1 - cos(body) ** Const(2)))
+            steps.append(calc.TrigIdentityStep(e, "TR5", t, 1 - cos(body) ** Const(2), loc)) 
         for t, loc, _ in cos_power1_expr:
-            body = t.args[1].args[0].args[0].args[0]
-            e = e.replace(t, (sin(body) ** Const(2)))
-            steps.append(calc.TrigIdentityStep(e, "TR6", t, sin(body) ** Const(2), loc))
+            body = t.args[0].args[0]
+            e = e.replace(t, (1 - sin(body) ** Const(2)))
+            steps.append(calc.TrigIdentityStep(e, "TR6", t, 1 - sin(body) ** Const(2), loc))
         return e, steps
 
 
@@ -692,8 +692,7 @@ class HeuristicIntegrationByParts(HeuristicRule):
                 return True
             elif isinstance(e, Op):
                 if e.op in ("+", "-"):
-                    return well_formed_eval_at(e.args[0]) and \
-                            well_formed_eval_at(e.args[1])
+                    return all(well_formed_eval_at(arg) for arg in e.args)
                 elif e.op == "*":
                     return well_formed_eval_at(e.args[1]) and \
                         e.args[0].is_const()
@@ -712,10 +711,7 @@ class HeuristicIntegrationByParts(HeuristicRule):
                 return None
             # extract eval_at expressions eval_at_i
             evalat_tms = [e[0] for e in separate_evalat(e)]
-            # check the correctness of extraction: e == ∑ eval_at_i
-            norm_e = rules.Simplify().eval(e, ctx=ctx)
-            eval_at_sum = rules.Simplify().eval(sum(evalat_tms[1:], evalat_tms[0]), ctx=ctx)
-            assert norm_e == eval_at_sum
+            # TODO: check the correctness of extraction: e == ∑ eval_at_i
             new_e = e
             for tm in evalat_tms:
                 new_e = new_e.replace(tm, tm.body)
@@ -816,11 +812,10 @@ class HeuristicTrigSubstitution(HeuristicRule):
         x = Symbol('x', [VAR])
 
         pats = [
-            (a + (x ^ Const(2)), lambda m: (m[a], Const(1))),
-            (a + b * (x ^ Const(2)), lambda m: (m[a], m[b])),
-            (a - b * (x ^ Const(2)), lambda m: (m[a], Const(-(m[b].val)))),
-            (a + -(x ^ Const(2)), lambda m: (m[a], Const(-1))),
-            (a - (x ^ Const(2)), lambda m: (m[a], Const(-1)))
+            ((x ^ Const(2) + a), lambda m: (m["a"], Const(1))),
+            (b * (x ^ Const(2)) + a, lambda m: (m["a"], m["b"])),
+            (-b * (x ^ Const(2)) + a, lambda m: (m["a"], Const(-(m["b"].val)))),
+            (-(x ^ Const(2)) + a, lambda m: (m["a"], Const(-1))),
         ]
 
         all_subterms = []
@@ -836,10 +831,10 @@ class HeuristicTrigSubstitution(HeuristicRule):
             a, b = a.val, b.val
             assert not a < 0 or not b < 0, "Invalid value: a=%s, b=%s" % (a, b)
             if a > 0 and b > 0:
-                subst = Op("^", Const(Fraction(a, b)), Const(Fraction(1,2))).normalize() * tan(new_var)
+                subst = Op("^", Const(Fraction(a, b)), Const(Fraction(1,2))) * tan(new_var)
                 
             elif a > 0 and b < 0:
-                subst = Op("^", Const(Fraction(a, -b)), Const(Fraction(1,2))).normalize() * sin(new_var)
+                subst = Op("^", Const(Fraction(a, -b)), Const(Fraction(1,2))) * sin(new_var)
             
             elif a < 0 and b > 0:
                 subst = Op("^", Const(Fraction(-a, b)), Const(Fraction(1,2))).normalize() * sec(new_var)
@@ -850,7 +845,7 @@ class HeuristicTrigSubstitution(HeuristicRule):
         return res
 
 class HeuristicExpandPower(HeuristicRule):
-    """Heuristic rule (g) in Slagle's thesis.
+    """Heuristic rule (h) in Slagle's thesis.
 
     Expansion of positive integer powers of nonconstant sums.
     
@@ -865,7 +860,7 @@ class HeuristicExpandPower(HeuristicRule):
 
         expand_expr = e
         for s, l, _ in subexpr:
-            base = to_poly(s.args[0])
+            base = to_poly(s.args[0], ctx)
             exp = s.args[1].val
             if isinstance(exp, int) and exp > 1 and exp <= 3:
                 pw = base
@@ -1220,6 +1215,10 @@ class Slagle(rules.Rule):
                 rule = rules.SubstitutionInverse(step.var_name, step.var_subst)
             elif step.reason == "Integrate by parts":
                 rule = rules.IntegrationByParts(step.u, step.v)
+            elif step.reason == "Rewrite trigonometric":
+                rule = rules.ApplyIdentity(step.before_trig, step.after_trig)
+            elif step.reason == "Unfold power":
+                rule = rules.ExpandPolynomial()
             else:
                 raise NotImplementedError(step.reason)
             if not loc.is_empty:

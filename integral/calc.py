@@ -163,7 +163,7 @@ class UnfoldPowerStep(IntegrationStep):
         self.e = e
         self.latex = latex.convert_expr(e)
         self.reason = "Unfold power"
-        self.comp = rules.UnfoldPower.eval
+        self.comp = rules.ExpandPolynomial.eval
         self.loc = Location(loc)
 
     def __str__(self):
