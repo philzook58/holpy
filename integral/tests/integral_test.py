@@ -2927,6 +2927,8 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.VarSubsOfEquation([{"var": "u", "expr": "sqrt((1+a)/2)"}]))
         calc.perform_rule(rules.FullSimplify())
 
+        self.checkAndOutput(file, omit_finish=True)
+
     def testPowerfulElementaryIntegral(self):
         # Reference: Impossible, Integrals, Sums, and Series
         # section 1.1

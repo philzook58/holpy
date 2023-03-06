@@ -851,6 +851,9 @@ def parse_rule(item) -> Rule:
         lower = parser.parse_expr(item['lower'])
         upper = parser.parse_expr(item['upper'])
         return rules.SummationEquation(idx_v, lower, upper)
+    elif item['name'] == 'FunEquation':
+        func_name = item['func_name']
+        return rules.FunEquation(func_name)
     else:
         print(item['name'], flush=True)
         raise NotImplementedError
