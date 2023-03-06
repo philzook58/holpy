@@ -1066,9 +1066,9 @@ class IntegralTest(unittest.TestCase):
                                          "(INT x:[-oo,oo]. (x ^ 2 + 1) / ((x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1)) - 2 * x * sin(a) / ((x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1)))"))
         calc.perform_rule(rules.Equation("(x ^ 2 + 1) / ((x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1)) - 2 * x * sin(a) / ((x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1))",
                                          "(x^2+1-2*x*sin(a)) / ((x ^ 2 - 2 * x * sin(a) + 1) * (x ^ 2 + 2 * x * sin(a) + 1))"))
-        calc.ctx.add_condition("-2*x*sin(a) + x^2 + 1 > 0")
+        calc.ctx.add_condition("-(2 * x * sin(a)) + x^2 + 1 > 0")
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnLocation(rules.Equation(None, "sin(a)^2 +cos(a)^2"), "1.1.0.1.1"))
+        calc.perform_rule(rules.OnLocation(rules.Equation("1", "sin(a)^2 +cos(a)^2"), "1.1.0.1.1"))
         calc.perform_rule(rules.Equation("(2 * x * sin(a) + x ^ 2 + (sin(a) ^ 2 + cos(a) ^ 2))",
                                          "(x+sin(a))^2 + cos(a) ^ 2"))
         calc.perform_rule(rules.Substitution("u", "x+sin(a)"))
@@ -2988,19 +2988,19 @@ class IntegralTest(unittest.TestCase):
         s2 = "sec(t/2)"
         calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0.0"))
         calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0.1"))
-        s1 = "sin(1/2 * t) ^ 2 / cos(1/2 * t) ^ 2"
+        s1 = "1 / cos(t / 2) ^ 2 * sin(t / 2) ^ 2"
         s2 = "(sin(1/2 * t) / cos(1/2*t)) ^ 2"
         calc.perform_rule(rules.Equation(s1, s2))
         s1 = "sin(1/2 * t) / cos(1/2*t)"
         s2 = "tan(1/2*t)"
         calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), '0.1.0.0.0'))
-        s1 = "y * sin(1/2 * t) / cos(1/2 * t)"
-        s2 = "y * (sin(1/2 * t) / cos(1/2 * t))"
+        s1 = "2 * y / cos(t / 2) * sin(t / 2)"
+        s2 = "2 * y * (sin(1/2 * t) / cos(1/2 * t))"
         calc.perform_rule(rules.Equation(s1, s2))
-        s1 = "sin(1/2 * t) / cos(1/2*t)"
-        s2 = "tan(1/2*t)"
-        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), '0.1.0.1.1.1'))
-        s1 = "INT t:[0,pi / 2]. (sec(t / 2) ^ 2 / (tan(1/2 * t) ^ 2 + 2 * (y * tan(1/2 * t)) + 1))"
+        s1 = "sin(1/2 * t) / cos(1/2 * t)"
+        s2 = "tan(1/2 * t)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), '0.1.0.1.1'))
+        s1 = "INT t:[0,pi / 2]. sec(t / 2) ^ 2 / (tan(1/2 * t) ^ 2 + 2 * y * tan(1/2 * t) + 1)"
         s2 = "INT t:[0,pi / 2]. 2 / (tan(1/2 * t) ^ 2 + 2 * (y * tan(1/2 * t)) + 1) . tan(t/2)"
         calc.perform_rule(rules.Equation(s1, s2))
         calc.perform_rule(rules.Substitution("u", "tan(t/2)"))
