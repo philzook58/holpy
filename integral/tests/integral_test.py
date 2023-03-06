@@ -3175,14 +3175,16 @@ class IntegralTest(unittest.TestCase):
         s1 = "(x ^ n - 1) / (-x + 1)"
         s2 = "-((1-x^n)/(1-x))"
         calc.perform_rule(rules.Equation(s1, s2))
-        calc.perform_rule(rules.OnLocation(rules.SeriesExpansionIdentity(index_var="k"), "1.0"))
+        calc.perform_rule(rules.OnLocation(rules.SeriesExpansionIdentity(index_var="k"), "1.0.0"))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnLocation(rules.IntSumExchange(), "0.0"))
+        calc.perform_rule(rules.OnLocation(rules.IntSumExchange(), "0.1"))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("H"), "0.0"))
+        calc.perform_rule(rules.OnLocation(rules.FoldDefinition("H"), "0.1"))
+        calc.perform_rule(rules.FullSimplify())
 
         self.checkAndOutput(file)
+
 
     def testUsefulLogIntegral(self):
         # Reference: Impossible, Integrals, Sums, and Series
@@ -3324,7 +3326,7 @@ class IntegralTest(unittest.TestCase):
         v = "Li(2, 1-t)"
         calc.perform_rule(rules.OnLocation(rules.IntegrationByParts(u, v), "0.1"))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.OnLocation(rules.ApplyEquation("(D x. -Li(3, 1-x)) = Li(2, -x+1) / (-x+1)"), "0.1.1.0"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation("(D x. -Li(3, 1-x)) = Li(2, -x+1) / (-x+1)"), "0.0.1.0"))
         calc.perform_rule(rules.FullSimplify())
         calc = proof.rhs_calc
         calc.perform_rule(rules.FullSimplify())
