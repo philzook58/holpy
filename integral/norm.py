@@ -71,17 +71,17 @@ def exp_normal_quotient(base: NormalQuotient, val: int):
                                   unfold_power(base.num, -val, base.ctx), base.ctx)
     elif isinstance(val, Fraction):
         if val >= 0:
-            return NormalQuotient(poly.singleton(from_poly(base.num) ** val, base.ctx),
-                                  poly.singleton(from_poly(base.denom) ** val, base.ctx), base.ctx)
+            return NormalQuotient(poly.singleton(from_poly(base.num) ** val),
+                                  poly.singleton(from_poly(base.denom) ** val), base.ctx)
         else:
-            return NormalQuotient(poly.singleton(from_poly(base.denom) ** -val, base.ctx),
-                                  poly.singleton(from_poly(base.num) ** -val, base.ctx), base.ctx)
+            return NormalQuotient(poly.singleton(from_poly(base.denom) ** -val),
+                                  poly.singleton(from_poly(base.num) ** -val), base.ctx)
     else:
         raise TypeError
 
 def equal_normal_quotient(n1: NormalQuotient, n2: NormalQuotient) -> bool:
-    e1 = from_poly(n1.num * n2.denom)
-    e2 = from_poly(n1.denom * n2.num)
+    e1 = from_poly((n1.num * n2.denom).reduce(n1.ctx))
+    e2 = from_poly((n1.denom * n2.num).reduce(n1.ctx))
     return e1 == e2
 
 def normalize_quotient(e: Expr, ctx: Context) -> NormalQuotient:
@@ -129,7 +129,7 @@ def normalize_quotient(e: Expr, ctx: Context) -> NormalQuotient:
                 e = expr.Fun(e.func_name, *(quotient_normalize(arg, ctx) for arg in e.args))
 
         # Un-handled cases
-        return NormalQuotient(poly.singleton(e, ctx), poly.constant(1, ctx), ctx)
+        return NormalQuotient(poly.singleton(e), poly.constant(1), ctx)
 
     return rec(e)
 
@@ -182,14 +182,14 @@ def add_normal_power(n1: NormalPower, n2: NormalPower) -> NormalPower:
         return NormalPower(num, denom, 1, n1.ctx)
     elif n1.root == 1 and n2.root > 1:
         # p/q + y^(1/n) = (p + q * y^(1/n)) / q
-        num = n1.num + n1.denom * poly.singleton(n2.to_expr(), n1.ctx)
+        num = n1.num + n1.denom * poly.singleton(n2.to_expr())
         denom = n1.denom
         return NormalPower(num, denom, 1, n1.ctx)
     elif n1.root > 1 and n2.root == 1:
         return add_normal_power(n2, n1)
     else:
-        return NormalPower(poly.singleton(n1.to_expr(), n1.ctx) + poly.singleton(n2.to_expr(), n1.ctx),
-                           poly.constant(1, n1.ctx), 1, n1.ctx)
+        return NormalPower(poly.singleton(n1.to_expr()) + poly.singleton(n2.to_expr()),
+                           poly.constant(1), 1, n1.ctx)
 
 def uminus_normal_power(n: NormalPower) -> NormalPower:
     """Negation of a normal form.
@@ -200,7 +200,7 @@ def uminus_normal_power(n: NormalPower) -> NormalPower:
     if n.root == 1:
         return NormalPower(-n.num, n.denom, 1, n.ctx)
     else:
-        return NormalPower(-poly.singleton(n.to_expr(), n.ctx), n.denom, 1, n.ctx)
+        return NormalPower(-poly.singleton(n.to_expr()), n.denom, 1, n.ctx)
 
 def minus_normal_power(n1: NormalPower, n2: NormalPower) -> NormalPower:
     return add_normal_power(n1, uminus_normal_power(n2))
@@ -283,7 +283,7 @@ def normalize_power(e: Expr, ctx: Context) -> NormalPower:
                 return rec(e.args[0] ** Const(Fraction(1,2)))
 
         # Un-handled cases
-        return NormalPower(poly.singleton(e, ctx), poly.constant(1, ctx), 1, ctx)
+        return NormalPower(poly.singleton(e), poly.constant(1), 1, ctx)
 
     return rec(e)
 
@@ -320,8 +320,8 @@ def normalize_log(e: Expr, ctx: Context) -> NormalLog:
         elif e.is_plus():
             return add_normal_log(rec(e.args[0]), rec(e.args[1]))
         elif e.is_fun() and e.func_name == 'log':
-            return NormalLog(poly.singleton(e.args[0], ctx))
-        return NormalLog(poly.singleton(expr.Fun("exp", e), ctx))
+            return NormalLog(poly.singleton(e.args[0]))
+        return NormalLog(poly.singleton(expr.Fun("exp", e)))
 
     return rec(e)
 
@@ -357,17 +357,14 @@ def normalize_exp(t: Expr) -> Expr:
     return rec(t)
 
 class NormalDefiniteIntegral:
-    def __init__(self, var: str, lower: Polynomial, upper: Polynomial, body: Polynomial):
+    def __init__(self, var: str, lower: Polynomial, upper: Polynomial, body: Polynomial, ctx: Context):
         self.var = var
-        self.lower = to_poly(from_poly(lower), lower.ctx)
-        self.upper = to_poly(from_poly(upper), upper.ctx)
-        self.body = to_poly(from_poly(body), body.ctx)
+        self.lower = to_poly(from_poly(lower), ctx)
+        self.upper = to_poly(from_poly(upper), ctx)
+        self.body = to_poly(from_poly(body), ctx)
 
     def __str__(self):
         return "INT(%s, %s, %s, %s)" % (self.var, from_poly(self.lower),from_poly(self.upper),from_poly(self.body))
-
-    def to_expr(self) -> Expr:
-        return from_poly(self.e)
 
 
 def equal_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefiniteIntegral):
@@ -375,26 +372,26 @@ def equal_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefinit
     e2 = from_poly(t2.body), from_poly(t2.lower), from_poly(t2.upper)
     return e1 == e2
 
-def add_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefiniteIntegral):
+def add_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefiniteIntegral, ctx: Context):
     tmp = from_poly(t2.body)
-    tmp = to_poly(tmp.subst(t2.var, expr.Var(t1.var)), t1.body.ctx)
-    return NormalDefiniteIntegral(t1.var, t1.lower, t1.upper, t1.body + tmp)
+    tmp = to_poly(tmp.subst(t2.var, expr.Var(t1.var)))
+    return NormalDefiniteIntegral(t1.var, t1.lower, t1.upper, t1.body + tmp, ctx)
 
-def minus_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefiniteIntegral):
+def minus_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefiniteIntegral, ctx: Context):
     tmp = from_poly(t2.body)
-    tmp = to_poly(tmp.subst(t2.var, expr.Var(t1.var)), t1.body.ctx)
-    return NormalDefiniteIntegral(t1.var, t1.lower, t1.upper, t1.body - tmp)
+    tmp = to_poly(tmp.subst(t2.var, expr.Var(t1.var)), ctx)
+    return NormalDefiniteIntegral(t1.var, t1.lower, t1.upper, t1.body - tmp, ctx)
 
 def normalize_definite_integral(e: Expr, ctx: Context):
     def rec(e: Expr) -> NormalDefiniteIntegral:
         if e.is_plus():
-            return add_normal_definite_integral(rec(e.args[0]), rec(e.args[1]))
+            return add_normal_definite_integral(rec(e.args[0]), rec(e.args[1]), ctx)
         elif e.is_minus():
-            return minus_normal_definite_integral(rec(e.args[0]), rec(e.args[1]))
+            return minus_normal_definite_integral(rec(e.args[0]), rec(e.args[1]), ctx)
         elif e.is_integral():
-            return NormalDefiniteIntegral(e.var, to_poly(e.lower, ctx), to_poly(e.upper, ctx), to_poly(e.body, ctx))
+            return NormalDefiniteIntegral(e.var, to_poly(e.lower, ctx), to_poly(e.upper, ctx), to_poly(e.body, ctx), ctx)
         else:
-            return NormalDefiniteIntegral("_x", to_poly(Const(0), ctx), to_poly(Const(1), ctx), to_poly(e, ctx))
+            return NormalDefiniteIntegral("_x", to_poly(Const(0), ctx), to_poly(Const(1), ctx), to_poly(e, ctx), ctx)
     return rec(e)
 
 def eq_definite_integral(t1: Expr, t2: Expr, ctx: Context) -> bool:

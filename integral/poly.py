@@ -37,7 +37,7 @@ def collect_pairs(ps):
         if isinstance(v, expr.Expr):
             return expr.Const(0)
         elif isinstance(v, Polynomial):
-            return Polynomial(tuple(), Context())
+            return Polynomial(tuple())
         elif isinstance(v, (int, Fraction)):
             return 0
         else:
@@ -48,7 +48,7 @@ def collect_pairs(ps):
         if v != zero_for(v):
             res_list.append((k, v))
     
-    return tuple(sorted(res_list, key=lambda p: p[0]))
+    return tuple(sorted(res_list))
 
 def collect_pairs_power(ps: Dict[expr.Expr, "Polynomial"], ctx: Context):
     res = {}
@@ -65,20 +65,22 @@ def collect_pairs_power(ps: Dict[expr.Expr, "Polynomial"], ctx: Context):
         if v in res:
             if is_non_negative(c) and is_non_negative(res[v]):
                 res[v] += c
+                res[v].reduce(ctx)
             elif ctx.is_nonzero(v):
                 res[v] += c
+                res[v].reduce(ctx)
             else:
                 res_list.append((v, c))
         else:  # v not in res
             res[v] = c
 
     for v, c in res.items():
-        if c != Polynomial(tuple(), Context()):
+        if c != Polynomial(tuple()):
             res_list.append((v, c))
     
-    return tuple(sorted(res_list, key=lambda p: p[0]))
+    return tuple(sorted(res_list))
 
-def reduce_power(n: expr.Expr, e: "Polynomial"):
+def reduce_power(n: expr.Expr, e: "Polynomial") -> Tuple[Tuple[expr.Expr, "Polynomial"]]:
     """Reduce n ^ e to normal form.
     
     Returns a list of (n_i, e_i), so that n ^ e equals (n_1 ^ e^1) * ... (n_k ^ e_k).
@@ -104,8 +106,7 @@ def reduce_power(n: expr.Expr, e: "Polynomial"):
     else:
         return ((n, e),)
 
-def extract_frac(ps: Tuple[Tuple[expr.Expr, "Polynomial"], ...], ctx: Context) -> \
-                    Tuple[Tuple[Tuple[expr.Expr, "Polynomial"], ...], Fraction]:
+def extract_frac(ps: Tuple[Tuple[expr.Expr, "Polynomial"]]) -> Tuple[Tuple[Tuple[expr.Expr, "Polynomial"]], Fraction]:
     """Reduce (n_1 ^ e_1) * ... * (n_k ^ e_k) by extracting fractions.
     
     Collects the integer part of e_i into a separate coefficient. E.g.
@@ -125,16 +126,18 @@ def extract_frac(ps: Tuple[Tuple[expr.Expr, "Polynomial"], ...], ctx: Context) -
             if val < 0:
                 coeff *= Fraction(1, bval ** (-math.floor(val)))
             if val - math.floor(val) != 0:
-                res.append((n, constant(val - math.floor(val), ctx)))
+                res.append((n, constant(val - math.floor(val))))
         else:
             res.append((n, e))
 
     return tuple(res), coeff
 
+empty_context = Context()
 
 class Monomial:
     """Represents a monomial."""
-    def __init__(self, coeff, factors, ctx: Context):
+    def __init__(self, coeff: Union[int, Fraction],
+                 factors: Tuple[Tuple[expr.Expr, Union[int, Fraction, "Polynomial"]]]):
         """Construct a monomial from coefficient and tuple of factors,
         where each factor is associated its power. For example,
 
@@ -148,28 +151,32 @@ class Monomial:
         assert isinstance(coeff, (int, Fraction)), "Unexpected coeff: %s" % str(coeff)
 
         self.coeff = coeff
-        self.ctx = ctx
 
         # First, coerce type of exponent to Polynomial
         self.factors = []
         for base, power in factors:
             assert isinstance(base, expr.Expr)
             if isinstance(power, (int, Fraction)):
-                power = constant(power, ctx)
+                power = constant(power)
             assert isinstance(power, Polynomial), "Unexpected power: %s" % str(power)
             self.factors.append((base, power))
+        self.factors = tuple(self.factors)
+        self.reduce(empty_context)
 
-        # Next, reduce power in factors
+    def reduce(self, ctx: Context) -> "Monomial":
+        # Reduce power in factors
         reduced_factors = []
         for n, e in self.factors:
+            e.reduce(ctx)
             reduced_factors.extend(reduce_power(n, e))
 
         # Here using collect power version
         self.factors = tuple((i, j) for i, j in collect_pairs_power(reduced_factors, ctx))
 
         # Extract fractions
-        self.factors, coeff2 = extract_frac(self.factors, ctx)
-        self.coeff = coeff * coeff2
+        self.factors, coeff2 = extract_frac(self.factors)
+        self.coeff = self.coeff * coeff2
+        return self
 
     def __hash__(self):
         return hash(("MONO", self.coeff, self.factors))
@@ -208,6 +215,8 @@ class Monomial:
         return "Monomial(%s)" % str(self)
 
     def __le__(self, other):
+        if not isinstance(other, Monomial):
+            raise TypeError
         return (self.factors, self.coeff) <= (other.factors, other.coeff)
 
     def __lt__(self, other):
@@ -215,25 +224,25 @@ class Monomial:
 
     def __mul__(self, other):
         if isinstance(other, (int, Fraction)):
-            return Monomial(self.coeff * other, self.factors, self.ctx)
+            return Monomial(self.coeff * other, self.factors)
         elif isinstance(other, Monomial):
-            return Monomial(self.coeff * other.coeff, self.factors + other.factors, self.ctx)
+            return Monomial(self.coeff * other.coeff, self.factors + other.factors)
         else:
             raise NotImplementedError
 
     def __neg__(self):
-        return Monomial(-self.coeff, self.factors, self.ctx)
+        return Monomial(-self.coeff, self.factors)
 
     def __truediv__(self, other):
         if isinstance(other, Monomial):
             inv_factors = tuple((n, -e) for n, e in other.factors)
-            return Monomial(Fraction(self.coeff) / other.coeff, self.factors + inv_factors, self.ctx)
+            return Monomial(Fraction(self.coeff) / other.coeff, self.factors + inv_factors)
         else:
             raise NotImplementedError
 
     def __pow__(self, exp):
         if isinstance(exp, int):
-            return Monomial(Fraction(self.coeff) ** exp, [(n, e * exp) for n, e in self.factors], self.ctx)
+            return Monomial(Fraction(self.coeff) ** exp, [(n, e * exp) for n, e in self.factors])
         elif isinstance(exp, Fraction) and exp.denominator % 2 == 0:
             sqrt_factors = []
             for n, e in self.factors:
@@ -242,22 +251,22 @@ class Monomial:
                 else:
                     sqrt_factors.append((n, e * exp))
             if self.coeff == 1:
-                return Monomial(1, sqrt_factors, self.ctx)
+                return Monomial(1, sqrt_factors)
             elif self.coeff < 0 and len(sqrt_factors) > 0:
                 # Avoid taking square root of negative coefficient, move the negation
                 # to the first sqrt_factor
                 sqrt_factors = [(-sqrt_factors[0][0], sqrt_factors[0][1])] + sqrt_factors[1:]
-                return Monomial(1, [(expr.Const(-self.coeff), exp)] + sqrt_factors, self.ctx)
+                return Monomial(1, [(expr.Const(-self.coeff), exp)] + sqrt_factors)
             else:
-                return Monomial(1, [(expr.Const(self.coeff), exp)] + sqrt_factors, self.ctx)
+                return Monomial(1, [(expr.Const(self.coeff), exp)] + sqrt_factors)
         elif isinstance(exp, Fraction) and exp.denominator % 2 == 1:
             factors = []
             for n, e in self.factors:
                 factors.append((n, e * exp))
             if self.coeff == 1:
-                return Monomial(1, factors, self.ctx)
+                return Monomial(1, factors)
             else:
-                return Monomial(1, [(expr.Const(self.coeff), exp)] + factors, self.ctx)
+                return Monomial(1, [(expr.Const(self.coeff), exp)] + factors)
         else:
             raise ValueError
 
@@ -279,13 +288,17 @@ class Monomial:
 
 class Polynomial:
     """Represents a polynomial."""
-    def __init__(self, monomials, ctx: Context):
-        monomials = tuple(monomials)
-        assert all(isinstance(mono, Monomial) for mono in monomials)
-        ts = collect_pairs((mono.factors, mono.coeff) for mono in monomials)
-        self.ctx = ctx
-        self.monomials = tuple(Monomial(coeff, factor, ctx)
-                               for factor, coeff in ts if coeff != 0)
+    def __init__(self, monomials: Tuple[Monomial]):
+        self.monomials = tuple(monomials)
+        assert all(isinstance(mono, Monomial) for mono in self.monomials)
+        self.reduce(empty_context)
+
+    def reduce(self, ctx: Context) -> "Polynomial":
+        for mono in self.monomials:
+            mono.reduce(ctx)
+        ts = collect_pairs((mono.factors, mono.coeff) for mono in self.monomials)
+        self.monomials = tuple(Monomial(coeff, factor) for factor, coeff in ts if coeff != 0)
+        return self
 
     def __eq__(self, other):
         if isinstance(other, (int, Fraction)):
@@ -294,6 +307,8 @@ class Polynomial:
         return isinstance(other, Polynomial) and self.monomials == other.monomials
 
     def __le__(self, other):
+        if not isinstance(other, Polynomial):
+            raise TypeError
         return self.monomials <= other.monomials
 
     def __lt__(self, other):
@@ -315,20 +330,22 @@ class Polynomial:
         return len(self.monomials)
 
     def __add__(self, other):
-        return Polynomial(self.monomials + other.monomials, self.ctx)
+        if not isinstance(other, Polynomial):
+            raise TypeError
+        return Polynomial(self.monomials + other.monomials)
 
     def __neg__(self):
-        return Polynomial([-m for m in self.monomials], self.ctx)
+        return Polynomial([-m for m in self.monomials])
 
     def __sub__(self, other):
         return self + (-other)
 
     def __mul__(self, other):
         if isinstance(other, (int, Fraction)):
-            return Polynomial([m * other for m in self.monomials], self.ctx)
+            return Polynomial([m * other for m in self.monomials])
         elif isinstance(other, Polynomial):
             # Applies distributivity - could expand the number of terms exponentially
-            return Polynomial([m1 * m2 for m1 in self.monomials for m2 in other.monomials], self.ctx)
+            return Polynomial([m1 * m2 for m1 in self.monomials for m2 in other.monomials])
         else:
             raise NotImplementedError
 
@@ -338,16 +355,16 @@ class Polynomial:
             if len(other.monomials) == 0:
                 raise ZeroDivisionError
             elif len(other.monomials) == 1:
-                return Polynomial([m / other.monomials[0] for m in self.monomials], self.ctx)
+                return Polynomial([m / other.monomials[0] for m in self.monomials])
             else:
                 raise ValueError
         else:
             raise NotImplementedError
 
-    def __pow__(self, exp):
+    def __pow__(self, exp: "Polynomial") -> "Polynomial":
         # Assume self is a monomial and exp is a fraction
         if len(self.monomials) == 1 and isinstance(exp, (int, Fraction)):
-            return Polynomial([self.monomials[0] ** exp], self.ctx)
+            return Polynomial([self.monomials[0] ** exp])
         else:
             raise ValueError('%s, %s' % (self, exp))
 
@@ -384,28 +401,26 @@ class Polynomial:
         return len(self.monomials) == 1 and self.monomials[0].is_one()
 
 
-def constant(c: Union[int, Fraction], ctx: Context) -> Polynomial:
+def constant(c: Union[int, Fraction]) -> Polynomial:
     """Polynomial for c (numerical constant)."""
-    return Polynomial([Monomial(c, tuple(), ctx)], ctx)
+    return Polynomial([Monomial(c, tuple())])
 
-def singleton(s: expr.Expr, ctx: Context) -> Polynomial:
+def singleton(s: expr.Expr) -> Polynomial:
     """Polynomial for 1*s^1."""
     if s.is_const():
-        return constant(s.val, ctx)
+        return constant(s.val)
     else:
-        return Polynomial([Monomial(1, [(s, 1)], ctx)], ctx)
+        return Polynomial([Monomial(1, [(s, 1)])])
 
 
 """
 Conversion from expressions to polynomials.
 """
 
-def to_poly(e: expr.Expr, ctx: Context) -> Polynomial:
+def to_poly_r(e: expr.Expr, ctx: Context) -> Polynomial:
     """Convert expression to polynomial."""
-    if e == expr.Op("^", expr.Const(3), expr.Const(Fraction(2, 3))):
-        e
     if e.is_var():
-        return singleton(e, ctx)
+        return singleton(e)
 
     elif e.is_plus():
         return to_poly(e.args[0], ctx) + to_poly(e.args[1], ctx)
@@ -423,46 +438,46 @@ def to_poly(e: expr.Expr, ctx: Context) -> Polynomial:
         elif a.is_fraction() or b.is_fraction():
             return a * b
         elif a.is_monomial():
-            return a * singleton(from_poly(b), ctx)
+            return a * singleton(from_poly(b))
         elif b.is_monomial():
-            return b * singleton(from_poly(a), ctx)
+            return b * singleton(from_poly(a))
         else:
-            return singleton(from_poly(a), ctx) * singleton(from_poly(b), ctx)
+            return singleton(from_poly(a)) * singleton(from_poly(b))
 
     elif e.is_divides():
         a, b = to_poly(e.args[0], ctx), to_poly(e.args[1], ctx)
         if a.is_fraction() and a.get_fraction() == 0:
-            return constant(0, ctx)
+            return constant(0)
         elif b.is_fraction() and b.get_fraction() == 1:
             return a
         elif a.is_monomial() and b.is_monomial():
             return a / b
         elif a.is_monomial():
-            return a / singleton(from_poly(b), ctx)
+            return a / singleton(from_poly(b))
         elif b.is_monomial():
-            return singleton(from_poly(a), ctx) / b
+            return singleton(from_poly(a)) / b
         else:
-            return singleton(from_poly(a), ctx) / singleton(from_poly(b), ctx)
+            return singleton(from_poly(a)) / singleton(from_poly(b))
 
     elif e.is_power():
         a, b = to_poly(e.args[0], ctx), to_poly(e.args[1], ctx)
         if a.is_fraction() and a.get_fraction() == 0:
-            return singleton(expr.Const(0), ctx)
+            return singleton(expr.Const(0))
         elif a.is_fraction() and a.get_fraction() == 1:
-            return singleton(expr.Const(1), ctx)
+            return singleton(expr.Const(1))
         elif a.is_monomial() and b.is_fraction():
             return a ** b.get_fraction()
         elif b.is_fraction():
-            return Polynomial([Monomial(1, [(from_poly(a), b.get_fraction())], ctx)], ctx)
+            return Polynomial([Monomial(1, [(from_poly(a), b.get_fraction())])])
         else:
-            return Polynomial([Monomial(1, [(from_poly(a), b)], ctx)], ctx)
+            return Polynomial([Monomial(1, [(from_poly(a), b)])])
 
     elif e.is_fun() and e.func_name == "exp":
         a = e.args[0]
         if a.is_fun() and a.func_name == "log":
             return to_poly(a.args[0], ctx)
         else:
-            return Polynomial([Monomial(1, [(expr.E, to_poly(a, ctx))], ctx)], ctx)
+            return Polynomial([Monomial(1, [(expr.E, to_poly(a, ctx))])])
 
     elif e.is_fun() and e.func_name in ("sin", "cos", "tan", "cot", "csc", "sec"):
         a = e.args[0]
@@ -472,9 +487,9 @@ def to_poly(e: expr.Expr, ctx: Context) -> Polynomial:
         else:
             tmp = normalize(a, ctx)
             if e.func_name == "cos" and tmp.is_uminus():
-                return singleton(expr.Fun(e.func_name, tmp.args[0]), ctx)
+                return singleton(expr.Fun(e.func_name, tmp.args[0]), )
             else:
-                return singleton(expr.Fun(e.func_name, tmp), ctx)
+                return singleton(expr.Fun(e.func_name, tmp))
 
     elif e.is_fun() and e.func_name in ("asin", "acos", "atan", "acot", "acsc", "asec"):
         a, = e.args
@@ -483,14 +498,14 @@ def to_poly(e: expr.Expr, ctx: Context) -> Polynomial:
             # atan(tan(x)) = x
             return to_poly(a.args[0], ctx)
         else:
-            return singleton(expr.Fun(e.func_name, normalize(a, ctx)), ctx)
+            return singleton(expr.Fun(e.func_name, normalize(a, ctx)))
 
     elif e.is_fun() and e.func_name == "sqrt":
         return to_poly(expr.Op("^", e.args[0], expr.Const(Fraction(1, 2))), ctx)
 
     elif e.is_fun():
         args_norm = [normalize(arg, ctx) for arg in e.args]
-        return singleton(expr.Fun(e.func_name, *args_norm), ctx)
+        return singleton(expr.Fun(e.func_name, *args_norm))
 
     elif e.is_evalat():
         if e.upper == expr.POS_INF:
@@ -532,23 +547,23 @@ def to_poly(e: expr.Expr, ctx: Context) -> Polynomial:
         if l.is_evaluable() and h.is_evaluable() :
             ll, hh = expr.eval_expr(l), expr.eval_expr(h)
             if ll > hh:
-                return singleton(-expr.Integral(e.var, h, l, body), ctx)
-        return singleton(expr.Integral(e.var, normalize(e.lower, ctx), normalize(e.upper, ctx), body), ctx)
+                return singleton(-expr.Integral(e.var, h, l, body))
+        return singleton(expr.Integral(e.var, normalize(e.lower, ctx), normalize(e.upper, ctx), body))
 
     elif e.is_limit():
         ctx2 = Context(ctx)
         if e.lim == expr.POS_INF:
             ctx2.add_condition(expr.Op(">", expr.Var(e.var), expr.Const(0)))
-        return singleton(expr.Limit(e.var, normalize(e.lim, ctx), normalize(e.body, ctx2)), ctx)
+        return singleton(expr.Limit(e.var, normalize(e.lim, ctx), normalize(e.body, ctx2)))
 
     elif e.is_inf():
         if e == expr.POS_INF:
-            return singleton(e, ctx)
+            return singleton(e)
         else:
-            return -singleton(expr.POS_INF, ctx)
+            return -singleton(expr.POS_INF)
 
     elif e.is_indefinite_integral():
-        return singleton(expr.IndefiniteIntegral(e.var, normalize(e.body, ctx), e.skolem_args), ctx)
+        return singleton(expr.IndefiniteIntegral(e.var, normalize(e.body, ctx), e.skolem_args))
 
     elif e.is_summation():
         l, u = normalize(e.lower, ctx), normalize(e.upper, ctx)
@@ -557,9 +572,12 @@ def to_poly(e: expr.Expr, ctx: Context) -> Polynomial:
         ctx2 = Context(ctx)
         ctx2.add_condition(expr.Op(">=", expr.Var(e.index_var), expr.Const(0)))
         return singleton(expr.Summation(e.index_var, normalize(e.lower, ctx),
-                                        normalize(e.upper, ctx), normalize(e.body, ctx2)), ctx)
+                                        normalize(e.upper, ctx), normalize(e.body, ctx2)))
     else:
-        return singleton(e, ctx)
+        return singleton(e)
+
+def to_poly(e: expr.Expr, ctx: Context) -> expr.Expr:
+    return to_poly_r(e, ctx).reduce(ctx)
 
 def function_eval(e: expr.Expr, ctx: Context) -> expr.Expr:
     if e.is_fun() and e.func_name == "binom":
@@ -869,7 +887,6 @@ def from_mono(m: Monomial) -> expr.Expr:
 
 def from_poly(p: Polynomial) -> expr.Expr:
     """Convert a polynomial to an expression."""
-
     if len(p.monomials) == 0:
         return expr.Const(0)
     else:

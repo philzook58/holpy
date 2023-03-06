@@ -17,7 +17,7 @@ class PolynomialTest(unittest.TestCase):
         for e1, e2, res in test_data:
             e1 = parse_expr(e1)
             e2 = parse_expr(e2)
-            self.assertEqual(str(from_poly(to_poly(e1, ctx) * to_poly(e2, ctx))), res)
+            self.assertEqual(str(from_poly((to_poly(e1, ctx) * to_poly(e2, ctx)).reduce(ctx))), res)
 
     def testNormalize(self):
         test_data = [
@@ -28,13 +28,16 @@ class PolynomialTest(unittest.TestCase):
             ("4 ^ (5/6)", "2 * 2 ^ (2/3)"),
             ("1/4 * (INT x:[0,oo]. x)", "1/4 * (INT x:[0,oo]. x)"),
             ("sqrt(-log(exp(-y)))", "sqrt(-log(exp(-y)))"),
+            ("x ^ 1 * x ^ n", "x * x ^ n"),
+            ("a ^ 2 * a ^ 2 + a ^ 2 * y ^ 2", "a ^ 2 * y ^ 2 + a ^ 4"),
+            ("a * y ^ 2 * a + a ^ 3 * a", "a ^ 2 * y ^ 2 + a ^ 4"),
         ]
 
         for e, res in test_data:
             e = parse_expr(e)
             ctx = Context()
-            self.assertEqual(str(normalize(e, ctx)), res)
-            self.assertEqual(normalize(e, ctx), parse_expr(res))
+            self.assertEqual(str(from_poly(to_poly(e, ctx))), res)
+            self.assertEqual(from_poly(to_poly(e, ctx)), parse_expr(res))
 
 
 if __name__ == "__main__":

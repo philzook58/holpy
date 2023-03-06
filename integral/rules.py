@@ -1214,17 +1214,17 @@ class ExpandPolynomial(Rule):
             res = base
             for i in range(n - 1):
                 res = res * base
-            return from_poly(res)
+            return from_poly(res.reduce(ctx))
         elif e.is_times():
             s1, s2 = self.eval(e.args[0], ctx), self.eval(e.args[1], ctx)
-            return from_poly(to_poly(s1, ctx) * to_poly(s2, ctx))
+            return from_poly((to_poly(s1, ctx) * to_poly(s2, ctx)).reduce(ctx))
         elif e.is_divides():
             s1, s2 = self.eval(e.args[0], ctx), self.eval(e.args[1], ctx)
             p1, p2 = to_poly(s1, ctx), to_poly(s2, ctx)
             if p2.is_monomial():
-                return from_poly(p1 / p2)
+                return from_poly((p1 / p2).reduce(ctx))
             else:
-                return from_poly(p1 / poly.singleton(from_poly(p2), ctx))
+                return from_poly((p1 / poly.singleton(from_poly(p2))).reduce(ctx))
         elif e.is_integral():
             return expr.Integral(e.var, e.lower, e.upper, self.eval(e.body, ctx), e.diff)
         else:

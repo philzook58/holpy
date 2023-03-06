@@ -314,11 +314,11 @@
                             "latex_res": "\\int \\frac{a}{a ^ {2} (u ^ {2} + 1)} \\,du",
                             "res": "INT u. a / (a ^ 2 * (u ^ 2 + 1))",
                             "rule": {
-                                "latex_str": "rewriting \\(\\frac{a}{a ^ {2} u ^ {2} + a ^ {2}}\\) to \\(\\frac{a}{a ^ {2} (u ^ {2} + 1)}\\)",
+                                "latex_str": "rewriting \\(a ^ {2} u ^ {2} + a ^ {2}\\) to \\(a ^ {2} (u ^ {2} + 1)\\)",
                                 "name": "Equation",
-                                "new_expr": "a / (a ^ 2 * (u ^ 2 + 1))",
-                                "old_expr": "a / (a ^ 2 * u ^ 2 + a ^ 2)",
-                                "str": "rewriting a / (a ^ 2 * u ^ 2 + a ^ 2) to a / (a ^ 2 * (u ^ 2 + 1))"
+                                "new_expr": "a ^ 2 * (u ^ 2 + 1)",
+                                "old_expr": "a ^ 2 * u ^ 2 + a ^ 2",
+                                "str": "rewriting a ^ 2 * u ^ 2 + a ^ 2 to a ^ 2 * (u ^ 2 + 1)"
                             },
                             "type": "CalculationStep"
                         },
