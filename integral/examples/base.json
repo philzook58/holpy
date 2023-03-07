@@ -195,7 +195,7 @@
         },
         {
             "type": "axiom",
-            "expr": "abs((-1) ^ n) = 1",
+            "expr": "abs(c ^ n) = abs(c) ^ n",
             "conds": [
                 "isInt(n)"
             ],

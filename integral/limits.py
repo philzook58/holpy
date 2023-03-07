@@ -172,7 +172,7 @@ def asymp_div(a: Asymptote, b: Asymptote, ctx: Context) -> Asymptote:
         raise AssertionError("asymp_div")
 
     if isinstance(a, Exp) and isinstance(b, Exp):
-        return a
+        return Exp(asymp_div(a.order, b.order, ctx))
     elif isinstance(a, Exp) and isinstance(b, PolyLog):
         return a
     elif isinstance(a, PolyLog) and isinstance(b, PolyLog):
@@ -459,7 +459,10 @@ def limit_power(a: Limit, b: Limit, ctx: Context) -> Limit:
             # TODO: try to figure out asymp in more cases
             return Limit(POS_INF)
         elif b.e == NEG_INF:
-            return Limit(None)
+            if a.asymp == PolyLog(1) and b.asymp == PolyLog(1):
+                return Limit(0, asymp=Exp(PolyLog(1, 1)), side=FROM_ABOVE)
+            else:
+                return Limit(None)
         elif ctx.is_positive(b.e):
             # Raise to a constant positive power
             return Limit(POS_INF, asymp=asymp_power(a.asymp, b.e, ctx))
@@ -579,7 +582,7 @@ def limit_of_expr(e: Expr, var_name: str, ctx: Context) -> Limit:
         else:
             l1 = limit_of_expr(e.args[0], var_name, ctx)
             l2 = limit_of_expr(e.args[1], var_name, ctx)
-            if l1.e.is_const() and expr.eval_expr(l1.e) == 1 and l2.e == POS_INF:
+            if l1.e is not None and l1.e.is_const() and expr.eval_expr(l1.e) == 1 and l2.e == POS_INF:
                 x = limit_of_expr(e.args[1] * expr.Fun('log', e.args[0]), var_name, ctx)
                 if x.e == None:
                     return Limit(None)

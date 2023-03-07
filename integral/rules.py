@@ -289,6 +289,8 @@ def check_asymp_converge(asymp: limits.Asymptote) -> bool:
             else:
                 return False
         return False
+    elif isinstance(asymp, limits.Exp):
+        return True
     else:
         return False
 
@@ -1943,25 +1945,26 @@ class IntSumExchange(Rule):
         if su != expr.POS_INF:
             return True
         abs_body = normalize(Fun("abs", body), ctx)
-        goal = Fun("converges", Summation(svar, sl, su, Integral(ivar, il, iu, abs_body)))
+        goal1 = Fun("converges", Summation(svar, sl, su, Integral(ivar, il, iu, abs_body)))
+
+        abs_int = normalize(Fun("abs", Integral(ivar, il, iu, body)), ctx)
+        goal2 = Fun("converges", Summation(svar, sl, su, abs_int))
         for lemma in ctx.get_lemmas():
-            if lemma.expr == goal:
+            if lemma.expr == goal1 or lemma.expr == goal2:
                 return True
-        print('goal', goal)
-        raise AssertionError
         return False
 
     def eval(self, e: Expr, ctx: Context):
         if e.is_integral() and e.body.is_summation():
             ctx2 = body_conds(e, body_conds(e.body, ctx))
             s = e.body
-            self.test_converge(s.index_var, s.lower, s.upper, e.var, e.lower, e.upper, e.body.body, ctx2)
-            return Summation(s.index_var, s.lower, s.upper, Integral(e.var, e.lower, e.upper, s.body))
+            if self.test_converge(s.index_var, s.lower, s.upper, e.var, e.lower, e.upper, e.body.body, ctx2):
+                return Summation(s.index_var, s.lower, s.upper, Integral(e.var, e.lower, e.upper, s.body))
         elif e.is_summation() and e.body.is_integral():
             ctx2 = body_conds(e, body_conds(e.body, ctx))
             i = e.body
-            self.test_converge(e.index_var, e.lower, e.upper, i.var, i.lower, i.upper, e.body.body, ctx2)
-            return Integral(i.var, i.lower, i.upper, Summation(e.index_var, e.lower, e.upper, i.body))
+            if self.test_converge(e.index_var, e.lower, e.upper, i.var, i.lower, i.upper, e.body.body, ctx2):
+                return Integral(i.var, i.lower, i.upper, Summation(e.index_var, e.lower, e.upper, i.body))
         else:
             return e
 

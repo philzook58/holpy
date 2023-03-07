@@ -3,8 +3,103 @@
         {
             "conds": [
                 {
-                    "cond": "a >= 0",
-                    "latex_cond": "a \\ge 0"
+                    "cond": "a > 0",
+                    "latex_cond": "a > 0"
+                },
+                {
+                    "cond": "c != 0",
+                    "latex_cond": "c \\neq 0"
+                }
+            ],
+            "finished": true,
+            "goal": "converges(SUM(k, 0, oo, abs(INT x:[0,1]. (c * x ^ a * log(x)) ^ k / factorial(k))))",
+            "latex_goal": "\\sum_{k=0}^{\\infty}{\\left| \\int_{0}^{1} \\frac{(c x ^ {a} \\log{x}) ^ {k}}{k!} \\,dx \\right|}\\quad\\mathrm{converges}",
+            "proof": {
+                "calcs": [
+                    {
+                        "latex_start": "\\sum_{k=0}^{\\infty}{\\left| \\int_{0}^{1} \\frac{(c x ^ {a} \\log{x}) ^ {k}}{k!} \\,dx \\right|}",
+                        "start": "SUM(k, 0, oo, abs(INT x:[0,1]. (c * x ^ a * log(x)) ^ k / factorial(k)))",
+                        "steps": [
+                            {
+                                "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{1}{k!} \\left| \\int_{0}^{1} (c x ^ {a} \\log{x}) ^ {k} \\,dx \\right|}",
+                                "res": "SUM(k, 0, oo, 1 / factorial(k) * abs(INT x:[0,1]. (c * x ^ a * log(x)) ^ k))",
+                                "rule": {
+                                    "name": "FullSimplify",
+                                    "str": "full simplify"
+                                },
+                                "type": "CalculationStep"
+                            },
+                            {
+                                "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{1}{k!} \\left| \\int_{0}^{1} (c x ^ {a}) ^ {k} \\log^{k}(x) \\,dx \\right|}",
+                                "res": "SUM(k, 0, oo, 1 / factorial(k) * abs(INT x:[0,1]. (c * x ^ a) ^ k * log(x) ^ k))",
+                                "rule": {
+                                    "latex_str": "rewrite \\((c x ^ {a} \\log{x}) ^ {k}\\) to \\((c x ^ {a}) ^ {k} \\log^{k}(x)\\) using identity",
+                                    "name": "ApplyIdentity",
+                                    "source": "(c * x ^ a * log(x)) ^ k",
+                                    "str": "rewrite (c * x ^ a * log(x)) ^ k to (c * x ^ a) ^ k * log(x) ^ k using identity",
+                                    "target": "(c * x ^ a) ^ k * log(x) ^ k"
+                                },
+                                "type": "CalculationStep"
+                            },
+                            {
+                                "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{1}{k!} \\left| \\int_{0}^{1} c ^ {k} (x ^ {a}) ^ {k} \\log^{k}(x) \\,dx \\right|}",
+                                "res": "SUM(k, 0, oo, 1 / factorial(k) * abs(INT x:[0,1]. c ^ k * x ^ a ^ k * log(x) ^ k))",
+                                "rule": {
+                                    "latex_str": "rewrite \\((c x ^ {a}) ^ {k}\\) to \\(c ^ {k} (x ^ {a}) ^ {k}\\) using identity",
+                                    "name": "ApplyIdentity",
+                                    "source": "(c * x ^ a) ^ k",
+                                    "str": "rewrite (c * x ^ a) ^ k to c ^ k * x ^ a ^ k using identity",
+                                    "target": "c ^ k * x ^ a ^ k"
+                                },
+                                "type": "CalculationStep"
+                            },
+                            {
+                                "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{\\left| c \\right| ^ {k}}{k!} \\left| \\int_{0}^{1} x ^ {a k} \\log^{k}(x) \\,dx \\right|}",
+                                "res": "SUM(k, 0, oo, abs(c) ^ k / factorial(k) * abs(INT x:[0,1]. x ^ (a * k) * log(x) ^ k))",
+                                "rule": {
+                                    "name": "FullSimplify",
+                                    "str": "full simplify"
+                                },
+                                "type": "CalculationStep"
+                            },
+                            {
+                                "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{\\left| c \\right| ^ {k}}{k!} \\left| (-1) ^ {k} k! (a k + 1) ^ {-k - 1} \\right|}",
+                                "res": "SUM(k, 0, oo, abs(c) ^ k / factorial(k) * abs((-1) ^ k * factorial(k) * (a * k + 1) ^ (-k - 1)))",
+                                "rule": {
+                                    "name": "DefiniteIntegralIdentity",
+                                    "str": "apply definite integral"
+                                },
+                                "type": "CalculationStep"
+                            },
+                            {
+                                "latex_res": "\\sum_{k=0}^{\\infty}{\\left| c \\right| ^ {k} (a k + 1) ^ {-k - 1}}",
+                                "res": "SUM(k, 0, oo, abs(c) ^ k * (a * k + 1) ^ (-k - 1))",
+                                "rule": {
+                                    "name": "FullSimplify",
+                                    "str": "full simplify"
+                                },
+                                "type": "CalculationStep"
+                            }
+                        ],
+                        "type": "Calculation"
+                    }
+                ],
+                "finished": true,
+                "goal": "converges(SUM(k, 0, oo, abs(INT x:[0,1]. (c * x ^ a * log(x)) ^ k / factorial(k))))",
+                "latex_goal": "\\sum_{k=0}^{\\infty}{\\left| \\int_{0}^{1} \\frac{(c x ^ {a} \\log{x}) ^ {k}}{k!} \\,dx \\right|}\\quad\\mathrm{converges}",
+                "type": "CalculationProof"
+            },
+            "type": "Goal"
+        },
+        {
+            "conds": [
+                {
+                    "cond": "a > 0",
+                    "latex_cond": "a > 0"
+                },
+                {
+                    "cond": "c != 0",
+                    "latex_cond": "c \\neq 0"
                 }
             ],
             "finished": true,

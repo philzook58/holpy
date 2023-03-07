@@ -11,6 +11,7 @@ from integral.limits import Unknown, PolyLog, Exp, Limit
 from integral.limits import UNKNOWN, LESS, GREATER, EQUAL
 from integral.limits import AT_CONST, FROM_ABOVE, FROM_BELOW, TWO_SIDED
 from integral import parser
+from integral.context import Context
 
 
 class LimitsTest(unittest.TestCase):
@@ -50,19 +51,21 @@ class LimitsTest(unittest.TestCase):
             (Exp(PolyLog(1)), PolyLog(1), Exp(PolyLog(1))),
         ]
 
+        ctx = Context()
         for a, b, res in test_data:
-            self.assertEqual(limits.asymp_mult(a, b), res)
+            self.assertEqual(limits.asymp_mult(a, b, ctx), res)
 
     def testAsympDiv(self):
         test_data = [
             (PolyLog(1, 1), PolyLog(1), PolyLog(0, 1)),
             (PolyLog(2), PolyLog(0, 1), PolyLog(2, -1)),
-            (Exp(PolyLog(1, 1)), Exp(PolyLog(1)), Exp(PolyLog(1, 1))),
+            (Exp(PolyLog(1, 1)), Exp(PolyLog(1)), Exp(PolyLog(0, 1))),
             (Exp(PolyLog(1)), PolyLog(1), Exp(PolyLog(1))),
         ]
 
+        ctx = Context()
         for a, b, res in test_data:
-            self.assertEqual(limits.asymp_div(a, b), res)
+            self.assertEqual(limits.asymp_div(a, b, ctx), res)
 
     def testAsympPower(self):
         test_data = [
@@ -72,8 +75,9 @@ class LimitsTest(unittest.TestCase):
             (Exp(PolyLog(1)), Const(2), Exp(PolyLog(1))),
         ]
 
+        ctx = Context()
         for a, b, res in test_data:
-            self.assertEqual(limits.asymp_power(a, b), res)
+            self.assertEqual(limits.asymp_power(a, b, ctx), res)
 
     def testExpAsymp(self):
         test_data = [
@@ -113,8 +117,9 @@ class LimitsTest(unittest.TestCase):
              Limit(0, side=TWO_SIDED)),
         ]
 
+        ctx = Context()
         for a, b, res in test_data:
-            self.assertEqual(limits.limit_add(a, b), res)
+            self.assertEqual(limits.limit_add(a, b, ctx), res)
 
     def testLimitUMinus(self):
         test_data = [
@@ -127,8 +132,9 @@ class LimitsTest(unittest.TestCase):
             (Limit(2, asymp=PolyLog(1), side=FROM_BELOW), Limit(-2, asymp=PolyLog(1), side=FROM_ABOVE)),
         ]
 
+        ctx = Context()
         for a, res in test_data:
-            self.assertEqual(limits.limit_uminus(a), res)
+            self.assertEqual(limits.limit_uminus(a, ctx), res)
 
     def testLimitMult(self):
         test_data = [
@@ -159,9 +165,9 @@ class LimitsTest(unittest.TestCase):
              Limit(0, asymp=PolyLog(3), side=FROM_BELOW)),
         ]
 
-        conds = Conditions()
+        ctx = Context()
         for a, b, res in test_data:
-            self.assertEqual(limits.limit_mult(a, b, conds), res)
+            self.assertEqual(limits.limit_mult(a, b, ctx), res)
 
     def testLimitInverse(self):
         test_data = [
@@ -179,9 +185,9 @@ class LimitsTest(unittest.TestCase):
              Limit(Fraction(1, 2), asymp=PolyLog(1), side=FROM_ABOVE)),
         ]
 
-        conds = Conditions()
+        ctx = Context()
         for a, res in test_data:
-            self.assertEqual(limits.limit_inverse(a, conds), res)
+            self.assertEqual(limits.limit_inverse(a, ctx), res)
 
     def testLimitPower(self):
         test_data = [
@@ -208,9 +214,9 @@ class LimitsTest(unittest.TestCase):
              Limit(0, asymp=PolyLog(2), side=TWO_SIDED)),
         ]
 
-        conds = Conditions()
+        ctx = Context()
         for a, b, res in test_data:
-            self.assertEqual(limits.limit_power(a, b, conds), res)
+            self.assertEqual(limits.limit_power(a, b, ctx), res)
 
     def testLimitOfExpr(self):
         test_data = [
@@ -236,15 +242,30 @@ class LimitsTest(unittest.TestCase):
             ("sin(1/x)^2", "0")
         ]
 
-        conds = Conditions()
+        ctx = Context()
         for a, res in test_data:
             a = parser.parse_expr(a)
-            l = limits.limit_of_expr(a, "x", conds)
+            l = limits.limit_of_expr(a, "x", ctx)
             if res is None:
                 self.assertIsNone(l.e)
             else:
                 res = parser.parse_expr(res)
                 self.assertEqual(l.e, res)
+
+    def testLimitOfExprFull(self):
+        test_data = [
+            ("abs(c) ^ k", Limit(POS_INF,asymp=Exp(PolyLog(1)),side=TWO_SIDED)),
+            ("(a * k + 1) ^ (-k - 1)", Limit(0,asymp=Exp(PolyLog(1,1)),side=FROM_ABOVE)),
+            ("abs(c) ^ k * (a * k + 1) ^ (-k - 1)", Limit(0,asymp=Exp(PolyLog(0,1)),side=FROM_ABOVE)),
+        ]
+
+        ctx = Context()
+        ctx.add_condition("a > 0")
+        ctx.add_condition("c != 0")
+        for a, res in test_data:
+            a = parser.parse_expr(a)
+            lim = limits.limit_of_expr(a, "k", ctx)
+            self.assertEqual(lim, res)
 
     def testLimitOfExprConds(self):
         test_data = [
@@ -264,10 +285,10 @@ class LimitsTest(unittest.TestCase):
         ]
 
         for a, res, cond in test_data:
-            conds = Conditions()
-            conds.add_condition(parser.parse_expr(cond))
+            ctx = Context()
+            ctx.add_condition(parser.parse_expr(cond))
             a = parser.parse_expr(a)
-            l = limits.limit_of_expr(a, "x", conds=conds)
+            l = limits.limit_of_expr(a, "x", ctx)
             if res is None:
                 self.assertIsNone(l.e)
             else:
@@ -276,15 +297,15 @@ class LimitsTest(unittest.TestCase):
 
     def testReduceLimit(self):
         test_data = [
-            ("1 / x + (x + 1) / x", "LIM {x -> oo}. x ^ -1 * (x + 1)"),
-            ("n * ((x + 1) / x)", "n * LIM {x -> oo}. x ^ -1 * (x + 1)"),
+            ("1 / x + (x + 1) / x", "LIM {x -> oo}. (x + 1) / x"),
+            ("n * ((x + 1) / x)", "n * LIM {x -> oo}. (x + 1) / x"),
         ]
 
-        conds = Conditions()
+        ctx = Context()
         for a, res in test_data:
             a = parser.parse_expr(a)
             res = parser.parse_expr(res)
-            self.assertEqual(limits.reduce_inf_limit(a, "x", conds), res)
+            self.assertEqual(limits.reduce_inf_limit(a, "x", ctx), res)
 
 
 if __name__ == "__main__":
