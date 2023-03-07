@@ -275,6 +275,49 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
     rec(e, ctx)
     return obligations
 
+def check_asymp_converge(asymp: limits.Asymptote) -> bool:
+    if isinstance(asymp, limits.PolyLog):
+        for n in asymp.order:
+            if isinstance(n, (int, Fraction)) and n > 1:
+                return True
+            elif isinstance(n, Expr) and n.val > 1:
+                return True
+            elif isinstance(n, (int, Fraction)) and n == 1:
+                continue  # check next orders
+            elif isinstance(n, Expr) and n.val == 1:
+                continue
+            else:
+                return False
+        return False
+    else:
+        return False
+
+def check_converge(e: Expr, ctx: Context) -> bool:
+    """Check convergence of the sum or integral."""
+    if e.is_summation():
+        lim = limits.limit_of_expr(e.body, e.index_var, ctx)
+        if lim.e == Const(0) and check_asymp_converge(lim.asymp):
+            return True
+    return False
+
+def simp_abs(e: Expr, ctx: Context) -> bool:
+    num_factors, denom_factors = decompose_expr_factor(e)
+
+    def power_neg_one(e: Expr) -> bool:
+        return e.is_power() and e.args[0] == Const(-1)
+
+    def prod(es):
+        es = list(es)
+        if len(es) == 0:
+            return Const(1)
+        else:
+            return functools.reduce(operator.mul, es[1:], es[0])
+
+    num = prod(f for f in num_factors if not power_neg_one(f))
+    denom = prod(f for f in denom_factors if not power_neg_one(f))
+    if denom != Const(1):
+        num = num / denom
+    return num
 
 class Rule:
     """
@@ -1911,21 +1954,29 @@ class IntSumExchange(Rule):
     def __str__(self):
         return "exchange integral and sum"
     
-    def test_converge(self, body, ctx: Context):
+    def test_converge(self, svar, sl, su, ivar, il, iu, body, ctx: Context):
         if ctx.is_not_negative(body):
             return True
-        # print(body, ctx.get_conds())
+        if ctx.is_not_positive(body):
+            return True
+        abs_body = simp_abs(body, ctx)
+        goal = Fun("converges", Summation(svar, sl, su, Integral(ivar, il, iu, abs_body)))
+        for lemma in ctx.get_lemmas():
+            if lemma.expr == goal:
+                return True
+        print('goal', goal)
+        return False
 
     def eval(self, e: Expr, ctx: Context):
         if e.is_integral() and e.body.is_summation():
             ctx2 = body_conds(e, body_conds(e.body, ctx))
-            self.test_converge(e.body.body, ctx2)
             s = e.body
+            self.test_converge(s.index_var, s.lower, s.upper, e.var, e.lower, e.upper, e.body.body, ctx2)
             return Summation(s.index_var, s.lower, s.upper, Integral(e.var, e.lower, e.upper, s.body))
         elif e.is_summation() and e.body.is_integral():
             ctx2 = body_conds(e, body_conds(e.body, ctx))
-            self.test_converge(e.body.body, ctx2)
             i = e.body
+            self.test_converge(e.index_var, e.lower, e.upper, i.var, i.lower, i.upper, e.body.body, ctx2)
             return Integral(i.var, i.lower, i.upper, Summation(e.index_var, e.lower, e.upper, i.body))
         else:
             return e

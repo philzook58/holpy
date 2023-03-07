@@ -15,41 +15,43 @@
             "goal": "(INT x:[0,oo]. sin(m * x) / (x * (a ^ 2 + x ^ 2))) = pi * (1 - exp(-a * m)) / (2 * a ^ 2)",
             "latex_goal": "\\int_{0}^{\\infty} \\frac{\\sin{(m x)}}{x (a ^ {2} + x ^ {2})} \\,dx = \\frac{\\pi (1 - e^{(-a) m})}{2 a ^ {2}}",
             "proof": {
+                "calcs": [
+                    {
+                        "latex_start": "\\int_{0}^{\\infty} \\frac{\\sin{(m x)}}{x (a ^ {2} + x ^ {2})} \\,dx",
+                        "start": "INT x:[0,oo]. sin(m * x) / (x * (a ^ 2 + x ^ 2))",
+                        "steps": [
+                            {
+                                "latex_res": "\\frac{\\pi (-e^{-a m} + 1)}{2 a ^ {2}}",
+                                "res": "pi * (-exp(-(a * m)) + 1) / (2 * a ^ 2)",
+                                "rule": {
+                                    "name": "DefiniteIntegralIdentity",
+                                    "str": "apply definite integral"
+                                },
+                                "type": "CalculationStep"
+                            }
+                        ],
+                        "type": "Calculation"
+                    },
+                    {
+                        "latex_start": "\\frac{\\pi (1 - e^{(-a) m})}{2 a ^ {2}}",
+                        "start": "pi * (1 - exp(-a * m)) / (2 * a ^ 2)",
+                        "steps": [
+                            {
+                                "latex_res": "\\frac{\\pi (-e^{-a m} + 1)}{2 a ^ {2}}",
+                                "res": "pi * (-exp(-(a * m)) + 1) / (2 * a ^ 2)",
+                                "rule": {
+                                    "name": "FullSimplify",
+                                    "str": "full simplify"
+                                },
+                                "type": "CalculationStep"
+                            }
+                        ],
+                        "type": "Calculation"
+                    }
+                ],
                 "finished": true,
                 "goal": "(INT x:[0,oo]. sin(m * x) / (x * (a ^ 2 + x ^ 2))) = pi * (1 - exp(-a * m)) / (2 * a ^ 2)",
                 "latex_goal": "\\int_{0}^{\\infty} \\frac{\\sin{(m x)}}{x (a ^ {2} + x ^ {2})} \\,dx = \\frac{\\pi (1 - e^{(-a) m})}{2 a ^ {2}}",
-                "lhs_calc": {
-                    "latex_start": "\\int_{0}^{\\infty} \\frac{\\sin{(m x)}}{x (a ^ {2} + x ^ {2})} \\,dx",
-                    "start": "INT x:[0,oo]. sin(m * x) / (x * (a ^ 2 + x ^ 2))",
-                    "steps": [
-                        {
-                            "latex_res": "\\frac{\\pi (-e^{-a m} + 1)}{2 a ^ {2}}",
-                            "res": "pi * (-exp(-(a * m)) + 1) / (2 * a ^ 2)",
-                            "rule": {
-                                "name": "DefiniteIntegralIdentity",
-                                "str": "apply definite integral"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
-                    "type": "Calculation"
-                },
-                "rhs_calc": {
-                    "latex_start": "\\frac{\\pi (1 - e^{(-a) m})}{2 a ^ {2}}",
-                    "start": "pi * (1 - exp(-a * m)) / (2 * a ^ 2)",
-                    "steps": [
-                        {
-                            "latex_res": "\\frac{\\pi (-e^{-a m} + 1)}{2 a ^ {2}}",
-                            "res": "pi * (-exp(-(a * m)) + 1) / (2 * a ^ 2)",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
-                    "type": "Calculation"
-                },
                 "type": "CalculationProof"
             },
             "type": "Goal"

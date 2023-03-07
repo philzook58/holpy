@@ -15,34 +15,36 @@
             "goal": "cos(2 * x) = 2 * cos(x) ^ 2 - 1",
             "latex_goal": "\\cos{(2 x)} = 2 \\cos^{2}(x) - 1",
             "proof": {
+                "calcs": [
+                    {
+                        "latex_start": "\\cos{(2 x)}",
+                        "start": "cos(2 * x)",
+                        "steps": [
+                            {
+                                "latex_res": "2 \\cos^{2}(x) - 1",
+                                "res": "2 * cos(x) ^ 2 - 1",
+                                "rule": {
+                                    "latex_str": "rewrite \\(\\cos{(2 x)}\\) to \\(2 \\cos^{2}(x) - 1\\) using identity",
+                                    "name": "ApplyIdentity",
+                                    "source": "cos(2 * x)",
+                                    "str": "rewrite cos(2 * x) to 2 * cos(x) ^ 2 - 1 using identity",
+                                    "target": "2 * cos(x) ^ 2 - 1"
+                                },
+                                "type": "CalculationStep"
+                            }
+                        ],
+                        "type": "Calculation"
+                    },
+                    {
+                        "latex_start": "2 \\cos^{2}(x) - 1",
+                        "start": "2 * cos(x) ^ 2 - 1",
+                        "steps": [],
+                        "type": "Calculation"
+                    }
+                ],
                 "finished": true,
                 "goal": "cos(2 * x) = 2 * cos(x) ^ 2 - 1",
                 "latex_goal": "\\cos{(2 x)} = 2 \\cos^{2}(x) - 1",
-                "lhs_calc": {
-                    "latex_start": "\\cos{(2 x)}",
-                    "start": "cos(2 * x)",
-                    "steps": [
-                        {
-                            "latex_res": "2 \\cos^{2}(x) - 1",
-                            "res": "2 * cos(x) ^ 2 - 1",
-                            "rule": {
-                                "latex_str": "rewrite \\(\\cos{(2 x)}\\) to \\(2 \\cos^{2}(x) - 1\\) using identity",
-                                "name": "ApplyIdentity",
-                                "source": "cos(2 * x)",
-                                "str": "rewrite cos(2 * x) to 2 * cos(x) ^ 2 - 1 using identity",
-                                "target": "2 * cos(x) ^ 2 - 1"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
-                    "type": "Calculation"
-                },
-                "rhs_calc": {
-                    "latex_start": "2 \\cos^{2}(x) - 1",
-                    "start": "2 * cos(x) ^ 2 - 1",
-                    "steps": [],
-                    "type": "Calculation"
-                },
                 "type": "CalculationProof"
             },
             "type": "Goal"

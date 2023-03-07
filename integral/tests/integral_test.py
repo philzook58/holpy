@@ -1699,6 +1699,15 @@ class IntegralTest(unittest.TestCase):
         # Inside interesting integrals, Section 5.2, example #1
         file = compstate.CompFile("interesting", "LogFunction01")
 
+        # Convergence
+        goal = file.add_goal("converges(SUM(n,0,oo, (INT x:[0,1]. x ^ (n + 1) * 1 / ((n + 1) * x))))")
+        proof = goal.proof_by_calculation()
+        calc = proof.arg_calc
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
+
         # Main result
         goal = file.add_goal("(INT x:[0,1]. log(1 + x) / x) = (pi^2) / 12")
         proof_of_goal01 = goal.proof_by_calculation()
