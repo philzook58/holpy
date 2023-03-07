@@ -3171,7 +3171,7 @@ class IntegralTest(unittest.TestCase):
         # section 1.4
         file = compstate.CompFile("impossible", "useful_log")
 
-        file.add_definition("Li(s, x) = SUM(k, 1, oo, x^k /k^s)", conds=["abs(x) < 1"])
+        file.add_definition("Li(s, x) = SUM(k, 1, oo, x^k /k^s)")
 
         goal = file.add_goal("x/(1-x) = SUM(k, 1, oo, x^k)", conds=["abs(x) < 1"])
         proof = goal.proof_by_calculation()
@@ -3287,8 +3287,17 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation("Li(s+1, x) = (INT t:[0, x]. Li(s, t) / t)"), "0.0"))
         calc.perform_rule(rules.FullSimplify())
 
+        goal = file.add_goal("Li(s,1) = zeta(s)", conds=["isInt(s)", "s>1"])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.ExpandDefinition("Li"))
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.ExpandDefinition("zeta"))
+        calc.perform_rule(rules.ChangeSummationIndex("1"))
+        calc.perform_rule(rules.FullSimplify())
+
         s1 = "(INT t:[0,x]. log(1-t)^2 / t)"
-        s2 = "log(x) * log(1-x)^2 + 2 * log(1-x) * Li(2, 1-x) - 2*Li(3,1-x) + 2 * Li(3, 1)"
+        s2 = "log(x) * log(1-x)^2 + 2 * log(1-x) * Li(2, 1-x) - 2*Li(3,1-x) + 2 * zeta(3)"
         goal = file.add_goal(s1+"="+s2, conds=["x>0", "x<1"])
         proof = goal.proof_by_calculation()
         calc = proof.lhs_calc
@@ -3307,6 +3316,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation("(D x. -Li(3, 1-x)) = Li(2, -x+1) / (-x+1)"), "0.0.1.0"))
         calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation("Li(s,1) = zeta(s)"), "1.1"))
         calc = proof.rhs_calc
         calc.perform_rule(rules.FullSimplify())
         self.assertTrue(goal.is_finished())
