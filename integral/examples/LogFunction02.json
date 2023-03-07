@@ -152,13 +152,13 @@
         },
         {
             "finished": true,
-            "goal": "converges(SUM(k, 0, oo, INT y:[0,1]. -(log(y) * y ^ k)))",
-            "latex_goal": "\\sum_{k=0}^{\\infty}{\\int_{0}^{1} -\\log{y} y ^ {k} \\,dy}\\quad\\mathrm{converges}",
+            "goal": "converges(SUM(k, 0, oo, INT y:[0,1]. -(y ^ k * log(y))))",
+            "latex_goal": "\\sum_{k=0}^{\\infty}{\\int_{0}^{1} -y ^ {k} \\log{y} \\,dy}\\quad\\mathrm{converges}",
             "proof": {
                 "calcs": [
                     {
-                        "latex_start": "\\sum_{k=0}^{\\infty}{\\int_{0}^{1} -\\log{y} y ^ {k} \\,dy}",
-                        "start": "SUM(k, 0, oo, INT y:[0,1]. -(log(y) * y ^ k))",
+                        "latex_start": "\\sum_{k=0}^{\\infty}{\\int_{0}^{1} -y ^ {k} \\log{y} \\,dy}",
+                        "start": "SUM(k, 0, oo, INT y:[0,1]. -(y ^ k * log(y)))",
                         "steps": [
                             {
                                 "latex_res": "-\\sum_{k=0}^{\\infty}{\\int_{0}^{1} y ^ {k} \\log{y} \\,dy}",
@@ -192,8 +192,8 @@
                     }
                 ],
                 "finished": true,
-                "goal": "converges(SUM(k, 0, oo, INT y:[0,1]. -(log(y) * y ^ k)))",
-                "latex_goal": "\\sum_{k=0}^{\\infty}{\\int_{0}^{1} -\\log{y} y ^ {k} \\,dy}\\quad\\mathrm{converges}",
+                "goal": "converges(SUM(k, 0, oo, INT y:[0,1]. -(y ^ k * log(y))))",
+                "latex_goal": "\\sum_{k=0}^{\\infty}{\\int_{0}^{1} -y ^ {k} \\log{y} \\,dy}\\quad\\mathrm{converges}",
                 "type": "CalculationProof"
             },
             "type": "Goal"

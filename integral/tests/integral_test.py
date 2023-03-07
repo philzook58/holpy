@@ -1667,10 +1667,9 @@ class IntegralTest(unittest.TestCase):
         calc = proof_of_goal1.rhs_calc
         calc.perform_rule(rules.Equation("1 / (k-1)^2", "1 / (-k+1)^2"))
 
-        goal = file.add_goal("converges(SUM(n, 0, oo, INT x:[1,oo]. (1 / x ^ 2) ^ n * log(x) * x ^ (-2)))")
+        goal = file.add_goal("converges(SUM(n, 0, oo, INT x:[1,oo]. x ^ (-(2 * n) - 2) * log(x)))")
         proof = goal.proof_by_calculation()
         calc = proof.arg_calc
-        calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.Equation("x ^ (-(2 * n) - 2) * log(x)", "log(x) / x^(2*n+2)"))
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal1.goal), "0"))
         calc.perform_rule(rules.FullSimplify())
@@ -1717,7 +1716,7 @@ class IntegralTest(unittest.TestCase):
         file = compstate.CompFile("interesting", "LogFunction01")
 
         # Convergence
-        goal = file.add_goal("converges(SUM(n,0,oo, (INT x:[0,1]. x ^ (n + 1) * 1 / ((n + 1) * x))))")
+        goal = file.add_goal("converges(SUM(n,0,oo, (INT x:[0,1]. x ^ n / (n + 1))))")
         proof = goal.proof_by_calculation()
         calc = proof.arg_calc
         calc.perform_rule(rules.FullSimplify())
@@ -1764,7 +1763,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.ApplyIdentity("(-1) ^ k * (-x) ^ k", "x ^ k"))
         calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "1"))
 
-        goal = file.add_goal("converges(SUM(k, 0, oo, INT y:[0,1]. -(log(y) * y ^ k)))")
+        goal = file.add_goal("converges(SUM(k, 0, oo, INT y:[0,1]. -(y ^ k * log(y))))")
         proof = goal.proof_by_calculation()
         calc = proof.arg_calc
         calc.perform_rule(rules.FullSimplify())

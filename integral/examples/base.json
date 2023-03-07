@@ -177,6 +177,33 @@
             ]
         },
         {
+            "type": "axiom",
+            "expr": "abs(x * y) = abs(x) * abs(y)",
+            "attributes": [
+                "simplify"
+            ]
+        },
+        {
+            "type": "axiom",
+            "expr": "abs(x / y) = abs(x) / abs(y)",
+            "conds": [
+                "y != 0"
+            ],
+            "attributes": [
+                "simplify"
+            ]
+        },
+        {
+            "type": "axiom",
+            "expr": "abs((-1) ^ n) = 1",
+            "conds": [
+                "isInt(n)"
+            ],
+            "attributes": [
+                "simplify"
+            ]
+        },
+        {
             "type": "header",
             "name": "Hyperbolic functions",
             "level": 2

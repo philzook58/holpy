@@ -178,7 +178,7 @@ class ProofObligation:
             return True
         elif len(self.branches > other.branches):
             return False
-        return all(a < b for a,b in zip(self.branches, other.branches))
+        return all(a < b for a, b in zip(self.branches, other.branches))
 
     def __str__(self):
         return "%s" % self.branches
@@ -299,51 +299,6 @@ def check_converge(e: Expr, ctx: Context) -> bool:
         if lim.e == Const(0) and check_asymp_converge(lim.asymp):
             return True
     return False
-
-def simp_abs(e: Expr, ctx: Context) -> bool:
-    num_factors, denom_factors = decompose_expr_factor(e)
-
-    def power_neg_one(e: Expr) -> bool:
-        return e.is_power() and e.args[0] == Const(-1)
-
-    def prod(es):
-        es = list(es)
-        if len(es) == 0:
-            return Const(1)
-        else:
-            return functools.reduce(operator.mul, es[1:], es[0])
-
-    sign = 1
-    num_factors_new = []
-    for factor in num_factors:
-        if power_neg_one(factor):
-            pass
-        elif ctx.is_not_negative(factor):
-            num_factors_new.append(factor)
-        elif ctx.is_not_positive(factor):
-            num_factors_new.append(factor)
-            sign *= -1
-        else:
-            num_factors_new.append(Fun("abs", factor))
-    denom_factors_new = []
-    for factor in denom_factors:
-        if power_neg_one(factor):
-            pass
-        elif ctx.is_not_negative(factor):
-            denom_factors_new.append(factor)
-        elif ctx.is_not_positive(factor):
-            denom_factors_new.append(factor)
-            sign *= -1
-        else:
-            denom_factors_new.append(Fun("abs", factor))
-            
-    num = prod(num_factors_new)
-    denom = prod(denom_factors_new)
-    if denom != Const(1):
-        num = num / denom
-    if sign == -1:
-        num = -num
-    return num
 
 class Rule:
     """
@@ -1985,12 +1940,15 @@ class IntSumExchange(Rule):
             return True
         if ctx.is_not_positive(body):
             return True
-        abs_body = simp_abs(body, ctx)
+        if su != expr.POS_INF:
+            return True
+        abs_body = normalize(Fun("abs", body), ctx)
         goal = Fun("converges", Summation(svar, sl, su, Integral(ivar, il, iu, abs_body)))
         for lemma in ctx.get_lemmas():
             if lemma.expr == goal:
                 return True
         print('goal', goal)
+        raise AssertionError
         return False
 
     def eval(self, e: Expr, ctx: Context):
