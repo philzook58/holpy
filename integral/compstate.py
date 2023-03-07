@@ -395,14 +395,17 @@ class CalculationProof(StateItem):
     
     @property
     def lhs_calc(self) -> Calculation:
+        assert self.goal.is_compare()
         return self.calcs[0]
 
     @property
     def rhs_calc(self) -> Calculation:
+        assert self.goal.is_compare()
         return self.calcs[1]
 
     @property
     def arg_calc(self) -> Calculation:
+        assert self.goal.is_fun()
         return self.calcs[0]
 
     def is_finished(self):

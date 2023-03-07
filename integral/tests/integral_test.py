@@ -1622,6 +1622,14 @@ class IntegralTest(unittest.TestCase):
         # Define Catalan's constant
         file.add_definition("G = SUM(n, 0, oo, (-1)^n / (2*n+1)^2)")
 
+        goal = file.add_goal("converges(SUM(n, 0, oo, INT x:[0,1]. x ^ (2 * n) / (2 * n + 1)))")
+        proof = goal.proof_by_calculation()
+        calc = proof.arg_calc
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
+
         # Evaluate integral of atan(x) / x
         goal = file.add_goal("(INT x:[0, 1]. atan(x) / x) = G")
         proof_of_goal = goal.proof_by_calculation()
@@ -1658,6 +1666,15 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc = proof_of_goal1.rhs_calc
         calc.perform_rule(rules.Equation("1 / (k-1)^2", "1 / (-k+1)^2"))
+
+        goal = file.add_goal("converges(SUM(n, 0, oo, INT x:[1,oo]. (1 / x ^ 2) ^ n * log(x) * x ^ (-2)))")
+        proof = goal.proof_by_calculation()
+        calc = proof.arg_calc
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Equation("x ^ (-(2 * n) - 2) * log(x)", "log(x) / x^(2*n+2)"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal1.goal), "0"))
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
 
         goal5 = file.add_goal("(INT x:[1,oo]. log(x) / (x^2+1)) = G")
         proof_of_goal5 = goal5.proof_by_calculation()
@@ -1746,6 +1763,14 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.SolveEquation(parser.parse_expr("x / (1-x^2)")))
         calc.perform_rule(rules.ApplyIdentity("(-1) ^ k * (-x) ^ k", "x ^ k"))
         calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "1"))
+
+        goal = file.add_goal("converges(SUM(k, 0, oo, INT y:[0,1]. -(log(y) * y ^ k)))")
+        proof = goal.proof_by_calculation()
+        calc = proof.arg_calc
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
 
         goal03 = file.add_goal("(INT x:[0, pi/2]. cos(x)/sin(x) * log(1/cos(x))) = pi^2/24")
         proof_of_goal03 = goal03.proof_by_calculation()

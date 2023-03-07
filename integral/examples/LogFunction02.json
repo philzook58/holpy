@@ -152,6 +152,54 @@
         },
         {
             "finished": true,
+            "goal": "converges(SUM(k, 0, oo, INT y:[0,1]. -(log(y) * y ^ k)))",
+            "latex_goal": "converges{(\\sum_{k=0}^{\\infty}{\\int_{0}^{1} -\\log{y} y ^ {k} \\,dy})}",
+            "proof": {
+                "calcs": [
+                    {
+                        "latex_start": "\\sum_{k=0}^{\\infty}{\\int_{0}^{1} -\\log{y} y ^ {k} \\,dy}",
+                        "start": "SUM(k, 0, oo, INT y:[0,1]. -(log(y) * y ^ k))",
+                        "steps": [
+                            {
+                                "latex_res": "-\\sum_{k=0}^{\\infty}{\\int_{0}^{1} y ^ {k} \\log{y} \\,dy}",
+                                "res": "-SUM(k, 0, oo, INT y:[0,1]. y ^ k * log(y))",
+                                "rule": {
+                                    "name": "FullSimplify",
+                                    "str": "full simplify"
+                                },
+                                "type": "CalculationStep"
+                            },
+                            {
+                                "latex_res": "-\\sum_{k=0}^{\\infty}{\\left. \\frac{y ^ {k + 1} \\log{y}}{k + 1} - \\frac{y ^ {k + 1}}{(k + 1) ^ {2}} \\right\\vert_{y=0}^{1}}",
+                                "res": "-SUM(k, 0, oo, [y ^ (k + 1) * log(y) / (k + 1) - y ^ (k + 1) / (k + 1) ^ 2]_y=0,1)",
+                                "rule": {
+                                    "name": "DefiniteIntegralIdentity",
+                                    "str": "apply definite integral"
+                                },
+                                "type": "CalculationStep"
+                            },
+                            {
+                                "latex_res": "\\sum_{k=0}^{\\infty}{\\frac{1}{(k + 1) ^ {2}}}",
+                                "res": "SUM(k, 0, oo, 1 / (k + 1) ^ 2)",
+                                "rule": {
+                                    "name": "FullSimplify",
+                                    "str": "full simplify"
+                                },
+                                "type": "CalculationStep"
+                            }
+                        ],
+                        "type": "Calculation"
+                    }
+                ],
+                "finished": true,
+                "goal": "converges(SUM(k, 0, oo, INT y:[0,1]. -(log(y) * y ^ k)))",
+                "latex_goal": "converges{(\\sum_{k=0}^{\\infty}{\\int_{0}^{1} -\\log{y} y ^ {k} \\,dy})}",
+                "type": "CalculationProof"
+            },
+            "type": "Goal"
+        },
+        {
+            "finished": true,
             "goal": "(INT x:[0,pi / 2]. cos(x) / sin(x) * log(1 / cos(x))) = pi ^ 2 / 24",
             "latex_goal": "\\int_{0}^{\\pi/2} \\frac{\\cos{x}}{\\sin{x}} \\log{(\\frac{1}{\\cos{x}})} \\,dx = \\frac{\\pi ^ {2}}{24}",
             "proof": {

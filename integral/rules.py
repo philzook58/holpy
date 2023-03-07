@@ -313,10 +313,36 @@ def simp_abs(e: Expr, ctx: Context) -> bool:
         else:
             return functools.reduce(operator.mul, es[1:], es[0])
 
-    num = prod(f for f in num_factors if not power_neg_one(f))
-    denom = prod(f for f in denom_factors if not power_neg_one(f))
+    sign = 1
+    num_factors_new = []
+    for factor in num_factors:
+        if power_neg_one(factor):
+            pass
+        elif ctx.is_not_negative(factor):
+            num_factors_new.append(factor)
+        elif ctx.is_not_positive(factor):
+            num_factors_new.append(factor)
+            sign *= -1
+        else:
+            num_factors_new.append(Fun("abs", factor))
+    denom_factors_new = []
+    for factor in denom_factors:
+        if power_neg_one(factor):
+            pass
+        elif ctx.is_not_negative(factor):
+            denom_factors_new.append(factor)
+        elif ctx.is_not_positive(factor):
+            denom_factors_new.append(factor)
+            sign *= -1
+        else:
+            denom_factors_new.append(Fun("abs", factor))
+            
+    num = prod(num_factors_new)
+    denom = prod(denom_factors_new)
     if denom != Const(1):
         num = num / denom
+    if sign == -1:
+        num = -num
     return num
 
 class Rule:
