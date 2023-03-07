@@ -791,35 +791,6 @@
             "finished": true,
             "goal": "(INT t:[0,x]. log(-t + 1) ^ 2 / t) = log(x) * log(1 - x) ^ 2 + 2 * log(1 - x) * Li(2,1 - x) - 2 * Li(3,1 - x) + 2 * Li(3,1)",
             "latex_goal": "\\int_{0}^{x} \\frac{\\log^{2}(-t + 1)}{t} \\,dt = \\log{x} \\log^{2}(1 - x) + 2 \\log{(1 - x)} \\operatorname{Li}(2,1 - x) - 2 \\operatorname{Li}(3,1 - x) + 2 \\operatorname{Li}(3,1)",
-            "obligations": [
-                {
-                    "branches": [
-                        {
-                            "exprs": [
-                                "1 - t > 0"
-                            ]
-                        }
-                    ],
-                    "conds": [
-                        {
-                            "cond": "x > 0",
-                            "latex_cond": "x > 0"
-                        },
-                        {
-                            "cond": "x < 1",
-                            "latex_cond": "x < 1"
-                        },
-                        {
-                            "cond": "t > 0",
-                            "latex_cond": "t > 0"
-                        },
-                        {
-                            "cond": "t < x",
-                            "latex_cond": "t < x"
-                        }
-                    ]
-                }
-            ],
             "proof": {
                 "finished": true,
                 "goal": "(INT t:[0,x]. log(-t + 1) ^ 2 / t) = log(x) * log(1 - x) ^ 2 + 2 * log(1 - x) * Li(2,1 - x) - 2 * Li(3,1 - x) + 2 * Li(3,1)",
@@ -937,8 +908,7 @@
                 },
                 "type": "CalculationProof"
             },
-            "type": "Goal",
-            "wellformed": false
+            "type": "Goal"
         }
     ],
     "name": "useful_log"

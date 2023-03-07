@@ -76,6 +76,13 @@ def init_all_conds(conds: Conditions) -> Dict[Expr, List[Expr]]:
                 all_conds[x.args[0]] = list()
             all_conds[x.args[0]].append(Op("<=", x.args[0], cond.args[1]))
             all_conds[x.args[0]].append(Op(">=", x.args[0], -cond.args[1]))
+    for k in all_conds:
+        for x in all_conds[k]:
+            if x.is_less() or x.is_less_eq():
+                if x.args[1] in all_conds:
+                    for y in all_conds[x.args[1]]:
+                        if y.is_less() or y.is_less_eq():
+                            all_conds[k].append(Op(x.op, x.args[0], y.args[1]))
     return all_conds
 
 def update_inst(k: str, v: Expr, inst: Dict[str, Expr]) -> Dict[str, Expr]:
