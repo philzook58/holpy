@@ -3,7 +3,7 @@
         {
             "finished": true,
             "goal": "converges(SUM(n, 0, oo, INT x:[0,1]. x ^ (n + 1) * 1 / ((n + 1) * x)))",
-            "latex_goal": "converges{(\\sum_{n=0}^{\\infty}{\\int_{0}^{1} \\frac{x ^ {n + 1}\\cdot 1}{(n + 1) x} \\,dx})}",
+            "latex_goal": "\\sum_{n=0}^{\\infty}{\\int_{0}^{1} \\frac{x ^ {n + 1}\\cdot 1}{(n + 1) x} \\,dx}\\quad\\mathrm{converges}",
             "proof": {
                 "calcs": [
                     {
@@ -43,7 +43,7 @@
                 ],
                 "finished": true,
                 "goal": "converges(SUM(n, 0, oo, INT x:[0,1]. x ^ (n + 1) * 1 / ((n + 1) * x)))",
-                "latex_goal": "converges{(\\sum_{n=0}^{\\infty}{\\int_{0}^{1} \\frac{x ^ {n + 1}\\cdot 1}{(n + 1) x} \\,dx})}",
+                "latex_goal": "\\sum_{n=0}^{\\infty}{\\int_{0}^{1} \\frac{x ^ {n + 1}\\cdot 1}{(n + 1) x} \\,dx}\\quad\\mathrm{converges}",
                 "type": "CalculationProof"
             },
             "type": "Goal"

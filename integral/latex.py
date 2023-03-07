@@ -171,6 +171,8 @@ def convert_expr(e: expr.Expr, mode: str = "large") -> str:
                 return "\\zeta{(%s)}" % sx
             elif e.func_name == 'isInt':
                 return "%s \\in\\mathbb{Z}" % sx
+            elif e.func_name == 'converges':
+                return "%s\\quad\\mathrm{converges}" % sx
             else:
                 return "%s{(%s)}" % (e.func_name, sx)
         elif len(e.args) == 2:
