@@ -157,7 +157,7 @@ def convert_expr(e: expr.Expr, mode: str = "large") -> str:
                 if not x.is_var():
                     sx = "(" + sx + ")"
                 return "\\sec^{-1}{%s}" % sx
-            elif e.func_name in ('log', 'sin', 'cos', 'tan', 'cot', 'csc', 'sec', 'sinh', 'cosh'):
+            elif e.func_name in ('log', 'sin', 'cos', 'tan', 'cot', 'csc', 'sec', 'sinh', 'cosh', 'tanh'):
                 if not x.is_var():
                     sx = "(" + sx + ")"
                 return "\\%s{%s}" % (e.func_name, sx)
@@ -178,6 +178,8 @@ def convert_expr(e: expr.Expr, mode: str = "large") -> str:
             sx, sy = convert_expr(x, mode), convert_expr(y, mode)
             if e.func_name == "binom":
                 return "\\binom{%s}{%s}" % (sx, sy)
+            elif e.func_name in ('Li'):
+                return "\\operatorname{%s}(%s,%s)" % (e.func_name, sx, sy)
             else:
                 return "%s(%s,%s)" % (e.func_name, sx, sy)
         else:

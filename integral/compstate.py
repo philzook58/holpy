@@ -368,12 +368,12 @@ class CalculationProof(StateItem):
 
     """
     def __init__(self, parent, goal: Expr):
-        # if not goal.is_equals():
-        #     raise AssertionError("CalculationProof: goal is not an equality.")
-
         self.parent = parent
         self.goal = goal
         self.ctx = parent.ctx
+
+        # Currently only handle comparisons
+        assert goal.is_compare()
         self.predicate = goal.op
         self.lhs_calc = Calculation(self, self.ctx, self.goal.args[0])
         self.rhs_calc = Calculation(self, self.ctx, self.goal.args[1])
@@ -454,7 +454,7 @@ class InductionProof(StateItem):
         else:
             raise NotImplementedError
 
-        # Base case: n = 0
+        # Base case: n = start
         eq0 = normalize(goal.subst(induct_var, self.start), self.ctx)
         self.base_case = Goal(self, self.ctx, eq0)
 

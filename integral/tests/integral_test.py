@@ -2932,7 +2932,8 @@ class IntegralTest(unittest.TestCase):
     def testPowerfulElementaryIntegral(self):
         # Reference: Impossible, Integrals, Sums, and Series
         # section 1.1
-        file = compstate.CompFile("interesting", "powerful_elementry_integral")
+        file = compstate.CompFile("impossible", "powerful_elementry_integral")
+
         s1 = "(INT x:[0, 1]. 1/ ((1 + y*x)*sqrt(1-x^2)))"
         s2 = "2 / sqrt(-(y ^ 2) + 1) * (atan((y + 1) / sqrt(-(y ^ 2) + 1)) - atan(y / sqrt(-(y ^ 2) + 1))) "
         goal01 = file.add_goal(s1+"="+s2, conds=["abs(y) < 1"])
@@ -3037,7 +3038,7 @@ class IntegralTest(unittest.TestCase):
     def testElementaryLogIntegral(self):
         # Reference: Impossible, Integrals, Sums, and Series
         # section 1.2
-        file = compstate.CompFile("interesting", "elmentary_log")
+        file = compstate.CompFile("impossible", "elementary_log")
         file.add_definition("I(m,n) = (INT x:[0,1]. x^m * log(x)^n)")
         s1 = "I(m,n)"
         s2 = "-(n / (m + 1)) * I(m, n - 1)"
@@ -3107,7 +3108,7 @@ class IntegralTest(unittest.TestCase):
     def testHarmonicSeries(self):
         # Reference: Impossible, Integrals, Sums, and Series
         # section 1.3
-        file = compstate.CompFile("interesting", "harmonic_series")
+        file = compstate.CompFile("impossible", "harmonic_series")
         file.add_definition("H(n) = SUM(k, 1, n, 1/k)")
         file.add_definition("I(n) = (INT x:[0,1]. x^(n-1) * log(1-x))")
 
@@ -3135,8 +3136,10 @@ class IntegralTest(unittest.TestCase):
     def testUsefulLogIntegral(self):
         # Reference: Impossible, Integrals, Sums, and Series
         # section 1.4
-        file = compstate.CompFile("interesting", "useful_log")
+        file = compstate.CompFile("impossible", "useful_log")
+
         file.add_definition("Li(s, x) = SUM(k, 1, oo, x^k /k^s)", conds=["abs(x) < 1"])
+
         goal = file.add_goal("x/(1-x) = SUM(k, 1, oo, x^k)", conds=["abs(x) < 1"])
         proof = goal.proof_by_calculation()
         calc = proof.lhs_calc
@@ -3275,6 +3278,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         self.assertTrue(goal.is_finished())
         self.checkAndOutput(file)
+
 
 if __name__ == "__main__":
     unittest.main()
