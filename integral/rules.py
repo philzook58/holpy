@@ -15,7 +15,7 @@ from integral.solve import solve_equation, solve_for_term
 from integral import latex
 from integral import limits
 from integral import norm
-from integral.context import Context, apply_subterm
+from integral.context import Context, apply_subterm, body_conds
 from integral import poly
 from integral.poly import from_poly, to_poly, normalize
 from integral.conditions import Conditions
@@ -263,31 +263,87 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
                     add_obligation(Op("<=", e.args[0], Const(1)), ctx)
             # TODO: add checks for other functions
         elif e.is_integral():
-            ctx2 = Context(ctx)
-            if e.lower != NEG_INF:
-                ctx2.add_condition(expr.Op(">", Var(e.var), e.lower))
-            if e.upper != POS_INF:
-                ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
-            rec(e.lower, ctx)
-            rec(e.upper, ctx)
-            rec(e.body, ctx2)
+            rec(e.body, body_conds(e, ctx))
         elif e.is_deriv():
             rec(e.body, ctx)
         elif e.is_summation():
-            ctx2 = Context(ctx)
-            if e.lower != NEG_INF:
-                ctx2.add_condition(expr.Op(">=", Var(e.index_var), e.lower))
-            if e.upper != POS_INF:
-                ctx2.add_condition(expr.Op(">=", e.upper - Var(e.index_var), Const(0)))
-            ctx2.add_condition(expr.Fun("isInt", Var(e.index_var)))
             rec(e.lower, ctx)
             rec(e.upper, ctx)
-            rec(e.body, ctx2)
+            rec(e.body, body_conds(e, ctx))
         else:
             pass
     rec(e, ctx)
     return obligations
 
+def check_asymp_converge(asymp: limits.Asymptote) -> bool:
+    if isinstance(asymp, limits.PolyLog):
+        for n in asymp.order:
+            if isinstance(n, (int, Fraction)) and n > 1:
+                return True
+            elif isinstance(n, Expr) and n.val > 1:
+                return True
+            elif isinstance(n, (int, Fraction)) and n == 1:
+                continue  # check next orders
+            elif isinstance(n, Expr) and n.val == 1:
+                continue
+            else:
+                return False
+        return False
+    else:
+        return False
+
+def check_converge(e: Expr, ctx: Context) -> bool:
+    """Check convergence of the sum or integral."""
+    if e.is_summation():
+        lim = limits.limit_of_expr(e.body, e.index_var, ctx)
+        if lim.e == Const(0) and check_asymp_converge(lim.asymp):
+            return True
+    return False
+
+def simp_abs(e: Expr, ctx: Context) -> bool:
+    num_factors, denom_factors = decompose_expr_factor(e)
+
+    def power_neg_one(e: Expr) -> bool:
+        return e.is_power() and e.args[0] == Const(-1)
+
+    def prod(es):
+        es = list(es)
+        if len(es) == 0:
+            return Const(1)
+        else:
+            return functools.reduce(operator.mul, es[1:], es[0])
+
+    sign = 1
+    num_factors_new = []
+    for factor in num_factors:
+        if power_neg_one(factor):
+            pass
+        elif ctx.is_not_negative(factor):
+            num_factors_new.append(factor)
+        elif ctx.is_not_positive(factor):
+            num_factors_new.append(factor)
+            sign *= -1
+        else:
+            num_factors_new.append(Fun("abs", factor))
+    denom_factors_new = []
+    for factor in denom_factors:
+        if power_neg_one(factor):
+            pass
+        elif ctx.is_not_negative(factor):
+            denom_factors_new.append(factor)
+        elif ctx.is_not_positive(factor):
+            denom_factors_new.append(factor)
+            sign *= -1
+        else:
+            denom_factors_new.append(Fun("abs", factor))
+            
+    num = prod(num_factors_new)
+    denom = prod(denom_factors_new)
+    if denom != Const(1):
+        num = num / denom
+    if sign == -1:
+        num = -num
+    return num
 
 class Rule:
     """
@@ -550,13 +606,7 @@ class DefiniteIntegralIdentity(Rule):
         if not (e.is_integral() or e.is_indefinite_integral()):
             sep_ints = e.separate_integral()
             for _, loc in sep_ints:
-                if e.is_summation():
-                    ctx2 = Context(ctx)
-                    ctx2.add_condition(Op(">=", Var(e.index_var), e.lower))
-                    ctx2.add_condition(Op("<=", Var(e.index_var), e.upper))
-                    e = OnLocation(self, loc).eval(e, ctx2)
-                else:
-                    e = OnLocation(self, loc).eval(e, ctx)
+                e = OnLocation(self, loc).eval(e, ctx)
             return e
 
         # First, look for indefinite integrals identities
@@ -842,9 +892,7 @@ class OnLocation(Rule):
                 new_args[loc.head] = rec(cur_e.args[loc.head], loc.rest, ctx)
                 return Fun(cur_e.func_name, *tuple(new_args))
             elif cur_e.is_integral():
-                ctx2 = Context(ctx)
-                ctx2.add_condition(expr.Op(">", Var(cur_e.var), cur_e.lower))
-                ctx2.add_condition(expr.Op("<", Var(cur_e.var), cur_e.upper))
+                ctx2 = body_conds(cur_e, ctx)
                 if loc.head == 0:
                     return Integral(cur_e.var, cur_e.lower, cur_e.upper, rec(cur_e.body, loc.rest, ctx2))
                 elif loc.head == 1:
@@ -876,8 +924,9 @@ class OnLocation(Rule):
                 assert loc.head == 0, "OnLocation: invalid location"
                 return IndefiniteIntegral(cur_e.var, rec(cur_e.body, loc.rest, ctx), cur_e.skolem_args)
             elif cur_e.is_summation():
+                ctx2 = body_conds(cur_e, ctx)
                 if loc.head == 0:
-                    return Summation(cur_e.index_var, cur_e.lower, cur_e.upper, rec(cur_e.body, loc.rest, ctx))
+                    return Summation(cur_e.index_var, cur_e.lower, cur_e.upper, rec(cur_e.body, loc.rest, ctx2))
                 elif loc.head == 1:
                     return Summation(cur_e.index_var, rec(cur_e.lower, loc.rest, ctx), cur_e.upper, cur_e.body)
                 elif loc.head == 2:
@@ -1073,10 +1122,7 @@ class Substitution(Rule):
             raise AssertionError("Substitution: variable not found")
 
         dfx = deriv(e.var, var_subst, ctx)
-        ctx2 = Context(ctx)
-        if e.is_integral():
-            ctx2.add_condition(expr.Op(">", Var(e.var), e.lower))
-            ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
+        ctx2 = body_conds(e, ctx)
         flag = False
         if e.is_integral():
             flag = normalize(e.diff, ctx2) == normalize(self.var_subst, ctx2)
@@ -1359,11 +1405,7 @@ class IntegrationByParts(Rule):
             else:
                 return OnLocation(self, sep_ints[0][1]).eval(e, ctx)
 
-        ctx2 = Context(ctx)
-        if e.is_integral():
-            ctx2.add_condition(expr.Op(">", Var(e.var), e.lower))
-            ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
-
+        ctx2 = body_conds(e, ctx)
         e.body = normalize(e.body, ctx2)
         du = deriv(e.var, self.u, ctx)
         dv = deriv(e.var, self.v, ctx)
@@ -1937,13 +1979,30 @@ class IntSumExchange(Rule):
 
     def __str__(self):
         return "exchange integral and sum"
+    
+    def test_converge(self, svar, sl, su, ivar, il, iu, body, ctx: Context):
+        if ctx.is_not_negative(body):
+            return True
+        if ctx.is_not_positive(body):
+            return True
+        abs_body = simp_abs(body, ctx)
+        goal = Fun("converges", Summation(svar, sl, su, Integral(ivar, il, iu, abs_body)))
+        for lemma in ctx.get_lemmas():
+            if lemma.expr == goal:
+                return True
+        print('goal', goal)
+        return False
 
     def eval(self, e: Expr, ctx: Context):
         if e.is_integral() and e.body.is_summation():
+            ctx2 = body_conds(e, body_conds(e.body, ctx))
             s = e.body
-            return Summation(s.index_var, s.lower, s.upper, Integral(e.var, e.lower, e.upper, e.body.body))
+            self.test_converge(s.index_var, s.lower, s.upper, e.var, e.lower, e.upper, e.body.body, ctx2)
+            return Summation(s.index_var, s.lower, s.upper, Integral(e.var, e.lower, e.upper, s.body))
         elif e.is_summation() and e.body.is_integral():
+            ctx2 = body_conds(e, body_conds(e.body, ctx))
             i = e.body
+            self.test_converge(e.index_var, e.lower, e.upper, i.var, i.lower, i.upper, e.body.body, ctx2)
             return Integral(i.var, i.lower, i.upper, Summation(e.index_var, e.lower, e.upper, i.body))
         else:
             return e

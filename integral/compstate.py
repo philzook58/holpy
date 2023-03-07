@@ -371,25 +371,42 @@ class CalculationProof(StateItem):
         self.parent = parent
         self.goal = goal
         self.ctx = parent.ctx
+        self.calcs = []
 
-        # Currently only handle comparisons
-        assert goal.is_compare()
-        self.predicate = goal.op
-        self.lhs_calc = Calculation(self, self.ctx, self.goal.args[0])
-        self.rhs_calc = Calculation(self, self.ctx, self.goal.args[1])
+        if goal.is_compare():
+            self.predicate = goal.op
+            self.calcs.append(Calculation(self, self.ctx, self.goal.args[0]))
+            self.calcs.append(Calculation(self, self.ctx, self.goal.args[1]))
+        elif goal.is_fun() and goal.func_name == "converges":
+            self.predicate = goal.func_name
+            self.calcs.append(Calculation(self, self.ctx, self.goal.args[0]))
+        else:
+            raise AssertionError("CalculationProof: unknown form of goal.")
 
     def __str__(self):
         if self.is_finished():
             res = "Proof by calculation (finished)\n"
         else:
             res = "Proof by calculation\n"
-        if self.lhs_calc.steps:
-            res += "LHS:\n"
-            res += str(self.lhs_calc)
-        if self.rhs_calc.steps:
-            res += "RHS:\n"
-            res += str(self.rhs_calc)
+        for calc in self.calcs:
+            if calc.steps:
+                res += str(calc)
         return res
+    
+    @property
+    def lhs_calc(self) -> Calculation:
+        assert self.goal.is_compare()
+        return self.calcs[0]
+
+    @property
+    def rhs_calc(self) -> Calculation:
+        assert self.goal.is_compare()
+        return self.calcs[1]
+
+    @property
+    def arg_calc(self) -> Calculation:
+        assert self.goal.is_fun()
+        return self.calcs[0]
 
     def is_finished(self):
         if self.predicate == '=':
@@ -404,6 +421,8 @@ class CalculationProof(StateItem):
             return self.ctx.is_greater_eq(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
         elif self.predicate == '!=':
             return self.ctx.is_not_equal(self.lhs_calc.last_expr, self.rhs_calc.last_expr)
+        elif self.predicate == 'converges':
+            return rules.check_converge(self.arg_calc.last_expr, self.ctx)
         raise NotImplementedError
 
     def export(self):
@@ -411,22 +430,19 @@ class CalculationProof(StateItem):
             "type": "CalculationProof",
             "goal": str(self.goal),
             "latex_goal": latex.convert_expr(self.goal),
-            "lhs_calc": self.lhs_calc.export(),
-            "rhs_calc": self.rhs_calc.export(),
-            "finished": self.is_finished()
+            "finished": self.is_finished(),
+            "calcs": [calc.export() for calc in self.calcs]
         }
 
     def clear(self):
-        self.lhs_calc.clear()
-        self.rhs_calc.clear()
+        for calc in self.calcs:
+            calc.clear()
 
     def get_by_label(self, label: Label):
         if label.empty():
             return self
-        elif label.head == 0:
-            return self.lhs_calc.get_by_label(label.tail)
-        elif label.head == 1:
-            return self.rhs_calc.get_by_label(label.tail)
+        elif label.head < len(self.calcs):
+            return self.calcs[label.head].get_by_label(label.tail)
         else:
             raise AssertionError("get_by_label: invalid label")
 
@@ -904,8 +920,8 @@ def parse_item(parent, item) -> StateItem:
     elif item['type'] == 'CalculationProof':
         goal = parser.parse_expr(item['goal'])
         res = CalculationProof(parent, goal)
-        res.lhs_calc = parse_item(res, item['lhs_calc'])
-        res.rhs_calc = parse_item(res, item['rhs_calc'])
+        for i, calc_item in enumerate(item['calcs']):
+            res.calcs[i] = parse_item(res, calc_item)
         return res
     elif item['type'] == 'Calculation':
         start = parser.parse_expr(item['start'])

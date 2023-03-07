@@ -11,76 +11,78 @@
             "goal": "(INT x:[0,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)) = 1/2 * (INT x:[-oo,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2))",
             "latex_goal": "\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx = \\frac{1}{2} (\\int_{-\\infty}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx)",
             "proof": {
+                "calcs": [
+                    {
+                        "latex_start": "\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx",
+                        "start": "INT x:[0,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)",
+                        "steps": [
+                            {
+                                "latex_res": "\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{-b ^ {2} + x ^ {2}} \\,dx",
+                                "res": "INT x:[0,oo]. x * sin(a * x) / (-(b ^ 2) + x ^ 2)",
+                                "rule": {
+                                    "name": "FullSimplify",
+                                    "str": "full simplify"
+                                },
+                                "type": "CalculationStep"
+                            }
+                        ],
+                        "type": "Calculation"
+                    },
+                    {
+                        "latex_start": "\\frac{1}{2} (\\int_{-\\infty}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx)",
+                        "start": "1/2 * (INT x:[-oo,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2))",
+                        "steps": [
+                            {
+                                "latex_res": "\\frac{1}{2} ((\\int_{-\\infty}^{0} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx) + (\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx))",
+                                "res": "1/2 * ((INT x:[-oo,0]. x * sin(a * x) / (x ^ 2 - b ^ 2)) + (INT x:[0,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)))",
+                                "rule": {
+                                    "c": "0",
+                                    "name": "SplitRegion",
+                                    "str": "split region at 0"
+                                },
+                                "type": "CalculationStep"
+                            },
+                            {
+                                "latex_res": "\\frac{1}{2} ((\\int_{0}^{\\infty} -\\frac{x \\sin{(-a x)}}{-b ^ {2} + x ^ {2}} \\,dx) + (\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx))",
+                                "res": "1/2 * ((INT x:[0,oo]. -(x * sin(-(a * x)) / (-(b ^ 2) + x ^ 2))) + (INT x:[0,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)))",
+                                "rule": {
+                                    "latex_str": "substitute \\(x\\) for \\(-x\\) at 1.0",
+                                    "loc": "1.0",
+                                    "name": "Substitution",
+                                    "str": "substitute x for -x at 1.0",
+                                    "var_name": "x",
+                                    "var_subst": "-x"
+                                },
+                                "type": "CalculationStep"
+                            },
+                            {
+                                "latex_res": "\\frac{1}{2} ((\\int_{0}^{\\infty} -\\frac{x (-\\sin{(a x)})}{-b ^ {2} + x ^ {2}} \\,dx) + (\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx))",
+                                "res": "1/2 * ((INT x:[0,oo]. -(x * -sin(a * x) / (-(b ^ 2) + x ^ 2))) + (INT x:[0,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)))",
+                                "rule": {
+                                    "latex_str": "rewrite \\(\\sin{(-a x)}\\) to \\(-\\sin{(a x)}\\) using identity",
+                                    "name": "ApplyIdentity",
+                                    "source": "sin(-(a * x))",
+                                    "str": "rewrite sin(-(a * x)) to -sin(a * x) using identity",
+                                    "target": "-sin(a * x)"
+                                },
+                                "type": "CalculationStep"
+                            },
+                            {
+                                "latex_res": "\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{-b ^ {2} + x ^ {2}} \\,dx",
+                                "res": "INT x:[0,oo]. x * sin(a * x) / (-(b ^ 2) + x ^ 2)",
+                                "rule": {
+                                    "name": "FullSimplify",
+                                    "str": "full simplify"
+                                },
+                                "type": "CalculationStep"
+                            }
+                        ],
+                        "type": "Calculation"
+                    }
+                ],
                 "finished": true,
                 "goal": "(INT x:[0,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)) = 1/2 * (INT x:[-oo,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2))",
                 "latex_goal": "\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx = \\frac{1}{2} (\\int_{-\\infty}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx)",
-                "lhs_calc": {
-                    "latex_start": "\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx",
-                    "start": "INT x:[0,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)",
-                    "steps": [
-                        {
-                            "latex_res": "\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{-b ^ {2} + x ^ {2}} \\,dx",
-                            "res": "INT x:[0,oo]. x * sin(a * x) / (-(b ^ 2) + x ^ 2)",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
-                    "type": "Calculation"
-                },
-                "rhs_calc": {
-                    "latex_start": "\\frac{1}{2} (\\int_{-\\infty}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx)",
-                    "start": "1/2 * (INT x:[-oo,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2))",
-                    "steps": [
-                        {
-                            "latex_res": "\\frac{1}{2} ((\\int_{-\\infty}^{0} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx) + (\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx))",
-                            "res": "1/2 * ((INT x:[-oo,0]. x * sin(a * x) / (x ^ 2 - b ^ 2)) + (INT x:[0,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)))",
-                            "rule": {
-                                "c": "0",
-                                "name": "SplitRegion",
-                                "str": "split region at 0"
-                            },
-                            "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "\\frac{1}{2} ((\\int_{0}^{\\infty} -\\frac{x \\sin{(-a x)}}{-b ^ {2} + x ^ {2}} \\,dx) + (\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx))",
-                            "res": "1/2 * ((INT x:[0,oo]. -(x * sin(-(a * x)) / (-(b ^ 2) + x ^ 2))) + (INT x:[0,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)))",
-                            "rule": {
-                                "latex_str": "substitute \\(x\\) for \\(-x\\) at 1.0",
-                                "loc": "1.0",
-                                "name": "Substitution",
-                                "str": "substitute x for -x at 1.0",
-                                "var_name": "x",
-                                "var_subst": "-x"
-                            },
-                            "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "\\frac{1}{2} ((\\int_{0}^{\\infty} -\\frac{x (-\\sin{(a x)})}{-b ^ {2} + x ^ {2}} \\,dx) + (\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{x ^ {2} - b ^ {2}} \\,dx))",
-                            "res": "1/2 * ((INT x:[0,oo]. -(x * -sin(a * x) / (-(b ^ 2) + x ^ 2))) + (INT x:[0,oo]. x * sin(a * x) / (x ^ 2 - b ^ 2)))",
-                            "rule": {
-                                "latex_str": "rewrite \\(\\sin{(-a x)}\\) to \\(-\\sin{(a x)}\\) using identity",
-                                "name": "ApplyIdentity",
-                                "source": "sin(-(a * x))",
-                                "str": "rewrite sin(-(a * x)) to -sin(a * x) using identity",
-                                "target": "-sin(a * x)"
-                            },
-                            "type": "CalculationStep"
-                        },
-                        {
-                            "latex_res": "\\int_{0}^{\\infty} \\frac{x \\sin{(a x)}}{-b ^ {2} + x ^ {2}} \\,dx",
-                            "res": "INT x:[0,oo]. x * sin(a * x) / (-(b ^ 2) + x ^ 2)",
-                            "rule": {
-                                "name": "FullSimplify",
-                                "str": "full simplify"
-                            },
-                            "type": "CalculationStep"
-                        }
-                    ],
-                    "type": "Calculation"
-                },
                 "type": "CalculationProof"
             },
             "type": "Goal"

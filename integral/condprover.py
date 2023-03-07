@@ -388,7 +388,9 @@ def get_standard_inequalities() -> List[Identity]:
 
         # Log
         (["x >= 1"], "log(x) >= 0"),
+        (["x > 1"], "log(x) > 0"),
         (["x <= 1", "x > 0"], "log(x) <= 0"),
+        (["x < 1", "x > 0"], "log(x) < 0"),
         (["x != 1"], "log(x) != 0"),
 
         # Absolute value

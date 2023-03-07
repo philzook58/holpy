@@ -1622,6 +1622,14 @@ class IntegralTest(unittest.TestCase):
         # Define Catalan's constant
         file.add_definition("G = SUM(n, 0, oo, (-1)^n / (2*n+1)^2)")
 
+        goal = file.add_goal("converges(SUM(n, 0, oo, INT x:[0,1]. x ^ (2 * n) / (2 * n + 1)))")
+        proof = goal.proof_by_calculation()
+        calc = proof.arg_calc
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
+
         # Evaluate integral of atan(x) / x
         goal = file.add_goal("(INT x:[0, 1]. atan(x) / x) = G")
         proof_of_goal = goal.proof_by_calculation()
@@ -1658,6 +1666,15 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
         calc = proof_of_goal1.rhs_calc
         calc.perform_rule(rules.Equation("1 / (k-1)^2", "1 / (-k+1)^2"))
+
+        goal = file.add_goal("converges(SUM(n, 0, oo, INT x:[1,oo]. (1 / x ^ 2) ^ n * log(x) * x ^ (-2)))")
+        proof = goal.proof_by_calculation()
+        calc = proof.arg_calc
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Equation("x ^ (-(2 * n) - 2) * log(x)", "log(x) / x^(2*n+2)"))
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal1.goal), "0"))
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
 
         goal5 = file.add_goal("(INT x:[1,oo]. log(x) / (x^2+1)) = G")
         proof_of_goal5 = goal5.proof_by_calculation()
@@ -1699,6 +1716,15 @@ class IntegralTest(unittest.TestCase):
         # Inside interesting integrals, Section 5.2, example #1
         file = compstate.CompFile("interesting", "LogFunction01")
 
+        # Convergence
+        goal = file.add_goal("converges(SUM(n,0,oo, (INT x:[0,1]. x ^ (n + 1) * 1 / ((n + 1) * x))))")
+        proof = goal.proof_by_calculation()
+        calc = proof.arg_calc
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
+
         # Main result
         goal = file.add_goal("(INT x:[0,1]. log(1 + x) / x) = (pi^2) / 12")
         proof_of_goal01 = goal.proof_by_calculation()
@@ -1738,6 +1764,14 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.ApplyIdentity("(-1) ^ k * (-x) ^ k", "x ^ k"))
         calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "1"))
 
+        goal = file.add_goal("converges(SUM(k, 0, oo, INT y:[0,1]. -(log(y) * y ^ k)))")
+        proof = goal.proof_by_calculation()
+        calc = proof.arg_calc
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(proof.is_finished())
+
         goal03 = file.add_goal("(INT x:[0, pi/2]. cos(x)/sin(x) * log(1/cos(x))) = pi^2/24")
         proof_of_goal03 = goal03.proof_by_calculation()
         calc = proof_of_goal03.lhs_calc
@@ -1747,16 +1781,16 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.ApplyIdentity("sin(acos(t))", "sqrt(1 - t^2)"))
         calc.perform_rule(rules.FullSimplify())
         e = parser.parse_expr("t")
-        calc.perform_rule(rules.Substitution(var_name='x', var_subst=e))
-        calc.perform_rule(rules.Equation("x * log(x) / (-(x ^ 2) + 1)",
-                                         "log(x) * (x / (-(x ^ 2) + 1))"))
+        calc.perform_rule(rules.Substitution(var_name='y', var_subst=e))
+        calc.perform_rule(rules.Equation("y * log(y) / (-(y ^ 2) + 1)",
+                                         "log(y) * (y / (-(y ^ 2) + 1))"))
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal02.goal), "0.0.1"))
         calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0"))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.Equation("log(x) * SUM(k, 0, oo, x ^ k)",
-                                         "SUM(k, 0, oo, log(x) * x ^ k)"))
-        calc.perform_rule(rules.Equation("log(x) * SUM(k, 0, oo, x ^ k * (-1) ^ k)",
-                                         "SUM(k, 0, oo, log(x) * x ^ k * (-1) ^ k)"))
+        calc.perform_rule(rules.Equation("log(y) * SUM(k, 0, oo, y ^ k)",
+                                         "SUM(k, 0, oo, log(y) * y ^ k)"))
+        calc.perform_rule(rules.Equation("log(y) * SUM(k, 0, oo, y ^ k * (-1) ^ k)",
+                                         "SUM(k, 0, oo, log(y) * y ^ k * (-1) ^ k)"))
         calc.perform_rule(rules.OnSubterm(rules.IntSumExchange()))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.DefiniteIntegralIdentity())

@@ -400,6 +400,29 @@ class Context:
         return self.check_condition(Op("!=", e1, e2))
 
 
+def body_conds(e: Expr, ctx: Context) -> Context:
+    """Return the conditions in the body."""
+    ctx2 = Context(ctx)
+    if e.is_integral():
+        if e.lower != expr.NEG_INF:
+            ctx2.add_condition(Op(">", expr.Var(e.var), e.lower))
+        if e.upper != expr.POS_INF:
+            ctx2.add_condition(Op("<", expr.Var(e.var), e.upper))
+    elif e.is_indefinite_integral():
+        pass
+    elif e.is_limit():
+        if e.lim == expr.POS_INF:
+            ctx2.add_condition(expr.Op(">", expr.Var(e.var), Const(0)))
+    elif e.is_summation():
+        ctx2.add_condition(expr.Op(">=", expr.Var(e.index_var), e.lower))
+        if e.upper != expr.POS_INF:
+            ctx2.add_condition(expr.Op("<=", expr.Var(e.index_var), e.upper))
+            ctx2.add_condition(expr.Op(">=", e.upper - expr.Var(e.index_var), Const(0)))
+        ctx2.add_condition(expr.Fun("isInt", expr.Var(e.index_var)))
+    else:
+        raise TypeError
+    return ctx2
+
 def apply_subterm(e: Expr, f: Callable[[Expr, Context], Expr], ctx: Context) -> Expr:
     def rec(e: Expr, ctx: Context):
         if e.is_var() or e.is_const() or e.is_inf() or e.is_skolem_func():
@@ -413,35 +436,24 @@ def apply_subterm(e: Expr, f: Callable[[Expr, Context], Expr], ctx: Context) -> 
         elif e.is_deriv():
             return f(expr.Deriv(e.var, rec(e.body, ctx)), ctx)
         elif e.is_integral():
-            # When evaluating the body, add interval constraint to context
-            ctx2 = Context(ctx)
-            ctx2.add_condition(expr.Op(">", expr.Var(e.var), e.lower))
-            ctx2.add_condition(expr.Op("<", expr.Var(e.var), e.upper))
             lower = rec(e.lower, ctx)
             upper = rec(e.upper, ctx)
-            body = rec(e.body, ctx2)
+            body = rec(e.body, body_conds(e, ctx))
             return f(expr.Integral(e.var, lower, upper, body, e.diff), ctx)
         elif e.is_evalat():
-            return f(expr.EvalAt(e.var, rec(e.lower, ctx), rec(e.upper, ctx),
-                                 rec(e.body, ctx)), ctx)
+            lower = rec(e.lower, ctx)
+            upper = rec(e.upper, ctx)
+            body = rec(e.body, ctx)
+            return f(expr.EvalAt(e.var, lower, upper, body), ctx)
         elif e.is_limit():
-            if e.lim == expr.POS_INF:
-                ctx2 = Context(ctx)
-                ctx2.add_condition(expr.Op(">", expr.Var(e.var), Const(0)))
-                return f(expr.Limit(e.var, e.lim, rec(e.body, ctx2)), ctx)
-            else:
-                return f(expr.Limit(e.var, e.lim, rec(e.body, ctx)), ctx)
+            return f(expr.Limit(e.var, rec(e.lim, ctx), rec(e.body, body_conds(e, ctx))), ctx)
         elif e.is_indefinite_integral():
             return f(expr.IndefiniteIntegral(e.var, rec(e.body, ctx), e.skolem_args), ctx)
         elif e.is_summation():
-            # When evaluating the body, add interval and integer constraint to context
-            ctx2 = Context(ctx)
-            ctx2.add_condition(expr.Op(">=", expr.Var(e.index_var), e.lower))
-            if e.upper != expr.POS_INF:
-                ctx2.add_condition(expr.Op("<=", expr.Var(e.index_var), e.upper))
-            ctx2.add_condition(expr.Fun("isInt", expr.Var(e.index_var)))
-            return f(
-                expr.Summation(e.index_var, rec(e.lower, ctx), rec(e.upper, ctx), rec(e.body, ctx2)), ctx)
+            lower = rec(e.lower, ctx)
+            upper = rec(e.upper, ctx)
+            body = rec(e.body, body_conds(e, ctx))
+            return f(expr.Summation(e.index_var, lower, upper, body), ctx)
         else:
             raise NotImplementedError
     return rec(e, ctx)
