@@ -1747,16 +1747,16 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.ApplyIdentity("sin(acos(t))", "sqrt(1 - t^2)"))
         calc.perform_rule(rules.FullSimplify())
         e = parser.parse_expr("t")
-        calc.perform_rule(rules.Substitution(var_name='x', var_subst=e))
-        calc.perform_rule(rules.Equation("x * log(x) / (-(x ^ 2) + 1)",
-                                         "log(x) * (x / (-(x ^ 2) + 1))"))
+        calc.perform_rule(rules.Substitution(var_name='y', var_subst=e))
+        calc.perform_rule(rules.Equation("y * log(y) / (-(y ^ 2) + 1)",
+                                         "log(y) * (y / (-(y ^ 2) + 1))"))
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal02.goal), "0.0.1"))
         calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0"))
         calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.Equation("log(x) * SUM(k, 0, oo, x ^ k)",
-                                         "SUM(k, 0, oo, log(x) * x ^ k)"))
-        calc.perform_rule(rules.Equation("log(x) * SUM(k, 0, oo, x ^ k * (-1) ^ k)",
-                                         "SUM(k, 0, oo, log(x) * x ^ k * (-1) ^ k)"))
+        calc.perform_rule(rules.Equation("log(y) * SUM(k, 0, oo, y ^ k)",
+                                         "SUM(k, 0, oo, log(y) * y ^ k)"))
+        calc.perform_rule(rules.Equation("log(y) * SUM(k, 0, oo, y ^ k * (-1) ^ k)",
+                                         "SUM(k, 0, oo, log(y) * y ^ k * (-1) ^ k)"))
         calc.perform_rule(rules.OnSubterm(rules.IntSumExchange()))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.DefiniteIntegralIdentity())

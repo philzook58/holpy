@@ -15,7 +15,7 @@ from integral.solve import solve_equation, solve_for_term
 from integral import latex
 from integral import limits
 from integral import norm
-from integral.context import Context, apply_subterm
+from integral.context import Context, apply_subterm, body_conds
 from integral import poly
 from integral.poly import from_poly, to_poly, normalize
 from integral.conditions import Conditions
@@ -263,26 +263,13 @@ def check_wellformed(e: Expr, ctx: Context) -> List[ProofObligation]:
                     add_obligation(Op("<=", e.args[0], Const(1)), ctx)
             # TODO: add checks for other functions
         elif e.is_integral():
-            ctx2 = Context(ctx)
-            if e.lower != NEG_INF:
-                ctx2.add_condition(expr.Op(">", Var(e.var), e.lower))
-            if e.upper != POS_INF:
-                ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
-            rec(e.lower, ctx)
-            rec(e.upper, ctx)
-            rec(e.body, ctx2)
+            rec(e.body, body_conds(e, ctx))
         elif e.is_deriv():
             rec(e.body, ctx)
         elif e.is_summation():
-            ctx2 = Context(ctx)
-            if e.lower != NEG_INF:
-                ctx2.add_condition(expr.Op(">=", Var(e.index_var), e.lower))
-            if e.upper != POS_INF:
-                ctx2.add_condition(expr.Op(">=", e.upper - Var(e.index_var), Const(0)))
-            ctx2.add_condition(expr.Fun("isInt", Var(e.index_var)))
             rec(e.lower, ctx)
             rec(e.upper, ctx)
-            rec(e.body, ctx2)
+            rec(e.body, body_conds(e, ctx))
         else:
             pass
     rec(e, ctx)
@@ -550,13 +537,7 @@ class DefiniteIntegralIdentity(Rule):
         if not (e.is_integral() or e.is_indefinite_integral()):
             sep_ints = e.separate_integral()
             for _, loc in sep_ints:
-                if e.is_summation():
-                    ctx2 = Context(ctx)
-                    ctx2.add_condition(Op(">=", Var(e.index_var), e.lower))
-                    ctx2.add_condition(Op("<=", Var(e.index_var), e.upper))
-                    e = OnLocation(self, loc).eval(e, ctx2)
-                else:
-                    e = OnLocation(self, loc).eval(e, ctx)
+                e = OnLocation(self, loc).eval(e, ctx)
             return e
 
         # First, look for indefinite integrals identities
@@ -842,9 +823,7 @@ class OnLocation(Rule):
                 new_args[loc.head] = rec(cur_e.args[loc.head], loc.rest, ctx)
                 return Fun(cur_e.func_name, *tuple(new_args))
             elif cur_e.is_integral():
-                ctx2 = Context(ctx)
-                ctx2.add_condition(expr.Op(">", Var(cur_e.var), cur_e.lower))
-                ctx2.add_condition(expr.Op("<", Var(cur_e.var), cur_e.upper))
+                ctx2 = body_conds(cur_e, ctx)
                 if loc.head == 0:
                     return Integral(cur_e.var, cur_e.lower, cur_e.upper, rec(cur_e.body, loc.rest, ctx2))
                 elif loc.head == 1:
@@ -876,8 +855,9 @@ class OnLocation(Rule):
                 assert loc.head == 0, "OnLocation: invalid location"
                 return IndefiniteIntegral(cur_e.var, rec(cur_e.body, loc.rest, ctx), cur_e.skolem_args)
             elif cur_e.is_summation():
+                ctx2 = body_conds(cur_e, ctx)
                 if loc.head == 0:
-                    return Summation(cur_e.index_var, cur_e.lower, cur_e.upper, rec(cur_e.body, loc.rest, ctx))
+                    return Summation(cur_e.index_var, cur_e.lower, cur_e.upper, rec(cur_e.body, loc.rest, ctx2))
                 elif loc.head == 1:
                     return Summation(cur_e.index_var, rec(cur_e.lower, loc.rest, ctx), cur_e.upper, cur_e.body)
                 elif loc.head == 2:
@@ -1073,10 +1053,7 @@ class Substitution(Rule):
             raise AssertionError("Substitution: variable not found")
 
         dfx = deriv(e.var, var_subst, ctx)
-        ctx2 = Context(ctx)
-        if e.is_integral():
-            ctx2.add_condition(expr.Op(">", Var(e.var), e.lower))
-            ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
+        ctx2 = body_conds(e, ctx)
         flag = False
         if e.is_integral():
             flag = normalize(e.diff, ctx2) == normalize(self.var_subst, ctx2)
@@ -1359,11 +1336,7 @@ class IntegrationByParts(Rule):
             else:
                 return OnLocation(self, sep_ints[0][1]).eval(e, ctx)
 
-        ctx2 = Context(ctx)
-        if e.is_integral():
-            ctx2.add_condition(expr.Op(">", Var(e.var), e.lower))
-            ctx2.add_condition(expr.Op("<", Var(e.var), e.upper))
-
+        ctx2 = body_conds(e, ctx)
         e.body = normalize(e.body, ctx2)
         du = deriv(e.var, self.u, ctx)
         dv = deriv(e.var, self.v, ctx)
@@ -1937,12 +1910,21 @@ class IntSumExchange(Rule):
 
     def __str__(self):
         return "exchange integral and sum"
+    
+    def test_converge(self, body, ctx: Context):
+        if ctx.is_not_negative(body):
+            return True
+        # print(body, ctx.get_conds())
 
     def eval(self, e: Expr, ctx: Context):
         if e.is_integral() and e.body.is_summation():
+            ctx2 = body_conds(e, body_conds(e.body, ctx))
+            self.test_converge(e.body.body, ctx2)
             s = e.body
-            return Summation(s.index_var, s.lower, s.upper, Integral(e.var, e.lower, e.upper, e.body.body))
+            return Summation(s.index_var, s.lower, s.upper, Integral(e.var, e.lower, e.upper, s.body))
         elif e.is_summation() and e.body.is_integral():
+            ctx2 = body_conds(e, body_conds(e.body, ctx))
+            self.test_converge(e.body.body, ctx2)
             i = e.body
             return Integral(i.var, i.lower, i.upper, Summation(e.index_var, e.lower, e.upper, i.body))
         else:
