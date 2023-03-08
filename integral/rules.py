@@ -1101,8 +1101,11 @@ class Substitution(Rule):
 
         dfx = deriv(e.var, var_subst, ctx)
         ctx2 = body_conds(e, ctx)
-        body = normalize(e.body / dfx, ctx2)
-        body_subst = body.replace(normalize(var_subst, ctx2), var_name)
+        if e.body.is_times() and e.body.args[1] == dfx:
+            body = e.body.args[0]
+        else:
+            body = normalize(e.body / dfx, ctx2)
+        body_subst = body.replace(var_subst, var_name)
         if e.var not in body_subst.get_vars():
             # Substitution is able to clear all x in original integrand
             self.f = body_subst

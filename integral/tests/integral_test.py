@@ -483,7 +483,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
 
         calc = file.add_calculation("INT x. 7 ^ (2*x+3)")
-        calc.perform_rule(rules.Substitution("u", "2 * x + 3"))
+        calc.perform_rule(rules.Substitution("u", "2 * x"))
         calc.perform_rule(rules.IndefiniteIntegralIdentity())
         calc.perform_rule(rules.ReplaceSubstitution())
         calc.perform_rule(rules.FullSimplify())
@@ -494,7 +494,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
 
         calc = file.add_calculation("INT x. exp(x) * (1 + 2*exp(x)) ^ 4")
-        calc.perform_rule(rules.Substitution("u", "1 + 2 * exp(x)"))
+        calc.perform_rule(rules.Substitution("u", "2 * exp(x) + 1"))
         calc.perform_rule(rules.IndefiniteIntegralIdentity())
         calc.perform_rule(rules.ReplaceSubstitution())
         calc.perform_rule(rules.FullSimplify())
@@ -505,7 +505,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
 
         calc = file.add_calculation("INT x. exp(x) * (1 - exp(x)) * (1 + exp(x)) ^ 10")
-        calc.perform_rule(rules.Substitution("u", "1 + exp(x)"))
+        calc.perform_rule(rules.Substitution("u", "exp(x) + 1"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.ExpandPolynomial())
         calc.perform_rule(rules.IndefiniteIntegralIdentity())
@@ -523,10 +523,10 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.Equation(None, "-2/5 / (log(3) - log(5)) - 1/5 / (2 * log(2) - log(5))"))
 
         goal02 = file.add_goal("(INT x. 30 * exp(-3*x) * (1 + 3 * exp(-x)) ^ 5) = "
-                             "(-5/36)*(1 + 3*exp(-x))^8 + (20/63)*(1 + 3*exp(-x))^7 + (-5/27)*(1+3*exp(-x))^6 + SKOLEM_CONST(C)")
+                             "(-5/36)*(3*exp(-x) + 1)^8 + (20/63)*(3*exp(-x) + 1)^7 + (-5/27)*(3*exp(-x) + 1)^6 + SKOLEM_CONST(C)")
         proof02 = goal02.proof_by_calculation()
         calc = proof02.lhs_calc
-        calc.perform_rule(rules.Substitution("u", "1 + 3 * exp(-x)"))
+        calc.perform_rule(rules.Substitution("u", "3 * exp(-x) + 1"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0.0.1.0"))
         calc.perform_rule(rules.FullSimplify())
@@ -548,14 +548,14 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.ReplaceSubstitution())
 
         goal04 = file.add_goal("(INT x. (27*exp(9*x) + exp(12*x)) ^ (1/3)) = "
-                             "(27 + exp(3 * x)) ^ (4/3) / 4 + SKOLEM_CONST(C)")
+                             "(exp(3 * x) + 27) ^ (4/3) / 4 + SKOLEM_CONST(C)")
         proof04 = goal04.proof_by_calculation()
         calc = proof04.lhs_calc
         calc.perform_rule(rules.Equation("27*exp(9*x) + exp(12*x)", "exp(9*x) * (27 + exp(3*x))"))
         calc.perform_rule(rules.ApplyIdentity("(exp(9*x) * (27 + exp(3*x))) ^ (1/3)",
                                               "exp(9*x) ^ (1/3) * (27 + exp(3*x)) ^ (1/3)"))
         calc.perform_rule(rules.Equation("exp(9*x) ^ (1/3)", "exp(3*x)"))
-        calc.perform_rule(rules.Substitution("u", "27 + exp(3*x)"))
+        calc.perform_rule(rules.Substitution("u", "exp(3*x) + 27"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.IndefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
@@ -667,6 +667,31 @@ class IntegralTest(unittest.TestCase):
 
         calc = file.add_calculation("INT x. (sec(x))^2 * sqrt(5 + tan(x))")
         calc.perform_rule(rules.Substitution("u", "5 + tan(x)"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. tan(x)^5")
+        calc.perform_rule(rules.Equation("tan(x)^5", "tan(x)^3 * tan(x)^2"))
+        calc.perform_rule(rules.ApplyIdentity("tan(x)^2", "sec(x)^2 - 1"))
+        calc.perform_rule(rules.ExpandPolynomial())
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Substitution("u", "tan(x)"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Equation("tan(x)^3", "tan(x) * tan(x)^2"))
+        calc.perform_rule(rules.ApplyIdentity("tan(x)^2", "sec(x)^2 - 1"))
+        calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Substitution("u", "tan(x)"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. (sin(x) - cos(x)) * (sin(x) + cos(x)) ^ 5")
+        calc.perform_rule(rules.OnLocation(rules.Equation(None, "-(sin(x) + cos(x)) ^ 5 * (cos(x) - sin(x))"), "0"))
+        calc.perform_rule(rules.Substitution("u", "sin(x) + cos(x)"))
         calc.perform_rule(rules.IndefiniteIntegralIdentity())
         calc.perform_rule(rules.ReplaceSubstitution())
         calc.perform_rule(rules.FullSimplify())
