@@ -1250,7 +1250,11 @@ class ExpandPolynomial(Rule):
             else:
                 return from_poly((p1 / poly.singleton(from_poly(p2))).reduce(ctx))
         elif e.is_integral():
-            return expr.Integral(e.var, e.lower, e.upper, self.eval(e.body, ctx), e.diff)
+            ctx2 = body_conds(e, ctx)
+            return expr.Integral(e.var, e.lower, e.upper, self.eval(e.body, ctx2), e.diff)
+        elif e.is_indefinite_integral():
+            ctx2 = body_conds(e, ctx)
+            return expr.IndefiniteIntegral(e.var, self.eval(e.body, ctx2), e.skolem_args)
         else:
             return e
 

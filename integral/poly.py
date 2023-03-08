@@ -772,6 +772,9 @@ def normalize(e: expr.Expr, ctx: Context) -> expr.Expr:
     if e.is_equals():
         return expr.Eq(normalize(e.lhs, ctx), normalize(e.rhs, ctx))
 
+    if e.is_const():
+        return e
+
     for i in range(5):
         old_e = e
         e = from_poly(to_poly(e, ctx))

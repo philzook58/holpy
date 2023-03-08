@@ -763,8 +763,8 @@
                     "type": "CalculationStep"
                 },
                 {
-                    "latex_res": "\\int_{\\pi/4}^{\\pi/2} -\\frac{\\sin^{2}(u)}{\\sin^{2}(u)} + \\frac{1}{\\sin^{2}(u)} \\,du",
-                    "res": "INT u:[pi / 4,pi / 2]. -(sin(u) ^ 2 / sin(u) ^ 2) + 1 / sin(u) ^ 2",
+                    "latex_res": "\\int_{\\pi/4}^{\\pi/2} \\frac{1}{\\sin^{2}(u)} - 1 \\,du",
+                    "res": "INT u:[pi / 4,pi / 2]. 1 / sin(u) ^ 2 - 1",
                     "rule": {
                         "name": "ExpandPolynomial",
                         "str": "expand polynomial"
@@ -830,8 +830,8 @@
                     "type": "CalculationStep"
                 },
                 {
-                    "latex_res": "\\int_{1}^{9} \\frac{5}{16 \\sqrt{u}} - \\frac{u}{16 \\sqrt{u}} \\,du",
-                    "res": "INT u:[1,9]. 5 / (16 * sqrt(u)) - u / (16 * sqrt(u))",
+                    "latex_res": "\\int_{1}^{9} \\frac{5}{16 \\sqrt{u}} - \\frac{\\sqrt{u}}{16} \\,du",
+                    "res": "INT u:[1,9]. 5 / (16 * sqrt(u)) - sqrt(u) / 16",
                     "rule": {
                         "name": "ExpandPolynomial",
                         "str": "expand polynomial"
@@ -897,8 +897,8 @@
                     "type": "CalculationStep"
                 },
                 {
-                    "latex_res": "\\int_{2}^{3} \\frac{2 v}{v} - \\frac{2}{v} \\,dv",
-                    "res": "INT v:[2,3]. 2 * v / v - 2 / v",
+                    "latex_res": "\\int_{2}^{3} -\\frac{2}{v} + 2 \\,dv",
+                    "res": "INT v:[2,3]. -(2 / v) + 2",
                     "rule": {
                         "name": "ExpandPolynomial",
                         "str": "expand polynomial"
@@ -964,8 +964,8 @@
                     "type": "CalculationStep"
                 },
                 {
-                    "latex_res": "\\int_{-1}^{-1/2} \\frac{2 v}{v} + \\frac{2}{v} \\,dv",
-                    "res": "INT v:[-1,-1/2]. 2 * v / v + 2 / v",
+                    "latex_res": "\\int_{-1}^{-1/2} \\frac{2}{v} + 2 \\,dv",
+                    "res": "INT v:[-1,-1/2]. 2 / v + 2",
                     "rule": {
                         "name": "ExpandPolynomial",
                         "str": "expand polynomial"

@@ -28,7 +28,6 @@ grammar = r"""
         | "INT" CNAME ":[" expr "," expr "]." expr "." expr -> integral_expr2
         | "INT" CNAME "." expr -> indefinite_integral_expr
         | "INT" CNAME "[" CNAME ("," CNAME)* "]" "." expr -> indefinite_integral_skolem_expr
-        | "DIFF" "." expr -> differential_expr
         | "[" expr "]_" CNAME "=" expr "," expr -> eval_at_expr
         | "LIM" "{" CNAME "->" expr "}" "." expr -> limit_inf_expr
         | "LIM" "{" CNAME "->" expr "-}" "."  expr -> limit_l_expr

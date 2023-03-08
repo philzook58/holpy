@@ -209,9 +209,8 @@
                     "latex_res": "\\int 2 \\cos{x} \\sin{x} + \\cos^{2}(x) + \\sin^{2}(x) \\,dx",
                     "res": "INT x. 2 * cos(x) * sin(x) + cos(x) ^ 2 + sin(x) ^ 2",
                     "rule": {
-                        "loc": "0",
                         "name": "ExpandPolynomial",
-                        "str": "expand polynomial at 0"
+                        "str": "expand polynomial"
                     },
                     "type": "CalculationStep"
                 },
@@ -344,9 +343,8 @@
                     "latex_res": "\\int \\tan^{2}(x) + 4 \\tan{x} + 4 \\,dx",
                     "res": "INT x. tan(x) ^ 2 + 4 * tan(x) + 4",
                     "rule": {
-                        "loc": "0",
                         "name": "ExpandPolynomial",
-                        "str": "expand polynomial at 0"
+                        "str": "expand polynomial"
                     },
                     "type": "CalculationStep"
                 },
@@ -452,9 +450,8 @@
                     "latex_res": "\\int -\\cos^{2}(x) \\sin{x} + \\sin{x} \\,dx",
                     "res": "INT x. -(cos(x) ^ 2 * sin(x)) + sin(x)",
                     "rule": {
-                        "loc": "0",
                         "name": "ExpandPolynomial",
-                        "str": "expand polynomial at 0"
+                        "str": "expand polynomial"
                     },
                     "type": "CalculationStep"
                 },
@@ -798,9 +795,8 @@
                     "latex_res": "\\int 2 \\cot{(3 x)} \\csc{(3 x)} + \\cot^{2}(3 x) + \\csc^{2}(3 x) \\,dx",
                     "res": "INT x. 2 * cot(3 * x) * csc(3 * x) + cot(3 * x) ^ 2 + csc(3 * x) ^ 2",
                     "rule": {
-                        "loc": "0",
                         "name": "ExpandPolynomial",
-                        "str": "expand polynomial at 0"
+                        "str": "expand polynomial"
                     },
                     "type": "CalculationStep"
                 },

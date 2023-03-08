@@ -111,9 +111,8 @@
                     "latex_res": "\\int \\frac{e^{7 x}}{7} + 3 e^{2 x} \\,dx",
                     "res": "INT x. exp(7 * x) / 7 + 3 * exp(2 * x)",
                     "rule": {
-                        "loc": "0",
                         "name": "ExpandPolynomial",
-                        "str": "expand polynomial at 0"
+                        "str": "expand polynomial"
                     },
                     "type": "CalculationStep"
                 },
@@ -192,9 +191,8 @@
                     "latex_res": "\\int e^{-8 x} + e^{8 x} - 2 \\,dx",
                     "res": "INT x. exp(-(8 * x)) + exp(8 * x) - 2",
                     "rule": {
-                        "loc": "0",
                         "name": "ExpandPolynomial",
-                        "str": "expand polynomial at 0"
+                        "str": "expand polynomial"
                     },
                     "type": "CalculationStep"
                 },
@@ -248,9 +246,8 @@
                     "latex_res": "\\int 2 u ^ {10} - u ^ {11} \\,du",
                     "res": "INT u. 2 * u ^ 10 - u ^ 11",
                     "rule": {
-                        "loc": "0",
                         "name": "ExpandPolynomial",
-                        "str": "expand polynomial at 0"
+                        "str": "expand polynomial"
                     },
                     "type": "CalculationStep"
                 },
