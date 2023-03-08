@@ -337,6 +337,460 @@
             "type": "Calculation"
         },
         {
+            "latex_start": "\\int (2 + \\tan{x}) ^ {2} \\,dx",
+            "start": "INT x. (2 + tan(x)) ^ 2",
+            "steps": [
+                {
+                    "latex_res": "\\int \\tan^{2}(x) + 4 \\tan{x} + 4 \\,dx",
+                    "res": "INT x. tan(x) ^ 2 + 4 * tan(x) + 4",
+                    "rule": {
+                        "loc": "0",
+                        "name": "ExpandPolynomial",
+                        "str": "expand polynomial at 0"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "(\\int \\tan^{2}(x) \\,dx) + 4 (\\int \\tan{x} \\,dx) + (\\int 4 \\,dx)",
+                    "res": "(INT x. tan(x) ^ 2) + 4 * (INT x. tan(x)) + (INT x. 4)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "(\\int \\tan^{2}(x) \\,dx) + 4 \\log{(\\left| \\sec{x} \\right|)} + 4 x + C",
+                    "res": "(INT x. tan(x) ^ 2) + 4 * log(abs(sec(x))) + 4 * x + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "IndefiniteIntegralIdentity",
+                        "str": "apply indefinite integral"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "(\\int \\sec^{2}(x) - 1 \\,dx) + 4 \\log{(\\left| \\sec{x} \\right|)} + 4 x + C",
+                    "res": "(INT x. sec(x) ^ 2 - 1) + 4 * log(abs(sec(x))) + 4 * x + SKOLEM_CONST(C)",
+                    "rule": {
+                        "latex_str": "rewrite \\(\\tan^{2}(x)\\) to \\(\\sec^{2}(x) - 1\\) using identity",
+                        "name": "ApplyIdentity",
+                        "source": "tan(x) ^ 2",
+                        "str": "rewrite tan(x) ^ 2 to sec(x) ^ 2 - 1 using identity",
+                        "target": "sec(x) ^ 2 - 1"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "4 \\log{(\\left| \\sec{x} \\right|)} + (\\int \\sec^{2}(x) \\,dx) + 4 x - (\\int 1 \\,dx) + C",
+                    "res": "4 * log(abs(sec(x))) + (INT x. sec(x) ^ 2) + 4 * x - (INT x. 1) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "4 \\log{(\\left| \\sec{x} \\right|)} + \\tan{x} + 4 x - 1 x + C",
+                    "res": "4 * log(abs(sec(x))) + tan(x) + 4 * x - 1 * x + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "IndefiniteIntegralIdentity",
+                        "str": "apply indefinite integral"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "4 \\log{(\\left| \\sec{x} \\right|)} + 3 x + \\tan{x} + C",
+                    "res": "4 * log(abs(sec(x))) + 3 * x + tan(x) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                }
+            ],
+            "type": "Calculation"
+        },
+        {
+            "conds": [
+                {
+                    "cond": "x > 0",
+                    "latex_cond": "x > 0"
+                },
+                {
+                    "cond": "x < pi / 2",
+                    "latex_cond": "x < \\frac{\\pi}{2}"
+                }
+            ],
+            "latex_start": "\\int \\sin^{3}(x) \\,dx",
+            "start": "INT x. sin(x) ^ 3",
+            "steps": [
+                {
+                    "latex_res": "\\int \\sin{x} \\sin^{2}(x) \\,dx",
+                    "res": "INT x. sin(x) * sin(x) ^ 2",
+                    "rule": {
+                        "latex_str": "rewriting \\(\\sin^{3}(x)\\) to \\(\\sin{x} \\sin^{2}(x)\\)",
+                        "name": "Equation",
+                        "new_expr": "sin(x) * sin(x) ^ 2",
+                        "old_expr": "sin(x) ^ 3",
+                        "str": "rewriting sin(x) ^ 3 to sin(x) * sin(x) ^ 2"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\int \\sin{x} (1 - \\cos^{2}(x)) \\,dx",
+                    "res": "INT x. sin(x) * (1 - cos(x) ^ 2)",
+                    "rule": {
+                        "latex_str": "rewrite \\(\\sin^{2}(x)\\) to \\(1 - \\cos^{2}(x)\\) using identity",
+                        "name": "ApplyIdentity",
+                        "source": "sin(x) ^ 2",
+                        "str": "rewrite sin(x) ^ 2 to 1 - cos(x) ^ 2 using identity",
+                        "target": "1 - cos(x) ^ 2"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\int -\\cos^{2}(x) \\sin{x} + \\sin{x} \\,dx",
+                    "res": "INT x. -(cos(x) ^ 2 * sin(x)) + sin(x)",
+                    "rule": {
+                        "loc": "0",
+                        "name": "ExpandPolynomial",
+                        "str": "expand polynomial at 0"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "-(\\int \\cos^{2}(x) \\sin{x} \\,dx) + -\\cos{x} + C",
+                    "res": "-(INT x. cos(x) ^ 2 * sin(x)) + -cos(x) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "IndefiniteIntegralIdentity",
+                        "str": "apply indefinite integral"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "-(\\int -u ^ {2} \\,du) + -\\cos{x} + C",
+                    "res": "-(INT u. -(u ^ 2)) + -cos(x) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "latex_str": "substitute \\(u\\) for \\(\\cos{x}\\)",
+                        "name": "Substitution",
+                        "str": "substitute u for cos(x)",
+                        "var_name": "u",
+                        "var_subst": "cos(x)"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "(\\int u ^ {2} \\,du) - \\cos{x} + C",
+                    "res": "(INT u. u ^ 2) - cos(x) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\frac{u ^ {2 + 1}}{2 + 1} - \\cos{x} + C",
+                    "res": "u ^ (2 + 1) / (2 + 1) - cos(x) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "IndefiniteIntegralIdentity",
+                        "str": "apply indefinite integral"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\frac{\\cos^{2 + 1}(x)}{2 + 1} - \\cos{x} + C",
+                    "res": "cos(x) ^ (2 + 1) / (2 + 1) - cos(x) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "ReplaceSubstitution",
+                        "str": "replace substitution"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\frac{\\cos^{3}(x)}{3} - \\cos{x} + C",
+                    "res": "cos(x) ^ 3 / 3 - cos(x) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                }
+            ],
+            "type": "Calculation"
+        },
+        {
+            "conds": [
+                {
+                    "cond": "x > 0",
+                    "latex_cond": "x > 0"
+                },
+                {
+                    "cond": "x < pi / 10",
+                    "latex_cond": "x < \\frac{\\pi}{10}"
+                }
+            ],
+            "latex_start": "\\int \\frac{\\cos{(5 x)}}{3 + \\sin{(5 x)}} \\,dx",
+            "start": "INT x. cos(5 * x) / (3 + sin(5 * x))",
+            "steps": [
+                {
+                    "latex_res": "\\int \\frac{1}{5 u + 15} \\,du",
+                    "res": "INT u. 1 / (5 * u + 15)",
+                    "rule": {
+                        "latex_str": "substitute \\(u\\) for \\(\\sin{(5 x)}\\)",
+                        "name": "Substitution",
+                        "str": "substitute u for sin(5 * x)",
+                        "var_name": "u",
+                        "var_subst": "sin(5 * x)"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\int \\frac{1}{5 v} \\,dv",
+                    "res": "INT v. 1 / (5 * v)",
+                    "rule": {
+                        "latex_str": "substitute \\(v\\) for \\(5 u + 15\\)",
+                        "name": "Substitution",
+                        "str": "substitute v for 5 * u + 15",
+                        "var_name": "v",
+                        "var_subst": "5 * u + 15"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\frac{1}{5} (\\int \\frac{1}{v} \\,dv)",
+                    "res": "1/5 * (INT v. 1 / v)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\frac{1}{5} \\log{(\\left| v \\right|)} + C",
+                    "res": "1/5 * log(abs(v)) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "IndefiniteIntegralIdentity",
+                        "str": "apply indefinite integral"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\frac{1}{5} \\log{(\\left| 5 u + 15 \\right|)} + C",
+                    "res": "1/5 * log(abs(5 * u + 15)) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "ReplaceSubstitution",
+                        "str": "replace substitution"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\frac{1}{5} \\log{(\\left| 5 \\sin{(5 x)} + 15 \\right|)} + C",
+                    "res": "1/5 * log(abs(5 * sin(5 * x) + 15)) + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "ReplaceSubstitution",
+                        "str": "replace substitution"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\frac{\\log{(5 \\sin{(5 x)} + 15)}}{5} + C",
+                    "res": "log(5 * sin(5 * x) + 15) / 5 + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                }
+            ],
+            "type": "Calculation"
+        },
+        {
+            "conds": [
+                {
+                    "cond": "x > 0",
+                    "latex_cond": "x > 0"
+                },
+                {
+                    "cond": "x < pi / 2",
+                    "latex_cond": "x < \\frac{\\pi}{2}"
+                }
+            ],
+            "latex_start": "\\int \\frac{\\cos^{2}(x)}{1 + \\sin{x}} \\,dx",
+            "start": "INT x. cos(x) ^ 2 / (1 + sin(x))",
+            "steps": [
+                {
+                    "latex_res": "\\int \\frac{1 - \\sin^{2}(x)}{1 + \\sin{x}} \\,dx",
+                    "res": "INT x. (1 - sin(x) ^ 2) / (1 + sin(x))",
+                    "rule": {
+                        "latex_str": "rewrite \\(\\cos^{2}(x)\\) to \\(1 - \\sin^{2}(x)\\) using identity",
+                        "name": "ApplyIdentity",
+                        "source": "cos(x) ^ 2",
+                        "str": "rewrite cos(x) ^ 2 to 1 - sin(x) ^ 2 using identity",
+                        "target": "1 - sin(x) ^ 2"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\int \\frac{(1 + \\sin{x}) (1 - \\sin{x})}{1 + \\sin{x}} \\,dx",
+                    "res": "INT x. (1 + sin(x)) * (1 - sin(x)) / (1 + sin(x))",
+                    "rule": {
+                        "latex_str": "rewriting \\(1 - \\sin^{2}(x)\\) to \\((1 + \\sin{x}) (1 - \\sin{x})\\)",
+                        "name": "Equation",
+                        "new_expr": "(1 + sin(x)) * (1 - sin(x))",
+                        "old_expr": "1 - sin(x) ^ 2",
+                        "str": "rewriting 1 - sin(x) ^ 2 to (1 + sin(x)) * (1 - sin(x))"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "-(\\int \\sin{x} \\,dx) + (\\int 1 \\,dx)",
+                    "res": "-(INT x. sin(x)) + (INT x. 1)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "--\\cos{x} + 1 x + C",
+                    "res": "--cos(x) + 1 * x + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "IndefiniteIntegralIdentity",
+                        "str": "apply indefinite integral"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\cos{x} + x + C",
+                    "res": "cos(x) + x + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                }
+            ],
+            "type": "Calculation"
+        },
+        {
+            "latex_start": "\\int \\frac{\\sin{x}}{1 + \\sin{x}} \\,dx",
+            "start": "INT x. sin(x) / (1 + sin(x))",
+            "steps": [
+                {
+                    "latex_res": "\\int \\frac{\\sin{x} (1 - \\sin{x})}{1 - \\sin^{2}(x)} \\,dx",
+                    "res": "INT x. sin(x) * (1 - sin(x)) / (1 - sin(x) ^ 2)",
+                    "rule": {
+                        "latex_str": "rewriting to \\(\\frac{\\sin{x} (1 - \\sin{x})}{1 - \\sin^{2}(x)}\\) at 0",
+                        "loc": "0",
+                        "name": "Equation",
+                        "new_expr": "sin(x) * (1 - sin(x)) / (1 - sin(x) ^ 2)",
+                        "str": "rewriting to sin(x) * (1 - sin(x)) / (1 - sin(x) ^ 2) at 0"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\int \\frac{\\sin{x} (1 - \\sin{x})}{\\cos^{2}(x)} \\,dx",
+                    "res": "INT x. sin(x) * (1 - sin(x)) / cos(x) ^ 2",
+                    "rule": {
+                        "latex_str": "rewrite \\(1 - \\sin^{2}(x)\\) to \\(\\cos^{2}(x)\\) using identity",
+                        "name": "ApplyIdentity",
+                        "source": "1 - sin(x) ^ 2",
+                        "str": "rewrite 1 - sin(x) ^ 2 to cos(x) ^ 2 using identity",
+                        "target": "cos(x) ^ 2"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\int \\frac{1}{\\cos{x}} (\\frac{\\sin{x}}{\\cos{x}}) - (\\frac{\\sin{x}}{\\cos{x}}) ^ {2} \\,dx",
+                    "res": "INT x. 1 / cos(x) * (sin(x) / cos(x)) - (sin(x) / cos(x)) ^ 2",
+                    "rule": {
+                        "latex_str": "rewriting to \\(\\frac{1}{\\cos{x}} (\\frac{\\sin{x}}{\\cos{x}}) - (\\frac{\\sin{x}}{\\cos{x}}) ^ {2}\\) at 0",
+                        "loc": "0",
+                        "name": "Equation",
+                        "new_expr": "1 / cos(x) * (sin(x) / cos(x)) - (sin(x) / cos(x)) ^ 2",
+                        "str": "rewriting to 1 / cos(x) * (sin(x) / cos(x)) - (sin(x) / cos(x)) ^ 2 at 0"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\int \\sec{x} (\\frac{\\sin{x}}{\\cos{x}}) - (\\frac{\\sin{x}}{\\cos{x}}) ^ {2} \\,dx",
+                    "res": "INT x. sec(x) * (sin(x) / cos(x)) - (sin(x) / cos(x)) ^ 2",
+                    "rule": {
+                        "latex_str": "rewrite \\(\\frac{1}{\\cos{x}}\\) to \\(\\sec{x}\\) using identity",
+                        "name": "ApplyIdentity",
+                        "source": "1 / cos(x)",
+                        "str": "rewrite 1 / cos(x) to sec(x) using identity",
+                        "target": "sec(x)"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\int \\sec{x} \\tan{x} - (\\frac{\\sin{x}}{\\cos{x}}) ^ {2} \\,dx",
+                    "res": "INT x. sec(x) * tan(x) - (sin(x) / cos(x)) ^ 2",
+                    "rule": {
+                        "latex_str": "rewrite \\(\\frac{\\sin{x}}{\\cos{x}}\\) to \\(\\tan{x}\\) using identity",
+                        "name": "ApplyIdentity",
+                        "source": "sin(x) / cos(x)",
+                        "str": "rewrite sin(x) / cos(x) to tan(x) using identity",
+                        "target": "tan(x)"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\int \\sec{x} \\tan{x} - \\tan^{2}(x) \\,dx",
+                    "res": "INT x. sec(x) * tan(x) - tan(x) ^ 2",
+                    "rule": {
+                        "latex_str": "rewrite \\(\\frac{\\sin{x}}{\\cos{x}}\\) to \\(\\tan{x}\\) using identity",
+                        "name": "ApplyIdentity",
+                        "source": "sin(x) / cos(x)",
+                        "str": "rewrite sin(x) / cos(x) to tan(x) using identity",
+                        "target": "tan(x)"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\int \\sec{x} \\tan{x} - (\\sec^{2}(x) - 1) \\,dx",
+                    "res": "INT x. sec(x) * tan(x) - (sec(x) ^ 2 - 1)",
+                    "rule": {
+                        "latex_str": "rewrite \\(\\tan^{2}(x)\\) to \\(\\sec^{2}(x) - 1\\) using identity",
+                        "name": "ApplyIdentity",
+                        "source": "tan(x) ^ 2",
+                        "str": "rewrite tan(x) ^ 2 to sec(x) ^ 2 - 1 using identity",
+                        "target": "sec(x) ^ 2 - 1"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "(\\int \\sec{x} \\tan{x} \\,dx) - (\\int \\sec^{2}(x) \\,dx) + (\\int 1 \\,dx)",
+                    "res": "(INT x. sec(x) * tan(x)) - (INT x. sec(x) ^ 2) + (INT x. 1)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\sec{x} - \\tan{x} + 1 x + C",
+                    "res": "sec(x) - tan(x) + 1 * x + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "IndefiniteIntegralIdentity",
+                        "str": "apply indefinite integral"
+                    },
+                    "type": "CalculationStep"
+                },
+                {
+                    "latex_res": "\\sec{x} - \\tan{x} + x + C",
+                    "res": "sec(x) - tan(x) + x + SKOLEM_CONST(C)",
+                    "rule": {
+                        "name": "FullSimplify",
+                        "str": "full simplify"
+                    },
+                    "type": "CalculationStep"
+                }
+            ],
+            "type": "Calculation"
+        },
+        {
             "latex_start": "\\int (\\csc{(3 x)} + \\cot{(3 x)}) ^ {2} \\,dx",
             "start": "INT x. (csc(3 * x) + cot(3 * x)) ^ 2",
             "steps": [

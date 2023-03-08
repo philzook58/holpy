@@ -81,6 +81,10 @@
             "expr": "(INT x. cot(x) * csc(x)) = -csc(x) + SKOLEM_CONST(C)"
         },
         {
+            "type": "axiom",
+            "expr": "(INT x. sec(x) * tan(x)) = sec(x) + SKOLEM_CONST(C)"
+        },
+        {
             "type": "header",
             "name": "Common series expansion",
             "level": 1
@@ -639,6 +643,17 @@
         },
         {
             "type": "axiom",
+            "expr": "1 / cos(x) = sec(x)",
+            "category": "trigonometric",
+            "conds": [
+                "cos(x) != 0"
+            ],
+            "attributes": [
+                "bidirectional"
+            ]
+        },
+        {
+            "type": "axiom",
             "expr": "sin(x) / cos(x) = tan(x)",
             "category": "trigonometric",
             "conds": [
@@ -698,6 +713,14 @@
         {
             "type": "axiom",
             "expr": "cot(x)^2 = csc(x)^2 - 1",
+            "category": "trigonometric",
+            "attributes": [
+                "bidirectional"
+            ]
+        },
+        {
+            "type": "axiom",
+            "expr": "tan(x)^2 = sec(x)^2 - 1",
             "category": "trigonometric",
             "attributes": [
                 "bidirectional"
@@ -843,6 +866,14 @@
         },
         {
             "type": "axiom",
+            "expr": "cos(asin(x)) = sqrt(1-x^2)",
+            "category": "trigonometric",
+            "attributes": [
+                "simplify"
+            ]
+        },
+        {
+            "type": "axiom",
             "expr": "sec(atan(x)) = sqrt(x ^ 2 + 1)",
             "category": "trigonometric",
             "attributes": [
@@ -917,6 +948,11 @@
             "conds": [
                 "a != 0"
             ],
+            "path": "standard"
+        },
+        {
+            "type": "problem",
+            "expr": "(INT x. tan(x)) = log(abs(sec(x))) + SKOLEM_CONST(C)",
             "path": "standard"
         },
         {
