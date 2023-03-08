@@ -562,6 +562,7 @@ class Expr:
                 for arg in t.args:
                     rec(arg, bd_vars)
             elif t.ty == DERIV:
+                res.add(t.var)
                 rec(t.body, bd_vars + [t.var])
             elif t.ty == LIMIT:
                 rec(t.lim, bd_vars + [t.var])

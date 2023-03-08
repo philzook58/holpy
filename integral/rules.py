@@ -1823,7 +1823,7 @@ class IntegralEquation(Rule):
         var = e.lhs.var
 
         # List of Skolem arguments is the free variables on the left side
-        skolem_args = e.lhs.get_vars()
+        skolem_args = tuple(v for v in e.lhs.get_vars() if v != var)
 
         # Return f(a) = INT a. g(a)
         return Op("=", e.lhs.body, IndefiniteIntegral(var, e.rhs, skolem_args))

@@ -152,7 +152,7 @@ class ExprTransformer(Transformer):
         return expr.Abs(expr)
 
     def deriv_expr(self, var, body):
-        return expr.Deriv(var, body)
+        return expr.Deriv(str(var), body)
 
     def integral_expr(self, var, lower, upper, body):
         return expr.Integral(str(var), lower, upper, body)
