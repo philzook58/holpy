@@ -793,18 +793,6 @@ class Expr:
             raise NotImplementedError
 
 
-def is_polynomial(e):
-    """Detect polynomials in x."""
-    if e.ty in (VAR, CONST):
-        return True
-    elif e.ty == OP and e.op in ('+', '-', '*'):
-        return all(is_polynomial(arg) for arg in e.args)
-    elif e.ty == OP and e.op == '^':
-        return is_polynomial(e.args[0]) and e.args[1].ty == CONST and isinstance(e.args[1].val, int)
-    else:
-        return False
-
-
 def match(exp: Expr, pattern: Expr) -> Optional[Dict]:
     """Match expr with given pattern.
 
