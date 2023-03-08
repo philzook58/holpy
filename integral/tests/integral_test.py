@@ -3246,26 +3246,12 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.IntSumExchange())
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
-        s1 = "k ^ (-s - 1) * x ^ k / k"
-        s2 = "k^-1 * k ^ (-s - 1) * x ^ k"
-        calc.perform_rule(rules.Equation(s1, s2))
-        s1 = "k^-1 * k ^ (-s - 1)"
-        s2 = "k ^ (-1 + (-s - 1))"
-        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0"))
-        calc.perform_rule(rules.FullSimplify())
         self.assertTrue(goal.is_finished())
 
         goal = file.add_goal("(D x. Li(2, 1-x)) = log(x)/(1-x)", conds=["x < 1", "x>0"])
         proof = goal.proof_by_calculation()
         calc = proof.lhs_calc
         calc.perform_rule(rules.OnLocation(rules.ExpandDefinition("Li"),"0"))
-        calc.perform_rule(rules.FullSimplify())
-        s1 = "k * (-x + 1) ^ (k - 1) / k ^ 2"
-        s2 = "k^1 * k^-2 * (-x+1) ^ (k-1)"
-        calc.perform_rule(rules.Equation(s1, s2))
-        s1 = "k^1 * k^-2"
-        s2 = "k^(1 + (-2))"
-        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0.0"))
         calc.perform_rule(rules.FullSimplify())
         calc = proof.rhs_calc
         calc.perform_rule(rules.Equation("log(x)", "log(1-(1-x))"))
@@ -3326,6 +3312,96 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.OnLocation(rules.IntegrationByParts(u, v), "0.1"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation("(D x. -Li(3, 1-x)) = Li(2, -x+1) / (-x+1)"), "0.0.1.0"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation("Li(s,1) = zeta(s)"), "1.1"))
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(goal.is_finished())
+
+        s1 = "(D x. Li(2, 1/(1+x)))"
+        s2 = "log(x/(1+x)) / (1+x)"
+        goal = file.add_goal(s1+"="+s2, conds=['x>0', 'x<1'])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.OnLocation(rules.ExpandDefinition("Li"), "0"))
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof.rhs_calc
+        s1 = "x/(1+x)"
+        s2 = "1 - 1/(1+x)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.OnLocation(rules.SeriesExpansionIdentity(), "0"))
+        s1 = "-(1/(1+x))"
+        s2 = "(-1) * (1/(1+x))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "((-1) * (1/(1+x)))^(n+1)"
+        s2 = "(-1)^(n+1) * (1/(1+x))^(n+1)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0.0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.ChangeSummationIndex('1'), '0.1'))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "(1 / (x + 1)) ^ n"
+        s2 = "(1 / (x + 1)) ^ (n-1 + 1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "(1 / (x + 1)) ^ (n-1 + 1)"
+        s2 = "(1 / (x + 1)) ^ (n-1) * (1/(x+1))^1"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.1.0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(goal.is_finished())
+
+        s1 = "1 / (x + 1) * Li(2,1 / (x + 1))"
+        s2 = "(D x. -Li(3, 1/(x+1)))"
+        goal = file.add_goal(s1+"="+s2, conds=["x>0", "x<1"])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        calc.perform_rule(rules.OnLocation(rules.ExpandDefinition("Li"), "1"))
+        s1 = "(1 / (x + 1)) ^ k"
+        s2 = "(1 / (x + 1)) ^ (k-1 + 1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "(1 / (x + 1)) ^ (k-1 + 1)"
+        s2 = "(1 / (x + 1)) ^ (k-1) * (1/(x+1))^1"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "1.0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc = proof.rhs_calc
+        calc.perform_rule(rules.OnLocation(rules.ExpandDefinition("Li"), "0.0"))
+        calc.perform_rule(rules.FullSimplify())
+        self.assertTrue(goal.is_finished())
+
+        s1 = "(INT t:[0, x]. log(1+t)^2 / t)"
+        s2 = "log(x)*log(1+x)^2-(2/3)*log(1+x)^3-\
+              2*log(1+x)*Li(2,1/(1+x))-2*Li(3,1/(1+x))+2*zeta(3)"
+        goal = file.add_goal(s1+"="+s2, conds=["x>0", "x<1"])
+        proof = goal.proof_by_calculation()
+        calc = proof.lhs_calc
+        u = "log(1+t)^2"
+        v = "log(t)"
+        calc.perform_rule(rules.IntegrationByParts(u, v))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "log(t)"
+        s2 = "log((1+t) * (t/(1+t)))"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s1 = "log((1+t) * (t/(1+t)))"
+        s2 = "log(1+t) + log(t/(1+t))"
+        calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.0.1.0.0.0"))
+        calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0.0.1.0.0"))
+        calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0.0.1.0"))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "INT t:[0,x]. log(t + 1) ^ 2 / (t + 1)"
+        s2 = "INT t:[0,x]. log(t + 1) ^ 2  .log(t+1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        calc.perform_rule(rules.OnLocation(rules.Substitution('u', 'log(t+1)'), '0.1.1'))
+        calc.perform_rule(rules.OnLocation(rules.DefiniteIntegralIdentity(), "0.1.1"))
+        calc.perform_rule(rules.FullSimplify())
+        s1 = "log(t + 1) / (t + 1) * log(t / (t + 1))"
+        s2 = "log(t/(1+t)) / (1+t) * log(t+1)"
+        calc.perform_rule(rules.Equation(s1, s2))
+        s = "(D x. Li(2, 1/(1+x))) = log(x/(1+x)) / (1+x)"
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(s), "0.0.0.1.0.0"))
+        u = "log(t+1)"
+        v = "Li(2, 1/(1+t))"
+        calc.perform_rule(rules.OnLocation(rules.IntegrationByParts(u, v), "0.0.0.1"))
+        calc.perform_rule(rules.FullSimplify())
+        s = "1 / (x + 1) * Li(2,1 / (x + 1)) = (D x. -Li(3, 1/(x+1)))"
+        calc.perform_rule(rules.OnLocation(rules.ApplyEquation(s), "0.0.0.1.0"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation("Li(s,1) = zeta(s)"), "1.1"))
         calc = proof.rhs_calc
