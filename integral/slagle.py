@@ -1249,6 +1249,7 @@ class Slagle(rules.Rule):
                 applied_rules.append(rules.OnLocation(rule, loc))
             else:
                 applied_rules.append(rule)
+        applied_rules.append(rules.FullSimplify())
         return applied_rules
                 
 
