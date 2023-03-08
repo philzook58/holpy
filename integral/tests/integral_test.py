@@ -1574,7 +1574,7 @@ class IntegralTest(unittest.TestCase):
         file.add_definition("I(a, b) = INT x:[0,oo]. (atan(a*x) - atan(b*x))/x", conds=["a > 0", "b > 0"])
 
         # Evalute D a. I(a, b) for a > 0
-        goal2 = file.add_goal("(D a. I(a,b)) = pi / (2*a)", conds=["a > 0"])
+        goal2 = file.add_goal("(D a. I(a,b)) = pi / (2*a)", conds=["a > 0", "b > 0"])
         proof_of_goal2 = goal2.proof_by_calculation()
         calc = proof_of_goal2.lhs_calc
         calc.perform_rule(rules.OnSubterm(rules.ExpandDefinition("I")))
@@ -1585,7 +1585,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
 
         # Integrate the previous result to get formula for I(a,b)
-        goal3 = file.add_goal("I(a,b) = 1/2 * pi * log(a) + SKOLEM_FUNC(C(b))", conds=["a > 0"])
+        goal3 = file.add_goal("I(a,b) = pi * log(a) / 2 + SKOLEM_FUNC(C(b))", conds=["a > 0", "b > 0"])
         proof_of_goal3 = goal3.proof_by_rewrite_goal(begin=goal2)
         calc = proof_of_goal3.begin
         calc.perform_rule(rules.IntegralEquation())
@@ -1594,7 +1594,7 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
 
         # Obtain value of Skolem function
-        goal4 = file.add_goal("SKOLEM_FUNC(C(a)) = -1/2 * pi * log(a)", conds=["a > 0"])
+        goal4 = file.add_goal("SKOLEM_FUNC(C(a)) = -(pi * log(a) / 2)", conds=["a > 0"])
         proof_of_goal4 = goal4.proof_by_rewrite_goal(begin=goal3)
         calc = proof_of_goal4.begin
         calc.perform_rule(rules.VarSubsOfEquation([{'var': "b", 'expr': "a"}]))
@@ -1603,13 +1603,11 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.FullSimplify())
 
         # Final result
-        goal6 = file.add_goal("I(a, b) = 1/2 * pi * log(a) - 1/2 * pi * log(b)", conds=["a > 0", "b > 0"])
+        goal6 = file.add_goal("I(a, b) = pi * log(a) / 2 - pi * log(b) / 2", conds=["a > 0", "b > 0"])
         proof_of_goal6 = goal6.proof_by_calculation()
         calc = proof_of_goal6.lhs_calc
         calc.perform_rule(rules.ApplyEquation(goal3.goal))
         calc.perform_rule(rules.OnLocation(rules.ApplyEquation(goal4.goal), "1"))
-        calc.perform_rule(rules.FullSimplify())
-        calc = proof_of_goal6.rhs_calc
         calc.perform_rule(rules.FullSimplify())
 
         self.checkAndOutput(file)
