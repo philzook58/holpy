@@ -149,7 +149,7 @@ class ExprTransformer(Transformer):
         return expr.Fun(func_name, *args)
 
     def abs_expr(self, expr):
-        return expr.Abs(expr)
+        return expr.Fun("abs", expr)
 
     def deriv_expr(self, var, body):
         return expr.Deriv(str(var), body)
@@ -181,8 +181,6 @@ class ExprTransformer(Transformer):
     def limit_r_expr(self, var, lim, body):
         return expr.Limit(str(var), lim, body, "+")
 
-    def differential_expr(self, body):
-        return expr.Differential(body)
 
 expr_parser = Lark(grammar, start="expr", parser="lalr", transformer=ExprTransformer())
 interval_parser = Lark(grammar, start="interval", parser="lalr", transformer=ExprTransformer())

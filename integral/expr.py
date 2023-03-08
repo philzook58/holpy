@@ -8,8 +8,8 @@ from collections.abc import Iterable
 from typing import Dict, List, Optional, Set, TypeGuard, Tuple, Union, Callable
 
 
-VAR, CONST, OP, FUN, DERIV, INTEGRAL, EVAL_AT, SYMBOL, LIMIT, INF, INDEFINITEINTEGRAL, DIFFERENTIAL, \
-SKOLEMFUNC, SUMMATION = range(14)
+VAR, CONST, OP, FUN, DERIV, INTEGRAL, EVAL_AT, SYMBOL, LIMIT, INF, INDEFINITEINTEGRAL, \
+SKOLEMFUNC, SUMMATION = range(13)
 
 op_priority = {
     "+": 65, "-": 65, "*": 70, "/": 70, "^": 75, "=": 50, "<": 50, ">": 50, "<=": 50, ">=": 50, "!=": 50
@@ -128,7 +128,7 @@ class Expr:
             return 1 + self.lower.size() + self.upper.size() + self.body.size()
         elif self.ty == LIMIT:
             return 1 + self.lim.size() + self.body.size()
-        elif self.ty in (DIFFERENTIAL, INDEFINITEINTEGRAL):
+        elif self.ty == INDEFINITEINTEGRAL:
             return 1 + self.body.size()
         elif self.ty == SKOLEMFUNC:
             return 1 + len(self.dependent_vars)
@@ -139,9 +139,6 @@ class Expr:
 
     def is_var(self) -> TypeGuard["Var"]:
         return self.ty == VAR
-
-    def is_diff(self) -> bool:
-        return self.ty == DIFFERENTIAL
 
     def is_const(self) -> TypeGuard["Const"]:
         return self.ty == CONST
@@ -328,7 +325,7 @@ class Expr:
                 raise NotImplementedError
         elif self.ty in (FUN, SUMMATION):
             return 95
-        elif self.ty in (DERIV, INTEGRAL, EVAL_AT, INDEFINITEINTEGRAL, DIFFERENTIAL):
+        elif self.ty in (DERIV, INTEGRAL, EVAL_AT, INDEFINITEINTEGRAL):
             return 10
         elif self.ty == LIMIT:
             return 5
@@ -1143,27 +1140,6 @@ class Inf(Expr):
 
     def __getitem__(self, item):
         return getattr(self, item)
-
-
-class Differential(Expr):
-    """Differential of an expression."""
-
-    def __init__(self, body: Expr):
-        assert isinstance(body, Expr)
-        self.body = body
-        self.ty = DIFFERENTIAL
-
-    def __hash__(self):
-        return hash((DIFFERENTIAL, self.body))
-
-    def __eq__(self, other):
-        return isinstance(other, Differential) and self.body == other.body
-
-    def __str__(self):
-        return "DIFF. %s" % str(self.body)
-
-    def __repr__(self):
-        return "Differential(%s)" % repr(self.body)
 
 
 class SkolemFunc(Expr):
