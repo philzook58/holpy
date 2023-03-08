@@ -778,14 +778,33 @@ class HeuristicElimQuadratic(HeuristicRule):
         c = Symbol('c', [CONST])
 
         quadratic_patterns = [
-            (x + (x^Const(2)), lambda m: (Const(0), Const(1), Const(1))),
-            (x + a * (x^Const(2)), lambda m: (Const(0), Const(1), m[a])),
-            (b * x + a * (x^Const(2)), lambda m: (Const(0), m[b], m[a])),
-            (c + x + (x^Const(2)), lambda m: (m[c], Const(1), Const(1))),
-            (c + x + a * (x^Const(2)), lambda m: (m[c], Const(1), m[a])),
-            (c + b * x + (x^Const(2)), lambda m: (m[c], m[b], Const(1))),
-            (c + b * x + a*(x^Const(2)), lambda m: (m[c], m[b], m[a])),
-            (c + (x ^ Const(2)), lambda m: (m[c], Const(0), Const(1))),
+            (x^Const(2) + x, lambda m: (Const(0), Const(1), Const(1))),
+            (x^Const(2) + x + c, lambda m: (m['c'], Const(1), Const(1))),
+            (x^Const(2) + x - c, lambda m: (-m['c'], Const(1), Const(1))),
+            (a * (x^Const(2)) + x, lambda m: (Const(0), Const(1), m['a'])),
+            (a * (x^Const(2)) + x + c, lambda m: (m['c'], Const(1), m['a'])),
+            (a * (x^Const(2)) + x - c, lambda m: (-m['c'], Const(1), m['a'])),
+            (a * (x^Const(2)) - x, lambda m: (Const(0), Const(-1), m['a'])),
+            (a * (x^Const(2)) - x + c, lambda m: (m['c'], Const(-1), m['a'])),
+            (a * (x^Const(2)) - x - c, lambda m: (-m['c'], Const(-1), m['a'])),
+            (a * (x^Const(2)) + b * x, lambda m: (Const(0), m['b'], m['a'])),
+            (a * (x^Const(2)) + b * x + c, lambda m: (m['c'], m['b'], m['a'])),
+            (a * (x^Const(2)) + b * x - c, lambda m: (-m['c'], m['b'], m['a'])),
+            (a * (x^Const(2)) - b * x, lambda m: (Const(0), -m['b'], m['a'])),
+            (a * (x^Const(2)) - b * x + c, lambda m: (m['c'], -m['b'], m['a'])),
+            (a * (x^Const(2)) - b * x - c, lambda m: (-m['c'], -m['b'], m['a'])),
+            (-(a * (x ^ 2)) + x, lambda m: (Const(0), Const(1), -m['a'])),
+            (-(a * (x ^ 2)) + x + c, lambda m: (m['c'], Const(1), -m['a'])),
+            (-(a * (x ^ 2)) + x - c, lambda m: (-m['c'], Const(1), -m['a'])),
+            (-(a * (x ^ 2)) - x, lambda m: (Const(0), Const(-1), -m['a'])),
+            (-(a * (x ^ 2)) - x + c, lambda m: (m['c'], Const(-1), -m['a'])),
+            (-(a * (x ^ 2)) - x - c, lambda m: (-m['c'], Const(-1), -m['a'])),
+            (-(a * (x ^ 2)) + b * x, lambda m: (Const(0), m['b'], -m['a'])),
+            (-(a * (x ^ 2)) + b * x + c, lambda m: (m['c'], m['b'], -m['a'])),
+            (-(a * (x ^ 2)) + b * x - c, lambda m: (-m['c'], m['b'], -m['a'])),
+            (-(a * (x ^ 2)) + -(b * x), lambda m: (Const(0), -m['b'], -m['a'])),
+            (-(a * (x ^ 2)) + -(b * x) + c, lambda m: (m['c'], -m['b'], -m['a'])),
+            (-(a * (x ^ 2)) + -(b * x) - c, lambda m: (-m['c'], -m['b'], -m['a'])),
         ]
 
         quadratic_terms = []
@@ -828,7 +847,7 @@ class HeuristicTrigSubstitution(HeuristicRule):
         pats = [
             ((x ^ Const(2) + a), lambda m: (m["a"], Const(1))),
             (b * (x ^ Const(2)) + a, lambda m: (m["a"], m["b"])),
-            (-b * (x ^ Const(2)) + a, lambda m: (m["a"], Const(-(m["b"].val)))),
+            (-(b * (x ^ Const(2))) + a, lambda m: (m["a"], Const(-(m["b"].val)))),
             (-(x ^ Const(2)) + a, lambda m: (m["a"], Const(-1))),
         ]
 
