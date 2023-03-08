@@ -855,6 +855,14 @@
         },
         {
             "type": "problem",
+            "expr": "(INT x. exp(-(a * x))) = - exp(-(a * x)) / a + SKOLEM_CONST(C)",
+            "conds": [
+                "a != 0"
+            ],
+            "path": "standard"
+        },
+        {
+            "type": "problem",
             "expr": "(INT x. sin(a * x)) = - (cos(a * x) / a) + SKOLEM_CONST(C)",
             "conds": [
                 "a != 0"

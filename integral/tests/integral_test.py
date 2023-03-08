@@ -472,6 +472,45 @@ class IntegralTest(unittest.TestCase):
     def testExponential(self):
         file = compstate.CompFile("UCDavis", 'Exponential')
 
+        calc = file.add_calculation("INT x. 5*exp(x)")
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+
+        calc = file.add_calculation("INT x. 2 - 3*exp(x)")
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+
+        calc = file.add_calculation("INT x:[0,log(2)/7]. 14*exp(7*x)")
+        calc.perform_rule(rules.DefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. 7 ^ (2*x+3)")
+        calc.perform_rule(rules.Substitution("u", "2 * x + 3"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. exp(5*x) * (exp(2*x) / 7 + 3 / exp(3*x))")
+        calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. exp(x) * (1 + 2*exp(x)) ^ 4")
+        calc.perform_rule(rules.Substitution("u", "1 + 2 * exp(x)"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. (exp(4*x) - exp(-4*x))^2")
+        calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. exp(x) * (1 - exp(x)) * (1 + exp(x)) ^ 10")
+        calc.perform_rule(rules.Substitution("u", "1 + exp(x)"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.FullSimplify())
+
         goal01 = file.add_goal("(INT x:[0,1]. (3^x + 4^x) / 5^x) = (-2/5) / (log(3) - log(5)) - (1/5) / (2 * log(2) - log(5))")
         proof01 = goal01.proof_by_calculation()
         calc = proof01.lhs_calc
