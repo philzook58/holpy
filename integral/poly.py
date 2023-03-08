@@ -567,7 +567,7 @@ def to_poly_r(e: expr.Expr, ctx: Context) -> Polynomial:
         if l == u:
             return to_poly(e.body.subst(e.index_var, l), ctx)
         ctx2 = Context(ctx)
-        ctx2.add_condition(expr.Op(">=", expr.Var(e.index_var), expr.Const(0)))
+        ctx2.add_condition(expr.Op(">=", expr.Var(e.index_var), l))
         return singleton(expr.Summation(e.index_var, normalize(e.lower, ctx),
                                         normalize(e.upper, ctx), normalize(e.body, ctx2)))
     else:
