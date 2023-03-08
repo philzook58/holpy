@@ -373,7 +373,7 @@ def equal_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefinit
 
 def add_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefiniteIntegral, ctx: Context):
     tmp = from_poly(t2.body)
-    tmp = to_poly(tmp.subst(t2.var, expr.Var(t1.var)))
+    tmp = to_poly(tmp.subst(t2.var, expr.Var(t1.var)), ctx)
     return NormalDefiniteIntegral(t1.var, t1.lower, t1.upper, t1.body + tmp, ctx)
 
 def minus_normal_definite_integral(t1: NormalDefiniteIntegral, t2: NormalDefiniteIntegral, ctx: Context):

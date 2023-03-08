@@ -563,6 +563,68 @@ class IntegralTest(unittest.TestCase):
 
         self.checkAndOutput(file)
 
+    def testTrigonometric(self):
+        file = compstate.CompFile("UCDavis", 'Trigonometric')
+
+        calc = file.add_calculation("INT x. sin(3*x)")
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+
+        calc = file.add_calculation("INT x. tan(5*x)", conds=["x > 0", "x < pi/10"])
+        calc.perform_rule(rules.ApplyIdentity("tan(5*x)", "sin(5*x) / cos(5*x)"))
+        calc.perform_rule(rules.Substitution("u", "cos(5*x)"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. 5 * sec(4*x) * tan(4*x)", conds=["x > 0", "x < pi/8"])
+        calc.perform_rule(rules.ApplyIdentity("sec(4*x)", "1 / cos(4*x)"))
+        calc.perform_rule(rules.ApplyIdentity("tan(4*x)", "sin(4*x) / cos(4*x)"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Substitution("u", "cos(4*x)"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. (sin(x) + cos(x)) ^ 2", conds=["x > 0", "x < pi/2"])
+        calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0"))
+        calc.perform_rule(rules.OnLocation(rules.Equation(None, "2 * cos(x) * sin(x) + (sin(x) ^ 2 + cos(x) ^ 2)"), "0"))
+        calc.perform_rule(rules.ApplyIdentity("sin(x) ^ 2 + cos(x) ^ 2", "1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Substitution("u", "sin(x)"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. 3 * cos(5*x) ^ 2")
+        calc.perform_rule(rules.Substitution("u", "5 * x"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. (csc(3*x) + cot(3*x)) ^ 2")
+        calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0"))
+        calc.perform_rule(rules.ApplyIdentity("cot(3*x)^2", "csc(3*x)^2 - 1"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.Substitution("u", "3 * x"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.Substitution("u", "3 * x"))
+        calc.perform_rule(rules.FullSimplify())
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+
+        calc = file.add_calculation("INT x. (sec(x))^2 * sqrt(5 + tan(x))")
+        calc.perform_rule(rules.Substitution("u", "5 + tan(x)"))
+        calc.perform_rule(rules.IndefiniteIntegralIdentity())
+        calc.perform_rule(rules.ReplaceSubstitution())
+        calc.perform_rule(rules.FullSimplify())
+
+        self.checkAndOutput(file)
+
     def testWallis(self):
         # Reference:
         # Irresistable Integrals, Section 2.3
@@ -1813,8 +1875,6 @@ class IntegralTest(unittest.TestCase):
         calc = proof_of_goal03.lhs_calc
         e = parser.parse_expr("cos(x)")
         calc.perform_rule(rules.Substitution(var_name='t', var_subst=e))
-        calc.perform_rule(rules.FullSimplify())
-        calc.perform_rule(rules.ApplyIdentity("sin(acos(t))", "sqrt(1 - t^2)"))
         calc.perform_rule(rules.FullSimplify())
         e = parser.parse_expr("t")
         calc.perform_rule(rules.Substitution(var_name='y', var_subst=e))

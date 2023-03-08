@@ -714,13 +714,20 @@ class CompFile:
             raise NotImplementedError
         return self.content[-1]
 
-    def add_calculation(self, calc: Union[str, Expr]) -> Calculation:
+    def add_calculation(self, calc: Union[str, Expr], *, conds: List[Union[str, Expr]] = None) -> Calculation:
         """Add a calculation."""
         ctx = self.get_context()
+        if conds is not None:
+            for i in range(len(conds)):
+                if isinstance(conds[i], str):
+                    conds[i] = parser.parse_expr(conds[i])
+        else:
+            conds = []
+        conds = Conditions(conds)
         if isinstance(calc, str):
-            self.content.append(Calculation(self, ctx, parser.parse_expr(calc)))
+            self.content.append(Calculation(self, ctx, parser.parse_expr(calc), conds=conds))
         elif isinstance(calc, Expr):
-            self.content.append(Calculation(self, ctx, calc))
+            self.content.append(Calculation(self, ctx, calc, conds=conds))
         else:
             raise NotImplementedError
         return self.content[-1]
@@ -928,7 +935,8 @@ def parse_item(parent, item) -> StateItem:
     elif item['type'] == 'Calculation':
         start = parser.parse_expr(item['start'])
         ctx = parent.get_context() if isinstance(parent, CompFile) else parent.ctx
-        res = Calculation(parent, ctx, start)
+        conds = parse_conds(item)
+        res = Calculation(parent, ctx, start, conds=conds)
         for i, step in enumerate(item['steps']):
             res.add_step(parse_step(res, step, i))
         return res

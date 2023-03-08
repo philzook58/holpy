@@ -20,6 +20,10 @@
         },
         {
             "type": "axiom",
+            "expr": "(INT x. -x) = -x ^ 2 / 2 + SKOLEM_CONST(C)"
+        },
+        {
+            "type": "axiom",
             "expr": "(INT x. 1 / x) = log(abs(x)) + SKOLEM_CONST(C)"
         },
         {
@@ -71,6 +75,10 @@
         {
             "type": "axiom",
             "expr": "(INT x. csc(x)^2) = -cot(x) + SKOLEM_CONST(C)"
+        },
+        {
+            "type": "axiom",
+            "expr": "(INT x. cot(x) * csc(x)) = -csc(x) + SKOLEM_CONST(C)"
         },
         {
             "type": "header",
@@ -615,20 +623,27 @@
             "expr": "sec(x)^2 = tan(x)^2 + 1",
             "category": "trigonometric",
             "attributes": [
-                "bidirection"
+                "bidirectional"
             ]
         },
         {
             "type": "axiom",
             "expr": "cos(x)^-1 = sec(x)",
             "category": "trigonometric",
-            "conds": ["cos(x)!=0"]
+            "conds": [
+                "cos(x) != 0"
+            ],
+            "attributes": [
+                "bidirectional"
+            ]
         },
         {
             "type": "axiom",
             "expr": "sin(x) / cos(x) = tan(x)",
             "category": "trigonometric",
-            "conds": ["cos(x)!=0"]
+            "conds": [
+                "cos(x) != 0"
+            ]
         },
         {
             "type": "axiom",
@@ -682,6 +697,14 @@
         },
         {
             "type": "axiom",
+            "expr": "cot(x)^2 = csc(x)^2 - 1",
+            "category": "trigonometric",
+            "attributes": [
+                "bidirectional"
+            ]
+        },
+        {
+            "type": "axiom",
             "expr": "1 / sin(x) ^ n = csc(x) ^ n",
             "conds": [
                 "n != 0"
@@ -702,6 +725,14 @@
             "category": "trigonometric",
             "attributes": [
                 "bidirectional"
+            ]
+        },
+        {
+            "type": "axiom",
+            "expr": "sin(x)^2 + cos(x)^2 = 1",
+            "category": "trigonometric",
+            "attributes": [
+                "simplify"
             ]
         },
         {
@@ -805,7 +836,18 @@
         {
             "type": "axiom",
             "expr": "sin(acos(x)) = sqrt(1-x^2)",
-            "category": "trigonometric"
+            "category": "trigonometric",
+            "attributes": [
+                "simplify"
+            ]
+        },
+        {
+            "type": "axiom",
+            "expr": "sec(atan(x)) = sqrt(x ^ 2 + 1)",
+            "category": "trigonometric",
+            "attributes": [
+                "simplify"
+            ]
         },
         {
             "type": "header",

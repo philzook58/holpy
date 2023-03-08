@@ -209,35 +209,14 @@
                         "start": "INT x:[0,pi / 2]. cos(x) / sin(x) * log(1 / cos(x))",
                         "steps": [
                             {
-                                "latex_res": "\\int_{0}^{1} -\\frac{t \\log{t}}{\\sin{(\\cos^{-1}{t})} \\sqrt{-t ^ {2} + 1}} \\,dt",
-                                "res": "INT t:[0,1]. -(t * log(t) / (sin(acos(t)) * sqrt(-(t ^ 2) + 1)))",
+                                "latex_res": "\\int_{0}^{1} -\\frac{t \\log{t}}{-t ^ {2} + 1} \\,dt",
+                                "res": "INT t:[0,1]. -(t * log(t) / (-(t ^ 2) + 1))",
                                 "rule": {
                                     "latex_str": "substitute \\(t\\) for \\(\\cos{x}\\)",
                                     "name": "Substitution",
                                     "str": "substitute t for cos(x)",
                                     "var_name": "t",
                                     "var_subst": "cos(x)"
-                                },
-                                "type": "CalculationStep"
-                            },
-                            {
-                                "latex_res": "-(\\int_{0}^{1} \\frac{t \\log{t}}{\\sin{(\\cos^{-1}{t})} \\sqrt{-t ^ {2} + 1}} \\,dt)",
-                                "res": "-(INT t:[0,1]. t * log(t) / (sin(acos(t)) * sqrt(-(t ^ 2) + 1)))",
-                                "rule": {
-                                    "name": "FullSimplify",
-                                    "str": "full simplify"
-                                },
-                                "type": "CalculationStep"
-                            },
-                            {
-                                "latex_res": "-(\\int_{0}^{1} \\frac{t \\log{t}}{\\sqrt{1 - t ^ {2}} \\sqrt{-t ^ {2} + 1}} \\,dt)",
-                                "res": "-(INT t:[0,1]. t * log(t) / (sqrt(1 - t ^ 2) * sqrt(-(t ^ 2) + 1)))",
-                                "rule": {
-                                    "latex_str": "rewrite \\(\\sin{(\\cos^{-1}{t})}\\) to \\(\\sqrt{1 - t ^ {2}}\\) using identity",
-                                    "name": "ApplyIdentity",
-                                    "source": "sin(acos(t))",
-                                    "str": "rewrite sin(acos(t)) to sqrt(1 - t ^ 2) using identity",
-                                    "target": "sqrt(1 - t ^ 2)"
                                 },
                                 "type": "CalculationStep"
                             },

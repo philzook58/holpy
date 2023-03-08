@@ -4,6 +4,7 @@ from copy import copy
 from typing import Dict, List
 
 from integral.expr import Expr, eval_expr, match, expr_to_pattern, Op, Const, Var
+from integral.poly import normalize
 from integral.conditions import Conditions
 from integral.context import Context, Identity
 from integral.parser import parse_expr
@@ -219,7 +220,7 @@ def check_cond(cond: Expr, all_conds: Dict[Expr, List[Expr]], inst: Dict[str, Ex
     # Not found
     return list()
 
-def saturate_expr(e: Expr, ineq: Identity, all_conds: Dict[Expr, List[Expr]]):
+def saturate_expr(e: Expr, ineq: Identity, all_conds: Dict[Expr, List[Expr]], ctx: Context):
     """Use the rule ineq to saturate facts about e, add to all_conds."""
     pat = subject_of(ineq.expr)
     inst = match(e, pat)
@@ -233,6 +234,8 @@ def saturate_expr(e: Expr, ineq: Identity, all_conds: Dict[Expr, List[Expr]]):
             old_list = new_list
         for inst in old_list:
             res = ineq.expr.inst_pat(inst)
+            if res.is_compare():
+                res = Op(res.op, res.args[0], normalize(res.args[1], ctx))
             if check_cond(res, all_conds, inst):
                 continue  # already exists
             if e not in all_conds:
@@ -240,12 +243,12 @@ def saturate_expr(e: Expr, ineq: Identity, all_conds: Dict[Expr, List[Expr]]):
             all_conds[e].append(res)
     return
 
-def saturate_once(e: Expr, ineqs: List[Identity], all_conds: Dict[Expr, List[Expr]]):
+def saturate_once(e: Expr, ineqs: List[Identity], all_conds: Dict[Expr, List[Expr]], ctx: Context):
     """Perform one round of saturation"""
     all_subs = e.find_all_subexpr()
     for sube, _ in all_subs:
         for ineq in ineqs:
-            saturate_expr(sube, ineq, all_conds)
+            saturate_expr(sube, ineq, all_conds, ctx)
 
 def all_conds_size(all_conds: Dict[Expr, List[Expr]]) -> int:
     """Return number of facts in all_conds."""
@@ -254,7 +257,7 @@ def all_conds_size(all_conds: Dict[Expr, List[Expr]]) -> int:
         res += len(conds)
     return res        
 
-def saturate(e: Expr, ineqs: List[Identity], all_conds: Dict[Expr, List[Expr]], *, 
+def saturate(e: Expr, ineqs: List[Identity], all_conds: Dict[Expr, List[Expr]], ctx: Context, *, 
              round_limit: int = 5, size_limit: int = 1000):
     """Saturate up to given number of rounds and size limits.
     
@@ -265,7 +268,7 @@ def saturate(e: Expr, ineqs: List[Identity], all_conds: Dict[Expr, List[Expr]], 
     i = 0
     while True:
         prev_size = all_conds_size(all_conds)
-        saturate_once(e, ineqs, all_conds)
+        saturate_once(e, ineqs, all_conds, ctx)
         i += 1
         next_size = all_conds_size(all_conds)
         if prev_size == next_size:
@@ -463,5 +466,5 @@ def check_condition(e: Expr, ctx: Context) -> bool:
         if lemma.expr.is_compare():
             ineqs.append(lemma)
 
-    saturate(subject_of(e), ineqs, all_conds)
+    saturate(subject_of(e), ineqs, all_conds, ctx)
     return len(check_cond(e, all_conds, dict())) == 1
