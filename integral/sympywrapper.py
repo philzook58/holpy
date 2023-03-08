@@ -1,4 +1,5 @@
 
+import math
 import sympy
 from fractions import Fraction
 
@@ -45,7 +46,7 @@ def convert_to_sympy(e: Expr):
             raise NotImplementedError
     return rec(e)
 
-def convert_from_sympy(e):
+def convert_from_sympy(e, ctx: Context) -> Expr:
     def rec(e):
         if isinstance(e, sympy.core.symbol.Symbol):
             return Var(e.name)
@@ -54,15 +55,17 @@ def convert_from_sympy(e):
         elif isinstance(e, sympy.core.numbers.Rational):
             return Const(Fraction(e.numerator, e.denominator))
         elif isinstance(e, sympy.core.add.Add):
-            return rec(e.args[0]) + rec(e.args[1])
+            args = [rec(arg) for arg in e.args]
+            return sum(args)
         elif isinstance(e, sympy.core.mul.Mul):
-            return rec(e.args[0]) * rec(e.args[1])
+            args = [rec(arg) for arg in e.args]
+            return math.prod(args)
         elif isinstance(e, sympy.core.power.Pow):
             return rec(e.args[0]) ** rec(e.args[1])
         else:
             print('convert_from_sympy', e)
             raise NotImplementedError
-    return normalize(rec(e), Context())
+    return normalize(rec(e), ctx)
 
-def partial_fraction(e: Expr):
-    return convert_from_sympy(sympy.apart(convert_to_sympy(e)))
+def partial_fraction(e: Expr, ctx: Context) -> Expr:
+    return convert_from_sympy(sympy.apart(convert_to_sympy(e)), ctx)

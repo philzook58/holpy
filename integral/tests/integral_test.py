@@ -183,13 +183,13 @@ class IntegralTest(unittest.TestCase):
         self.assertEqual(str(calc.last_expr), "-(81 * 2 ^ (2/3) / 11) + 945 * 3 ^ (2/3) / 44")
 
         calc = file.add_calculation("INT x:[-1, 0]. (3 * x ^ 4 + 3 * x ^ 2 + 1) / (x ^ 2 + 1)")
-        calc.perform_rule(rules.OnLocation(rules.Equation(None, "3*x^2 + 1/(x^2+1)"), "0"))
+        calc.perform_rule(rules.OnLocation(rules.PartialFractionDecomposition(), "0"))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
         self.assertEqual(str(calc.last_expr), "pi / 4 + 1")
 
         calc = file.add_calculation("INT x:[4, exp(1) + 3]. (x ^ 3 - 12 * x ^ 2 - 42) / (x - 3)")
-        calc.perform_rule(rules.OnLocation(rules.Equation(None, "x^2 - 9*x - 27 - 123 / (x - 3)"), "0"))
+        calc.perform_rule(rules.OnLocation(rules.PartialFractionDecomposition(), "0"))
         calc.perform_rule(rules.DefiniteIntegralIdentity())
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.Substitution("u", parser.parse_expr("x - 3")))

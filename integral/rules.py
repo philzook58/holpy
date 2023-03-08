@@ -19,6 +19,7 @@ from integral.context import Context, apply_subterm, body_conds
 from integral import poly
 from integral.poly import from_poly, to_poly, normalize
 from integral.conditions import Conditions
+from integral import sympywrapper
 
 
 def deriv(var: str, e: Expr, ctx: Context) -> Expr:
@@ -478,6 +479,26 @@ class Linearity(Rule):
                 return e
         return rec(e)
 
+
+class PartialFractionDecomposition(Rule):
+    """Apply partial fraction decomposition from sympy."""
+    def __init__(self):
+        self.name = "PartialFractionDecomposition"
+
+    def __str__(self):
+        return "partial fraction decomposition"
+    
+    def export(self):
+        return {
+            "name": self.name,
+            "str": str(self)
+        }
+
+    def eval(self, e: Expr, ctx: Context) -> Expr:
+        if sympywrapper.is_rational(e):
+            return sympywrapper.partial_fraction(e, ctx)
+        else:
+            return e
 
 class ApplyIdentity(Rule):
     """Apply identities (trigonometric, etc) to the current term.
