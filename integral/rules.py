@@ -1103,6 +1103,8 @@ class Substitution(Rule):
         ctx2 = body_conds(e, ctx)
         if e.body.is_times() and e.body.args[1] == dfx:
             body = e.body.args[0]
+        elif e.body.is_times() and e.body.args[0] == dfx:
+            body = e.body.args[1]
         else:
             body = normalize(e.body / dfx, ctx2)
         body_subst = body.replace(var_subst, var_name)
@@ -1350,7 +1352,7 @@ class IntegrationByParts(Rule):
 
     """
 
-    def __init__(self, u: Expr, v: Expr):
+    def __init__(self, u: Union[str, Expr], v: Union[str, Expr]):
         self.name = "IntegrationByParts"
         if isinstance(u, str):
             u = parser.parse_expr(u)
@@ -1448,8 +1450,10 @@ class SplitRegion(Rule):
 class IntegrateByEquation(Rule):
     """When the initial integral occurs in the steps."""
 
-    def __init__(self, lhs: Expr):
+    def __init__(self, lhs: Union[str, Expr]):
         self.name = "IntegrateByEquation"
+        if isinstance(lhs, str):
+            lhs = parser.parse_expr(lhs)
         self.lhs = lhs
         self.coeff = None
 
