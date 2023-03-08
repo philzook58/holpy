@@ -870,6 +870,8 @@ def parse_rule(item) -> Rule:
     elif item['name'] == 'FunEquation':
         func_name = item['func_name']
         return rules.FunEquation(func_name)
+    elif item['name'] == 'PartialFractionDecomposition':
+        return rules.PartialFractionDecomposition()
     else:
         print(item['name'], flush=True)
         raise NotImplementedError
