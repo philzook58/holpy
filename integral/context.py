@@ -439,7 +439,7 @@ def apply_subterm(e: Expr, f: Callable[[Expr, Context], Expr], ctx: Context) -> 
             lower = rec(e.lower, ctx)
             upper = rec(e.upper, ctx)
             body = rec(e.body, body_conds(e, ctx))
-            return f(expr.Integral(e.var, lower, upper, body, e.diff), ctx)
+            return f(expr.Integral(e.var, lower, upper, body), ctx)
         elif e.is_evalat():
             lower = rec(e.lower, ctx)
             upper = rec(e.upper, ctx)

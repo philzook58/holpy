@@ -1279,7 +1279,7 @@ class IndefiniteIntegral(Expr):
 class Integral(Expr):
     """Integral of an expression."""
 
-    def __init__(self, var: str, lower: Expr, upper: Expr, body: Expr, diff:Expr = None):
+    def __init__(self, var: str, lower: Expr, upper: Expr, body: Expr):
         assert isinstance(var, str) and isinstance(lower, Expr) and \
                isinstance(upper, Expr) and isinstance(body, Expr)
         self.ty = INTEGRAL
@@ -1287,7 +1287,6 @@ class Integral(Expr):
         self.lower = lower
         self.upper = upper
         self.body = body
-        self.diff = Var(self.var) if diff == None else diff
 
     def __hash__(self):
         return hash((INTEGRAL, self.var, self.lower, self.upper, self.body))

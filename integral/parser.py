@@ -25,7 +25,6 @@ grammar = r"""
         | "\|" expr "\|" -> abs_expr 
         | "$" expr "$" -> trig_expr
         | "INT" CNAME ":[" expr "," expr "]." expr -> integral_expr
-        | "INT" CNAME ":[" expr "," expr "]." expr "." expr -> integral_expr2
         | "INT" CNAME "." expr -> indefinite_integral_expr
         | "INT" CNAME "[" CNAME ("," CNAME)* "]" "." expr -> indefinite_integral_skolem_expr
         | "[" expr "]_" CNAME "=" expr "," expr -> eval_at_expr
@@ -155,9 +154,6 @@ class ExprTransformer(Transformer):
 
     def integral_expr(self, var, lower, upper, body):
         return expr.Integral(str(var), lower, upper, body)
-
-    def integral_expr2(self, var, lower, upper, body, diff):
-        return expr.Integral(str(var), lower, upper, body, diff)
 
     def indefinite_integral_expr(self, var, body):
         return expr.IndefiniteIntegral(str(var), body, tuple())

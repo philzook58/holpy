@@ -533,8 +533,6 @@ def to_poly_r(e: expr.Expr, ctx: Context) -> Polynomial:
         return to_poly(normalize(upper, ctx) - normalize(lower, ctx), ctx)
 
     elif e.is_integral():
-        if e.diff != expr.Var(e.var):
-            e = expr.Integral(e.var, e.lower, e.upper, e.body * expr.Deriv(e.var, e.diff))
         ctx2 = Context(ctx)
         ctx2.add_condition(expr.Op(">", expr.Var(e.var), e.lower))
         ctx2.add_condition(expr.Op("<", expr.Var(e.var), e.upper))

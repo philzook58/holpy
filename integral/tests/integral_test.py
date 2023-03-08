@@ -3156,8 +3156,6 @@ class IntegralTest(unittest.TestCase):
         s1 = "sin(1/2 * t) / cos(1/2 * t)"
         s2 = "tan(1/2 * t)"
         calc.perform_rule(rules.ApplyIdentity(s1, s2))
-        s2 = "INT t:[0,pi / 2]. 2 / (tan(1/2 * t) ^ 2 + 2 * (y * tan(1/2 * t)) + 1) . tan(t/2)"
-        calc.perform_rule(rules.Equation(None, s2))
         calc.perform_rule(rules.Substitution("u", "tan(t/2)"))
         calc.perform_rule(rules.FullSimplify())
         s1 = "2 * u * y + u ^ 2 + 1"
@@ -3215,9 +3213,6 @@ class IntegralTest(unittest.TestCase):
         s2 = "acos(y) / 2"
         calc.perform_rule(rules.OnLocation(rules.ApplyIdentity(s1, s2), "0.1"))
         calc.perform_rule(rules.FullSimplify())
-        s1 = "INT y:[-1,1]. acos(y) / sqrt(-(y ^ 2) + 1)"
-        s2 = "- INT y:[-1,1]. acos(y) .acos(y)"
-        calc.perform_rule(rules.Equation(s1, s2))
         calc.perform_rule(rules.Substitution("x", "acos(y)"))
         calc.perform_rule(rules.FullSimplify())
         calc.perform_rule(rules.DefiniteIntegralIdentity())
@@ -3530,9 +3525,6 @@ class IntegralTest(unittest.TestCase):
         calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0.0.1.0.0"))
         calc.perform_rule(rules.OnLocation(rules.ExpandPolynomial(), "0.0.1.0"))
         calc.perform_rule(rules.FullSimplify())
-        s1 = "INT t:[0,x]. log(t + 1) ^ 2 / (t + 1)"
-        s2 = "INT t:[0,x]. log(t + 1) ^ 2  .log(t+1)"
-        calc.perform_rule(rules.Equation(s1, s2))
         calc.perform_rule(rules.OnLocation(rules.Substitution('u', 'log(t+1)'), '0.1.1'))
         calc.perform_rule(rules.OnLocation(rules.DefiniteIntegralIdentity(), "0.1.1"))
         calc.perform_rule(rules.FullSimplify())
