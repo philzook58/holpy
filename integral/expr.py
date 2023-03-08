@@ -696,7 +696,12 @@ class Expr:
     def is_spec_function(self, fun_name):
         """Return true iff e is formed by rational options of fun_name."""
         v = Symbol("v", [VAR, OP, FUN])
-        pat1 = sin(v)
+        if fun_name == "sin":
+            pat1 = sin(v)
+        elif fun_name == "cos":
+            pat1 = cos(v)
+        else:
+            return False
         if len(find_pattern(self, pat1)) != 1:
             return False
 
