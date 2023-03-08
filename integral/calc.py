@@ -2,10 +2,9 @@
 Record integral calculation process.
 
 """
-import json
 from integral import latex
 from integral import rules
-from integral.expr import Location, Var
+from integral.expr import Location, Var, Expr
 
 
 class IntegrationStep:
@@ -351,3 +350,12 @@ class SplitRegionStep(IntegrationStep):
                 "c": str(self.zero_point)
             }
         }
+class EquationStep(IntegrationStep):
+    def __init__(self, lhs:Expr, rhs:Expr, loc=[]) -> None:
+        self.lhs = lhs
+        self.rhs = rhs
+        self.loc = Location(loc)
+        self.reason = "Equation"
+
+    def __str__(self) -> str:
+        return "Rewrite %s to %s" % (self.lhs, self.rhs)

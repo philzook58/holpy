@@ -3,6 +3,7 @@ import functools
 import operator
 import math
 import multiprocessing.pool
+
 from integral.expr import *
 from integral.parser import parse_expr
 from integral import rules
@@ -11,6 +12,7 @@ from integral import latex
 from integral import context
 from integral.poly import from_poly, to_poly
 from integral import compstate
+from integral import norm
 
 a = Symbol('a', [CONST])
 b = Symbol('b', [CONST])
@@ -339,7 +341,7 @@ class ElimAbsRule(AlgorithmRule):
 
 # TrigIdentity must execute before HalfAngleIndetity
 algorithm_rules = [
-    AlgoNonLinearSubstitution,
+    # AlgoNonLinearSubstitution,
     # DividePolynomial,
     LinearSubstitution,
     TrigIdentity,
@@ -913,32 +915,19 @@ class HeuristicRationalSineCosine(HeuristicRule):
     """
     def eval(self, e):
         e_body = e.body
-        if e_body.is_spec_function("sin"):
-            """
-            Replace sin(v) by 2*u/(1+u^2) 
-            """
-            v = Symbol("v", [VAR, OP, FUN])
-            pat1 = sin(v)
-            s = find_pattern(e_body, pat1)[0]
-            new_e_body = e_body.replace(s, parse_expr('2*u/(1+u^2)')) * parse_expr('2/(1+u^2)')
-            lower = tan(e.lower/2)
-            upper = tan(e.upper/2)
-            return [(Integral("u", lower, upper, new_e_body), None)]
-            
-        elif e.is_spec_function("cos"):
-            """
-            Repalce cos(v) by (1-u^2)/(1+u^2) 
-            """
-            v = Symbol("v", [VAR, OP, FUN])
-            pat1 = sin(v)
-            s = find_pattern(e_body, pat1)[0]
-            new_e_body = e_body.replace(s, parse_expr('(1-u^2)/(1+u^2)')) * parse_expr('2/(1+u^2)')
-            lower = tan(e.lower/2)
-            upper = tan(e.upper/2)
-            return [(Integral("u", lower, upper, new_e_body), None)]
-
-        else:
+        if not (e_body.is_spec_function("sin"), 
+                e_body.is_spec_function("cos")):
             return [(e, None)]
+        u = gen_rand_letter(e.var)
+        rule = rules.Substitution(u, tan(Var(e.var)/2))
+        subst_integral = rule.eval(e, ctx)
+        subst_step = calc.SubstitutionStep(subst_integral, u, 
+                tan(Var(e.var)/2), rule.f)
+        q_norm_body = norm.quotient_normalize(subst_integral.body, ctx)
+        q_norm_integral = Integral(subst_integral.var, subst_integral.lower, 
+                     subst_integral.upper, q_norm_body)
+        equation_step = calc.EquationStep(subst_integral.body, q_norm_body)
+        return [(q_norm_integral, [subst_step, equation_step])]
 
 
 heuristic_rules = [
@@ -950,7 +939,7 @@ heuristic_rules = [
     HeuristicExpandPower,
     HeuristicTrigSubstitution,
     HeuristicExponentBase,
-    # HeuristicRationalSineCosine
+    HeuristicRationalSineCosine
 ]
 
 
@@ -1219,6 +1208,8 @@ class Slagle(rules.Rule):
                 rule = rules.ApplyIdentity(step.before_trig, step.after_trig)
             elif step.reason == "Unfold power":
                 rule = rules.ExpandPolynomial()
+            elif step.reason == "Equation":
+                rule = rules.Equation(step.lhs, step.rhs)
             else:
                 raise NotImplementedError(step.reason)
             if not loc.is_empty:

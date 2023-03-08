@@ -26,7 +26,7 @@ test_cases = {
         # ("INT x:[-1, 0]. (3 * x ^ 4 + 3 * x ^ 2 + 1) / (x ^ 2 + 1)" , "1 + 1/4 * pi"),
         # ("INT x:[4, exp(1) + 3]. (x ^ 3 - 12 * x ^ 2 - 42) / (x - 3)" , "-461/6 + -45 * exp(1) + -3/2 * exp(2) + 1/3 * exp(3)"),
         ("INT x:[0, pi / 2]. sin(x) * cos(x) ^ 3" , "1/4"),
-        #("INT x:[0, pi]. (1 - sin(x)^3)" , "-1/8 * sqrt(3) + 1/6 * pi"),
+        # ("INT x:[0, pi]. (1 - sin(x)^3)" , "-1/8 * sqrt(3) + 1/6 * pi"),
         ("INT x:[pi/6, pi/2]. cos(x) ^ 2" , "1/4 * pi"),
         ("INT x:[0, 1]. (1 - x^2) ^ (1/2)" , "1/2 * pi"),
         ("INT x:[0, sqrt(2)]. sqrt(2 - x^2)" , "2 * sqrt(2) + sqrt(2) * pi"),
@@ -49,7 +49,8 @@ test_cases = {
         # ("INT x:[0, pi/2]. exp(2*x)*cos(x)", ""),
         # ("INT x:[0,pi]. (x * sin(x))^2", ""),
         # ("INT x:[1, exp(1)]. sin(log(x))", ""),
-        # ("INT x:[1/exp(1), exp(1)]. abs(log(x))", "")
+        ("INT x:[1/exp(1), exp(1)]. abs(log(x))", ""),
+        ("INT x:[0, pi/2]. 1/(1 + cos(x))", "")
     ],
 
     "MIT/2013": {
