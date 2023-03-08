@@ -155,7 +155,7 @@ class SubstitutionInverseStep(IntegrationStep):
         }
 
     def compute(self):
-        return self.comp(e)
+        return self.comp(self.e)
 
 class UnfoldPowerStep(IntegrationStep):
     def __init__(self, e, loc=[]):
@@ -177,7 +177,7 @@ class UnfoldPowerStep(IntegrationStep):
         }
 
     def compute(self):
-        return self.comp(e)
+        return self.comp(self.e)
 
 class EquationSubstitutionStep(IntegrationStep):
     def __init__(self, e, loc=[]):
@@ -198,7 +198,7 @@ class EquationSubstitutionStep(IntegrationStep):
         }
 
     def compute(self):
-        return self.comp(e)
+        return self.comp(self.e)
 
 class TrigSubstitutionStep(IntegrationStep):
     def __init__(self, e, loc, old_trig, new_trig, tr_rule):

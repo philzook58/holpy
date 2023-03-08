@@ -24,8 +24,10 @@ pat2 = a * x
 pat3 = e ^ a
 pat4 = a + x
 pat5 = x + a
+pat6 = x - a
+pat7 = a * x - b
 
-linear_pat = [pat0, pat1, pat2, pat4, pat5]
+linear_pat = [pat0, pat1, pat2, pat4, pat5, pat6, pat7]
 
 
 ctx = context.Context()
@@ -114,8 +116,9 @@ class DividePolynomial(AlgorithmRule):
         else:
             denom = e_body.args[1].args[0]
         try:
-            new_integral = rules.PolynomialDivision().eval(e)
-            step = calc.PolynomialDivisionStep(new_integral, denom, new_integral.body, Location([0]))
+            new_body = rules.PartialFractionDecomposition().eval(e.body, ctx)
+            new_integral = Integral(e.var, e.lower, e.upper, new_body)
+            step = calc.PolynomialDivisionStep(new_integral, denom, new_body, Location([0]))
             return new_integral, [step]
         except NotImplementedError:
             return e, None
@@ -161,25 +164,34 @@ def substitution(integral, subst):
     steps = [calc.SubstitutionStep(e=new_e, var_name=new_var, var_subst=subst, f=rule.f, loc=[])]
     return new_e, steps
 
-def linear_substitution(integral):
-    assert isinstance(integral, Integral), "%s Should be an integral." % (integral)
-    func_body = collect_spec_expr(integral.body, Symbol('f', [FUN]))
+def is_linear(p: Expr) -> bool:
+    return functools.reduce(lambda x,y:x or y, 
+            [match(p, pat) for pat in linear_pat])
 
+def linear_substitution(e:Integral) -> Integral:
+    assert isinstance(e, Integral), "%s Should be an integral." % (e)
+    body = e.body
+    if body.is_divides():
+        if body.args[0].is_constant():
+            denom = body.args[1]
+            for pat in linear_pat:
+                if match(denom, pat):
+                    return substitution(e, denom)
+    func_body = collect_spec_expr(e.body, Symbol('f', [FUN]))            
     if len(func_body) == 1 and any([match(func_body[0], p) for p in linear_pat]): 
-        return substitution(integral, func_body[0])
+        return substitution(e, func_body[0])
 
     elif len(func_body) == 0:
-        power_body = collect_spec_expr(integral.body, pat3)
+        power_body = collect_spec_expr(body, pat3)
         if len(power_body) == 0:
-            return integral, None
-        is_linear = functools.reduce(lambda x,y:x or y, [match(power_body[0], pat) for pat in linear_pat])
-        if len(power_body) == 1 and is_linear:
-            return substitution(integral, power_body[0])
+            return e, None
+        if len(power_body) == 1 and is_linear(power_body[0]):
+            return substitution(e, power_body[0])
         else:
-            return integral, None
+            return e, None
 
     else:
-        return integral, None
+        return e, None
 
 class LinearSubstitution(AlgorithmRule):
     """Algorithm rule (d) in Slagle's thesis.
@@ -342,7 +354,7 @@ class ElimAbsRule(AlgorithmRule):
 # TrigIdentity must execute before HalfAngleIndetity
 algorithm_rules = [
     # AlgoNonLinearSubstitution,
-    # DividePolynomial,
+    DividePolynomial,
     LinearSubstitution,
     TrigIdentity,
     # ElimAbsRule,
@@ -1024,7 +1036,7 @@ class OrNode(GoalNode):
                 algo_steps.append(calc.SimplifyStep(norm_integral, self.loc))
                 cur_integral = norm_integral
 
-        if cur_integral.ty == INTEGRAL:
+        if cur_integral.is_integral():
             # Single integral case
             for rule in heuristic_rules:
                 res = rule().eval(cur_integral)
@@ -1035,11 +1047,10 @@ class OrNode(GoalNode):
                         norm_r = rules.FullSimplify().eval(r, ctx=ctx)
                         if norm_r != r:
                             steps.append(calc.SimplifyStep(norm_r, self.loc))
-                        if norm_r.ty == INTEGRAL and norm_r not in not_solved_integral:
+                        if norm_r.is_integral() and norm_r not in not_solved_integral:
                             self.children.append(OrNode(norm_r, loc=self.loc, parent=self, steps=algo_steps+steps))
                         elif norm_r not in not_solved_integral:
                             self.children.append(AndNode(norm_r, loc=self.loc, parent=self, steps=algo_steps+steps))
-        
         else:
             # Linear combination of integrals
             not_solved_integral.remove(self.root)
@@ -1168,6 +1179,7 @@ class Slagle(rules.Rule):
     """Wrapper for slagle algorithm."""
     def __init__(self, p : Integral, time_out:Optional[int]=None):
         self.p = p
+        self.node = OrNode(p)
         if time_out is None:
             self.timeout = 5
         else:
@@ -1210,9 +1222,11 @@ class Slagle(rules.Rule):
                 rule = rules.ExpandPolynomial()
             elif step.reason == "Equation":
                 rule = rules.Equation(step.lhs, step.rhs)
+            elif step.reason == "Rewrite fraction":
+                rule = rules.PartialFractionDecomposition()
             else:
                 raise NotImplementedError(step.reason)
-            if not loc.is_empty:
+            if not loc.is_empty():
                 applied_rules.append(rules.OnLocation(rule, loc))
             else:
                 applied_rules.append(rule)
