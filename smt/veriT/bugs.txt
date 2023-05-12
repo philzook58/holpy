@@ -1,1 +1,2 @@
 1. UF//sledgehammer/TypeSafe/uf.913303.smt2 cong
+2. define-fun is not supported

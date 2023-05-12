@@ -44,6 +44,7 @@ smt_decl_grammar = r"""
     ?vname: VNAME -> mk_vname
         | QUOTED_VNAME -> mk_quoted_vname
         | "(Array " VNAME VNAME ")" -> mk_array
+        | "(_ BitVec" INT ")" -> mk_bitvector
 
     ?term: "(declare-fun" vname "()" vname ")" -> mk_tm
         | "(declare-fun" vname "(" vname+ ")" vname ")" -> mk_fun
@@ -81,6 +82,9 @@ class DeclTransformer(Transformer):
 
     def mk_array(self, domain, codomain):
         return hol_type.TFun(str_to_hol_type(domain), str_to_hol_type(codomain))
+    
+    def mk_bitvector(self, num):
+        return "bitvector"
 
 decl_parser = Lark(smt_decl_grammar, start="term", parser="lalr", transformer=DeclTransformer())
 
@@ -118,7 +122,7 @@ veriT_grammar = r"""
 
     ?step_annotation : ":premises" "(" step_id+ ")" -> mk_step_premises
                     | ":args" "(" step_arg_pair+ ")" -> mk_step_args
-                    | ":discharge" "(" CNAME* ")" -> mk_discharge
+                    | ":discharge" "(" step_id* ")" -> mk_discharge
 
     ?proof_term : term
 
@@ -131,6 +135,9 @@ veriT_grammar = r"""
             | "(not " term ")" -> mk_neg_tm
             | "(or " term+ ")" -> mk_disj_tm
             | "(and " term+ ")" -> mk_conj_tm
+            | "(bvsgt" term term ")" -> mk_bvsgt_tm 
+            | "(bvsle" term term ")" -> mk_bvsgt_tm 
+            | "(bvslt" term term ")" -> mk_bvsgt_tm 
             | "(=>" term term ")" -> mk_impl_tm
             | "(=" term term ")" -> mk_eq_tm
             | "(+" term* ")" -> mk_plus_tm
@@ -158,6 +165,7 @@ veriT_grammar = r"""
             | "(! " term (":pattern " term)+ ")" -> mk_pat_term
             | INT -> mk_int
             | DECIMAL -> mk_decimal
+            | "#b" INT -> mk_bitval
             | name
 
     ?step_id : vname ("." vname)* -> mk_step_id
@@ -300,6 +308,8 @@ class ProofTransformer(Transformer):
                 return hol_term.Var(tm, ctx[tm].get_type())
         if tm in self.let_tm:
             return self.let_tm[tm]
+        if tm.startswith("termITE"):
+            return hol_term.Const(tm, hol_type.BoolType)
         # If not found in all these contexts, raise error
         raise ValueError(tm)
 
@@ -389,6 +399,9 @@ class ProofTransformer(Transformer):
 
     def mk_conj_tm(self, *tms):
         return hol_term.And(*tms)
+    
+    def mk_bvsgt_tm(self, tm1, tm2):
+        return hol_term.Int(1)
 
     def mk_impl_tm(self, *tms):
         return hol_term.Implies(*tms)
@@ -419,6 +432,9 @@ class ProofTransformer(Transformer):
 
     def mk_decimal(self, num):
         return hol_term.Real(Fraction(num))
+    
+    def mk_bitval(self, num):
+        return hol_term.Int(int(num))
 
     def mk_plus_tm(self, *ts):
         res = ts[0]

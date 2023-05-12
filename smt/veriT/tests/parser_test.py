@@ -26,7 +26,7 @@ def test_parse_step(verit_proof, ctx):
     for s in verit_proof.replace("\r", "").split("\n"):
         if s == "unsat" or s == "":
             continue
-        # print(s)
+        #print(s)
         step = parser.parse(s)
         if isinstance(step, command.Step) and step.rule_name == "lia_generic":
             print('lia_generic')
@@ -407,6 +407,14 @@ class ParserTest(unittest.TestCase):
 
         for path in test_paths:
             test_path(path)
+
+    def testParseBV(self):
+        test_paths = [
+            'BV/unsat/test1.smt2'
+        ]
+
+        for path in test_paths:
+            test_path(path, write_file=True)
 
     def testParseSMTAssertions(self):
         test_paths = [
