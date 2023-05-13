@@ -48,10 +48,11 @@ def test_file(filename, write_file=False, show_time=True, veriT_only=False, pars
         return
 
     abs_name = smtlib_path + filename
-    if not interface.is_unsat(abs_name):
-        print('sat / unknown / unsupported')
-        return
+    print("Test file", abs_name)
 
+    # if not interface.is_unsat(abs_name):
+    #     print('sat / unknown / unsupported')
+    #     return
     
     if parse_assertion:
         assts = proof_rec.get_assertions(abs_name)
@@ -62,6 +63,7 @@ def test_file(filename, write_file=False, show_time=True, veriT_only=False, pars
     start_time = time.perf_counter()
     verit_proof = interface.solve(abs_name)
     solve_time = time.perf_counter() - start_time
+    print("Finished solve in", solve_time)
     if verit_proof is None:
         return
 
@@ -83,7 +85,6 @@ def test_file(filename, write_file=False, show_time=True, veriT_only=False, pars
     # Only check whether veriT finishes
     if veriT_only:
         return
-
 
     # Parse
     start_time = time.perf_counter()
@@ -410,7 +411,9 @@ class ParserTest(unittest.TestCase):
 
     def testParseBV(self):
         test_paths = [
-            'BV/unsat/test1.smt2'
+            'BV/unsat/inf6.smt2',
+            'BV/unsat/Prim_4.smt2',
+            'BV/unsat/predicate_125.smt2',
         ]
 
         for path in test_paths:

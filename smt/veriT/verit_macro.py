@@ -619,6 +619,7 @@ class Equiv1Macro(Macro):
             return Thm(Or(*args), pt.hyps)
         else:
             raise VeriTException("equiv1", "unexpected result")
+
     def get_proof_term(self, args, prevs):
         pt = prevs[0]
         pt1 = logic.apply_theorem("equiv1", pt)

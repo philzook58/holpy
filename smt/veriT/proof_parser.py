@@ -18,21 +18,21 @@ class VeriTParseException(Exception):
         return "%s: %s" % (self.tm_name, self.message)
 
 def str_to_hol_type(s: Union[hol_type.Type, str]) -> hol_type.Type:
-        """Convert string to HOL type."""
-        if isinstance(s, hol_type.Type):
-            return s
-        s = str(s)
-        if s == "Bool":
-            return hol_type.BoolType
-        elif s == "Int":
-            return hol_type.IntType
-        elif s == "Real":
-            return hol_type.RealType
-        elif s == "ArrayIntInt":
-            return hol_type.TFun(hol_type.IntType, hol_type.IntType)
-        else:
-            # All other types are converted to type variables.
-            return hol_type.TVar(s)
+    """Convert string to HOL type."""
+    if isinstance(s, hol_type.Type):
+        return s
+    s = str(s)
+    if s == "Bool":
+        return hol_type.BoolType
+    elif s == "Int":
+        return hol_type.IntType
+    elif s == "Real":
+        return hol_type.RealType
+    elif s == "ArrayIntInt":
+        return hol_type.TFun(hol_type.IntType, hol_type.IntType)
+    else:
+        # All other types are converted to type variables.
+        return hol_type.TVar(s)
 
 
 # Grammar of SMT-LIB language
@@ -58,6 +58,7 @@ smt_decl_grammar = r"""
     %import common.NUMBER
     %ignore WS
 """
+
 @v_args(inline=True)
 class DeclTransformer(Transformer):
     """A parser for declaration in SMT-LIB."""
@@ -73,7 +74,7 @@ class DeclTransformer(Transformer):
         return name[1:-1]
 
     def mk_tm(self, name, ty):
-        "Make a term: name :: ty"
+        """Make a term: name :: ty"""
         return {name: str_to_hol_type(ty)}
 
     def mk_fun(self, name, *args):
@@ -114,15 +115,15 @@ veriT_grammar = r"""
     ?clause : "(cl " proof_term* ")" -> mk_clause
             | "(cl)" -> mk_empty_clause
     
-    ?single_context :  "(:=" "(" anchor_name vname ")" (term|vname) ")" -> add_context
+    ?single_context : "(:=" "(" anchor_name vname ")" (term | vname) ")" -> add_context
                     | "(" anchor_name vname ")" -> add_trivial_ctx
 
-    ?step_arg_pair : "(:=" CNAME term")" -> mk_forall_inst_args
+    ?step_arg_pair : "(:=" CNAME term ")" -> mk_forall_inst_args
                    | term* -> mk_la_generic_args
 
     ?step_annotation : ":premises" "(" step_id+ ")" -> mk_step_premises
-                    | ":args" "(" step_arg_pair+ ")" -> mk_step_args
-                    | ":discharge" "(" step_id* ")" -> mk_discharge
+                     | ":args" "(" step_arg_pair+ ")" -> mk_step_args
+                     | ":discharge" "(" step_id* ")" -> mk_discharge
 
     ?proof_term : term
 
@@ -138,6 +139,7 @@ veriT_grammar = r"""
             | "(bvsgt" term term ")" -> mk_bvsgt_tm 
             | "(bvsle" term term ")" -> mk_bvsgt_tm 
             | "(bvslt" term term ")" -> mk_bvsgt_tm 
+            | "(_" "zero_extend" INT ")" -> mk_zero_extend_tm
             | "(=>" term term ")" -> mk_impl_tm
             | "(=" term term ")" -> mk_eq_tm
             | "(+" term* ")" -> mk_plus_tm
@@ -228,7 +230,6 @@ class ProofTransformer(Transformer):
                 self.is_real = True
                 break
 
-
     def add_context(self, var, ty, tm_name):
         """return the new variables and the assigned term
         var is the variable name, ty is its type, tm_name is
@@ -270,12 +271,15 @@ class ProofTransformer(Transformer):
         return self.annot_tm[name]
 
     def ret_let_tm(self, name):
-        """There are three kinds of occursion of ?name in proof.
+        """There are three kinds of occurrence of ?name in proof.
+
         1. let expression : (let (?x 1) ?x + 1)
         2. anchor context: (:= (?x I) term)
         3. quantified variable: (forall (?x t). ?x)
+
         We first search ?name in let scope then in quantified variables, then in context, 
         this is correct since if ?name is not a binding var, the let scope would be empty. 
+
         """
         name = str(name)
         if name in self.let_tm:
@@ -308,10 +312,11 @@ class ProofTransformer(Transformer):
                 return hol_term.Var(tm, ctx[tm].get_type())
         if tm in self.let_tm:
             return self.let_tm[tm]
-        if tm.startswith("termITE"):
-            return hol_term.Const(tm, hol_type.BoolType)
-        # If not found in all these contexts, raise error
-        raise ValueError(tm)
+
+        # If not found in all these contexts, return variable with
+        # unspecified type.
+        print('Undeclared variable', tm)
+        return hol_term.Var(tm, None)
 
     def mk_par_tm(self, tm):
         return tm
@@ -403,11 +408,20 @@ class ProofTransformer(Transformer):
     def mk_bvsgt_tm(self, tm1, tm2):
         return hol_term.Int(1)
 
-    def mk_impl_tm(self, *tms):
-        return hol_term.Implies(*tms)
+    def mk_zero_extend_tm(self, num):
+        return hol_type.BoolType
 
-    def mk_eq_tm(self, *tms):
-        return hol_term.Eq(*tms)
+    def mk_impl_tm(self, tm1, tm2):
+        return hol_term.Implies(tm1, tm2)
+
+    def mk_eq_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        # Perform basic type inference
+        if tm1.is_var() and tm1.T is None:
+            derivedT = tm2.get_type()
+            print('Derive type for', tm1.name, 'to be', derivedT)
+            self.smt_file_ctx[tm1.name] = derivedT
+            tm1.T = derivedT
+        return hol_term.Eq(tm1, tm2)
 
     def mk_ite_tm(self, P, x, y):
         return logic.mk_if(P, x, y)

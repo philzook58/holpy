@@ -356,10 +356,6 @@ class Term:
         f(self)
         return res
 
-
-
-
-
     def get_type(self) -> Type:
         """Returns type of the term with minimal type checking."""
         def rec(t: Term, bd_vars):

@@ -15,7 +15,9 @@ class ProofCommand:
 
 class Assume(ProofCommand):
     """Assume command introduces a new assumption (pt) 
-    which is neither tautological or derived from permises."""
+    which is neither tautological or derived from premises.
+    
+    """
     def __init__(self, id, assm) -> None:
         self.id = id
         self.assm = assm

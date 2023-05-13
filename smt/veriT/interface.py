@@ -46,7 +46,7 @@ def veriT_solve(f, write_file=False, timeout=5):
                 print("Proof extraction from veriT is timeout (veriT)")
                 return None
             
-def solve(filename, write_file=False,timeout=120):
+def solve(filename, write_file=False, timeout=120):
     res = check_sat_from_file(filename)
     if res in ("sat", "unknown", "none"):
         return None
@@ -79,6 +79,7 @@ def check_sat_from_file(filename: str) -> str:
     """check the status from smt file"""
     with open(filename, "r") as f:
         for line in f.readlines():
+            line = line.strip()
             if line == "(set-info :status sat)":
                 return "sat"
             elif line == "(set-info :status unknown)":
