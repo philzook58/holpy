@@ -5,6 +5,7 @@ from logic import logic
 from kernel import term as hol_term
 from kernel import type as hol_type
 from data import list as hol_list
+from data import bitvector as hol_bitvector
 from fractions import Fraction
 
 PREMISES, ARGS, DISCHARGE = range(3)
@@ -85,7 +86,9 @@ class DeclTransformer(Transformer):
         return hol_type.TFun(str_to_hol_type(domain), str_to_hol_type(codomain))
     
     def mk_bitvector(self, num):
-        return "bitvector"
+        num = int(num)
+        assert num in hol_bitvector.allowed_lengths, "Unknown bitvector length %d" % num
+        return hol_bitvector.WordType[num]
 
 decl_parser = Lark(smt_decl_grammar, start="term", parser="lalr", transformer=DeclTransformer())
 
@@ -136,10 +139,15 @@ veriT_grammar = r"""
             | "(not " term ")" -> mk_neg_tm
             | "(or " term+ ")" -> mk_disj_tm
             | "(and " term+ ")" -> mk_conj_tm
+            | "(bvsge" term term ")" -> mk_bvsge_tm 
             | "(bvsgt" term term ")" -> mk_bvsgt_tm 
-            | "(bvsle" term term ")" -> mk_bvsgt_tm 
-            | "(bvslt" term term ")" -> mk_bvsgt_tm 
-            | "(_" "zero_extend" INT ")" -> mk_zero_extend_tm
+            | "(bvsle" term term ")" -> mk_bvsle_tm 
+            | "(bvslt" term term ")" -> mk_bvslt_tm
+            | "(bvadd" term+ ")" -> mk_bvadd_tm
+            | "(bvsub" term term ")" -> mk_bvsub_tm
+            | "(bvmul" term+ ")" -> mk_bvmul_tm
+            | "(" "(_" "zero_extend" INT ")" term ")" -> mk_zero_extend_tm
+            | "(" "(_" "extract" INT INT ")" term ")" -> mk_extract_tm
             | "(=>" term term ")" -> mk_impl_tm
             | "(=" term term ")" -> mk_eq_tm
             | "(+" term* ")" -> mk_plus_tm
@@ -405,11 +413,52 @@ class ProofTransformer(Transformer):
     def mk_conj_tm(self, *tms):
         return hol_term.And(*tms)
     
-    def mk_bvsgt_tm(self, tm1, tm2):
-        return hol_term.Int(1)
+    def mk_bvsge_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        return tm1 >= tm2
 
-    def mk_zero_extend_tm(self, num):
-        return hol_type.BoolType
+    def mk_bvsgt_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        return tm1 > tm2
+
+    def mk_bvsle_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        return tm1 <= tm2
+
+    def mk_bvslt_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        return tm1 < tm2
+
+    def mk_bvadd_tm(self, *ts):
+        res = ts[0]
+        for t in ts[1:]:
+            res = res + t
+        return res
+    
+    def mk_bvsub_tm(self, tm1, tm2):
+        return tm1 - tm2
+
+    def mk_bvmul_tm(self, *ts):
+        res = ts[0]
+        for t in ts[1:]:
+            res = res * t
+        return res
+
+    def mk_zero_extend_tm(self, num, tm: hol_term.Term):
+        num = int(num)
+        argT = tm.get_type()
+        assert hol_bitvector.is_word_type(argT), "zero_extend: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        res_len = arg_len + num
+        assert res_len in hol_bitvector.allowed_lengths, "zero_extend: unexpected result length %d" % res_len
+        return hol_bitvector.zero_extend(arg_len, num)(tm)
+
+    def mk_extract_tm(self, end, start, tm: hol_term.Term):
+        end = int(end)
+        start = int(start)
+        argT = tm.get_type()
+        assert hol_bitvector.is_word_type(argT), "extract: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        assert start < arg_len and end < arg_len and start <= end
+        res_len = end - start + 1
+        assert res_len in hol_bitvector.allowed_lengths, "extract: unexpected result length %d" % res_len
+        return hol_bitvector.extract(arg_len, start, end)(tm)
 
     def mk_impl_tm(self, tm1, tm2):
         return hol_term.Implies(tm1, tm2)
@@ -448,7 +497,9 @@ class ProofTransformer(Transformer):
         return hol_term.Real(Fraction(num))
     
     def mk_bitval(self, num):
-        return hol_term.Int(int(num))
+        argLen = len(num)
+        assert argLen in hol_bitvector.allowed_lengths, "bitval: unexpected length %d" % argLen
+        return hol_term.Number(hol_bitvector.WordType[argLen], hol_bitvector.parse_binary(num))
 
     def mk_plus_tm(self, *ts):
         res = ts[0]
