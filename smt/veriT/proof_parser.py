@@ -143,11 +143,22 @@ veriT_grammar = r"""
             | "(bvsgt" term term ")" -> mk_bvsgt_tm 
             | "(bvsle" term term ")" -> mk_bvsle_tm 
             | "(bvslt" term term ")" -> mk_bvslt_tm
+            | "(bvneg" term ")" -> mk_bvneg_tm
             | "(bvadd" term+ ")" -> mk_bvadd_tm
             | "(bvsub" term term ")" -> mk_bvsub_tm
             | "(bvmul" term+ ")" -> mk_bvmul_tm
+            | "(bvsdiv" term term ")" -> mk_bvsdiv_tm
+            | "(bvudiv" term term ")" -> mk_bvudiv_tm
+            | "(bvnot" term ")" -> mk_bvnot_tm
+            | "(bvand" term+ ")" -> mk_bvand_tm
+            | "(bvor" term+ ")" -> mk_bvor_tm
+            | "(bvxor" term+ ")" -> mk_bvxor_tm
+            | "(bvuge" term term ")" -> mk_bvuge_tm
+            | "(bvule" term term ")" -> mk_bvule_tm
             | "(" "(_" "zero_extend" INT ")" term ")" -> mk_zero_extend_tm
+            | "(" "(_" "sign_extend" INT ")" term ")" -> mk_sign_extend_tm
             | "(" "(_" "extract" INT INT ")" term ")" -> mk_extract_tm
+            | "(concat" term term ")" -> mk_concat_tm
             | "(=>" term term ")" -> mk_impl_tm
             | "(=" term term ")" -> mk_eq_tm
             | "(+" term* ")" -> mk_plus_tm
@@ -425,6 +436,9 @@ class ProofTransformer(Transformer):
     def mk_bvslt_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
         return tm1 < tm2
 
+    def mk_bvneg_tm(self, tm):
+        return - tm
+
     def mk_bvadd_tm(self, *ts):
         res = ts[0]
         for t in ts[1:]:
@@ -439,6 +453,63 @@ class ProofTransformer(Transformer):
         for t in ts[1:]:
             res = res * t
         return res
+    
+    def mk_bvsdiv_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        argT = tm1.get_type()
+        assert hol_bitvector.is_word_type(argT), "bvsdiv: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        return hol_bitvector.bvsdiv(arg_len)(tm1, tm2)
+
+    def mk_bvudiv_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        argT = tm1.get_type()
+        assert hol_bitvector.is_word_type(argT), "bvudiv: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        return hol_bitvector.bvudiv(arg_len)(tm1, tm2)
+
+    def mk_bvnot_tm(self, tm: hol_term.Term):
+        argT = tm.get_type()
+        assert hol_bitvector.is_word_type(argT), "bvxor: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        return hol_bitvector.bvnot(arg_len)(tm)
+
+    def mk_bvxor_tm(self, *ts):
+        argT = ts[0].get_type()
+        assert hol_bitvector.is_word_type(argT), "bvxor: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        res = ts[0]
+        for t in ts[1:]:
+            res = hol_bitvector.bvxor(arg_len)(res, t)
+        return res
+
+    def mk_bvand_tm(self, *ts):
+        argT = ts[0].get_type()
+        assert hol_bitvector.is_word_type(argT), "bvand: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        res = ts[0]
+        for t in ts[1:]:
+            res = hol_bitvector.bvand(arg_len)(res, t)
+        return res
+
+    def mk_bvor_tm(self, *ts):
+        argT = ts[0].get_type()
+        assert hol_bitvector.is_word_type(argT), "bvor: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        res = ts[0]
+        for t in ts[1:]:
+            res = hol_bitvector.bvor(arg_len)(res, t)
+        return res
+    
+    def mk_bvuge_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        argT = tm1.get_type()
+        assert hol_bitvector.is_word_type(argT), "bvuge: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        return hol_bitvector.bvuge(arg_len)(tm1, tm2)
+
+    def mk_bvule_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        argT = tm1.get_type()
+        assert hol_bitvector.is_word_type(argT), "bvule: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        return hol_bitvector.bvule(arg_len)(tm1, tm2)
 
     def mk_zero_extend_tm(self, num, tm: hol_term.Term):
         num = int(num)
@@ -448,6 +519,15 @@ class ProofTransformer(Transformer):
         res_len = arg_len + num
         assert res_len in hol_bitvector.allowed_lengths, "zero_extend: unexpected result length %d" % res_len
         return hol_bitvector.zero_extend(arg_len, num)(tm)
+
+    def mk_sign_extend_tm(self, num, tm: hol_term.Term):
+        num = int(num)
+        argT = tm.get_type()
+        assert hol_bitvector.is_word_type(argT), "sign_extend: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        res_len = arg_len + num
+        assert res_len in hol_bitvector.allowed_lengths, "sign_extend: unexpected result length %d" % res_len
+        return hol_bitvector.sign_extend(arg_len, num)(tm)
 
     def mk_extract_tm(self, end, start, tm: hol_term.Term):
         end = int(end)
@@ -459,6 +539,17 @@ class ProofTransformer(Transformer):
         res_len = end - start + 1
         assert res_len in hol_bitvector.allowed_lengths, "extract: unexpected result length %d" % res_len
         return hol_bitvector.extract(arg_len, start, end)(tm)
+
+    def mk_concat_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        argT1 = tm1.get_type()
+        argT2 = tm2.get_type()
+        assert hol_bitvector.is_word_type(argT1) and hol_bitvector.is_word_type(argT2), \
+            "concat: argument is not word type"
+        arg_len1 = hol_bitvector.get_word_length(argT1)
+        arg_len2 = hol_bitvector.get_word_length(argT2)
+        res_len = arg_len1 + arg_len2
+        assert res_len in hol_bitvector.allowed_lengths, "concat: unexpected result length %d" % res_len
+        return hol_bitvector.concat(arg_len1, arg_len2)(tm1, tm2)
 
     def mk_impl_tm(self, tm1, tm2):
         return hol_term.Implies(tm1, tm2)
