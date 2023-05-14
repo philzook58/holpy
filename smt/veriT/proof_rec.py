@@ -63,7 +63,7 @@ def get_assertions(file_name: str) -> set:
     lines = get_complete_line(file_name)
     for s in lines:
         if s.startswith("(assert"):
-            l = re.sub("\s{4,}"," ", s.replace("\n", ""))
+            l = re.sub("\s{4,}", " ", s.replace("\n", " "))
             if l.startswith("(assert"):
                 asst = parser.parse(l)
                 assertions.add(asst)
