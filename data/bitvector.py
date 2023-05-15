@@ -57,6 +57,14 @@ def extract(len: int, start: int, end: int) -> term.Term:
     outputT = WordType[end - start + 1]
     return Const('bv_extract_%d' % start, TFun(inputT, outputT))
 
+def get_bitOf(len: int, num: int) -> term.Term:
+    inputT = WordType[len]
+    outputT = type.BoolType
+    return Const('bv_bitOf_%d' % num, TFun(inputT, outputT))
+
+def bool_word1() -> term.Term:
+    return Const("bool_word1", TFun(type.BoolType, WordType[1]))
+
 def concat(len1: int, len2: int) -> term.Term:
     """concat function joins together two bitvectors."""
     inputT1 = WordType[len1]

@@ -5241,3 +5241,63 @@ class NotITE1Macro(Macro):
     def get_proof_term(self, args, prevs) -> ProofTerm:
         pt = prevs[0]
         return logic.apply_theorem("verit_not_ite2", pt, concl=Or(*args))
+    
+@register_macro("verit_symm")
+class SymmMacro(Macro):
+    def __init__(self):
+        self.level = 1
+        self.sig = Term
+        self.limit = None
+
+    def eval(self, args, prevs) -> Thm:
+        if len(args) != 1 or len(prevs) != 1:
+            raise VeriTException("symm", "unexpected number of arguments and prevs")
+        th = prevs[0]
+        expected_res = args[0]
+        if not th.prop.is_equals():
+            raise VeriTException("symm", "pt is not an equality")
+        A, B = th.prop.args
+        if not expected_res == Eq(B, A):
+            raise VeriTException("symm", "Unexpected result")
+        return Thm(expected_res, th.hyps)
+
+    def get_proof_term(self, args, prevs) -> ProofTerm:
+        pt = prevs[0]
+        return pt.symmetric()
+    
+@register_macro("verit_reordering")
+class ReorderingMacro(Macro):
+    def __init__(self):
+        self.level = 1
+        self.sig = Term
+        self.limit = None
+
+    def eval(self, args, prevs) -> Thm:
+        if len(prevs) != 1:
+            raise VeriTException("reordering", "unexpected number of prevs")
+        th = prevs[0]
+        disjs = th.prop.strip_disj()
+        if set(disjs) != set(args):
+            raise VeriTException("reordering", "prevs and arg is not the same")
+        return Thm(Or(*args), th.hyps)
+
+    def get_proof_term(self, args, prevs) -> ProofTerm:
+        pt = prevs[0]
+        eq_pt = logic.imp_disj_iff(Eq(pt.prop, Or(*args)))
+        return eq_pt.equal_elim(pt)
+    
+@register_macro("verit_all_simplify")
+class ReorderingMacro(Macro):
+    def __init__(self):
+        self.level = 1
+        self.sig = Term
+        self.limit = None
+
+    def eval(self, args, prevs) -> Thm:
+        
+        raise NotImplementedError
+
+    def get_proof_term(self, args, prevs) -> ProofTerm:
+        lhs, rhs = args[0].args
+        # 从头推导
+        raise NotImplementedError

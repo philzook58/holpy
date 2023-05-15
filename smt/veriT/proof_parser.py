@@ -159,6 +159,8 @@ veriT_grammar = r"""
             | "(" "(_" "sign_extend" INT ")" term ")" -> mk_sign_extend_tm
             | "(" "(_" "extract" INT INT ")" term ")" -> mk_extract_tm
             | "(concat" term term ")" -> mk_concat_tm
+            | "(" "(_" "bitOf" INT ")" term ")" -> mk_bitof_tm
+            | "(bbT" term+ ")" -> mk_bbt_tm
             | "(=>" term term ")" -> mk_impl_tm
             | "(=" term term ")" -> mk_eq_tm
             | "(+" term* ")" -> mk_plus_tm
@@ -550,6 +552,25 @@ class ProofTransformer(Transformer):
         res_len = arg_len1 + arg_len2
         assert res_len in hol_bitvector.allowed_lengths, "concat: unexpected result length %d" % res_len
         return hol_bitvector.concat(arg_len1, arg_len2)(tm1, tm2)
+    
+    def mk_bitof_tm(self, num, tm: hol_term.Term):
+        argT = tm.get_type()
+        assert hol_bitvector.is_word_type(argT), \
+            "bitOf: argument is not word type"
+        arg_len = hol_bitvector.get_word_length(argT)
+        num = int(num)
+        assert num < arg_len, \
+            "bitOf: bitNum is oversize"
+        return hol_bitvector.get_bitOf(arg_len, num)(tm)
+    
+    def mk_bbt_tm(self, *tms):
+        for tm in tms:
+            tm = hol_bitvector.bool_word1()(tm)
+        res = tms[0]
+        for i in range(1, len(tms)):
+            res = hol_bitvector.concat(i, 1)(res, tms[i])
+        return res
+        
 
     def mk_impl_tm(self, tm1, tm2):
         return hol_term.Implies(tm1, tm2)
@@ -561,6 +582,11 @@ class ProofTransformer(Transformer):
             print('Derive type for', tm1.name, 'to be', derivedT)
             self.smt_file_ctx[tm1.name] = derivedT
             tm1.T = derivedT
+        elif tm2.is_var() and tm2.T is None: #Both None still needs implements
+            derivedT = tm1.get_type()
+            print('Derive type for', tm2.name, 'to be', derivedT)
+            self.smt_file_ctx[tm2.name] = derivedT
+            tm2.T = derivedT
         return hol_term.Eq(tm1, tm2)
 
     def mk_ite_tm(self, P, x, y):

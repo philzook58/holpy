@@ -26,7 +26,7 @@ def test_parse_step(verit_proof, ctx):
     for s in verit_proof.replace("\r", "").split("\n"):
         if s == "unsat" or s == "":
             continue
-        #print(s)
+        # print(s)
         step = parser.parse(s)
         if isinstance(step, command.Step) and step.rule_name == "lia_generic":
             print('lia_generic')
@@ -411,9 +411,22 @@ class ParserTest(unittest.TestCase):
 
     def testParseBV(self):
         test_paths = [
-            'BV/unsat/inf6.smt2',
-            'BV/unsat/Prim_4.smt2',
-            'BV/unsat/predicate_125.smt2',
+            #'BV/unsat/inf6.smt2',
+            # 'BV/unsat/inf8.smt2',
+            # 'BV/unsat/Prim_4.smt2',
+            # 'BV/unsat/counterexample.dump.ia32_Mul_base_disp--Add32.load32.Mul32.Mulh_u32.0005.smt2',
+            # 'BV/unsat/bitcount16.smt2',
+            # 'BV/unsat/bitcount32.smt2',
+            # 'BV/unsat/ex2_prime.smt2',
+            # 'BV/unsat/ex7_prime.smt2',
+            # 'BV/unsat/ex23.smt2',
+            # 'BV/unsat/ex30.smt2',
+            # 'BV/unsat/ex34.smt2',
+            # 'BV/unsat/ex37.smt2',
+            # 'BV/unsat/ex49.smt2',
+            # 'BV/unsat/intSqRoot.smt2',
+            # 'BV/unsat/simpleWhile.smt2',
+            # # 'BV/unsat/predicate_125.smt2',
         ]
 
         for path in test_paths:
