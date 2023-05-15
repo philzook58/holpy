@@ -1,16 +1,23 @@
 """Utility functions for bitvectors."""
 
+from typing import Dict
 from kernel import type
+from kernel.proofterm import ProofTerm, refl
 from kernel.type import TFun, TConst
 from kernel import term
-from kernel.term import Const
+from kernel.term import Const, Term
+from logic.conv import Conv, rewr_conv
 
 # List of currently allowed word lengths
 allowed_lengths = tuple(range(1, 129))
 
-# Definitions of types of bitvectors
-WordType = dict()
-WordTypeInv = dict()
+# Mapping from word length to word type
+WordType: Dict[int, type.Type] = dict()
+
+# Mapping from word type to word length
+WordTypeInv: Dict[type.Type, int] = dict()
+
+# Initialize the content of WordType and WordTypeInv
 for i in allowed_lengths:
     wordT = TConst("word" + str(i))
     WordType[i] = wordT
@@ -108,3 +115,31 @@ def bvule(len) -> term.Term:
     """unsigned le function on bitvectors."""
     argT = WordType[len]
     return Const('bvule', TFun(argT, argT, type.BoolType))
+
+
+# Conversions: compared to the case of natural numbers and real numbers,
+# additional complexity come from the fact that theorems are parameterized
+# by word length.
+
+# Hence, we define conversions for each individual applications of theorems,
+# that selects the appropriate theorem to use depending on word length.
+
+class bv_add_comm(Conv):
+    """Commutativity of addition."""
+    def get_proof_term(self, t: Term) -> ProofTerm:
+        argT = t.get_type()
+        assert is_word_type(argT), "bv_add_comm: input is not valid word type"
+        inputLen = WordTypeInv[argT]
+        pt = refl(t)
+        pt = pt.on_rhs(rewr_conv("bv_add_comm_" + str(inputLen)))
+        return pt
+    
+class bv_add_assoc(Conv):
+    """Associativity of addition."""
+    def get_proof_term(self, t: Term) -> ProofTerm:
+        argT = t.get_type()
+        assert is_word_type(argT), "bv_add_comm: input is not valid word type"
+        inputLen = WordTypeInv[argT]
+        pt = refl(t)
+        pt = pt.on_rhs(rewr_conv("bv_add_assoc_" + str(inputLen)))
+        return pt
