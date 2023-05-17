@@ -6,6 +6,7 @@ import cProfile
 import sys
 
 from kernel.report import ProofReport
+from logic import basic
 from smt.veriT import interface, proof_rec, proof_parser, command
 from syntax.settings import settings
 settings.unicode = False
@@ -789,6 +790,8 @@ class ProofrecTest(unittest.TestCase):
             p.print_stats(50)
 
     def test_BV(self):
+        # basic.load_theory("bitvector")
+        # basic.load_theory("verit")
         test_paths = [
             # 'BV/unsat/inf6.smt2',
             # 'BV/unsat/inf8.smt2',

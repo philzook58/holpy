@@ -1630,6 +1630,8 @@ class ReflMacro(Macro):
             return Thm(goal, goal)
         if goal.rhs.is_var() and goal.rhs.name in ctxt and ctxt[goal.rhs.name] == goal.lhs:
             return Thm(goal, Eq(goal.rhs, goal.lhs))
+        if goal.rhs == goal.lhs:
+            return Thm(goal)
         else:
             raise VeriTException("refl", "either lhs and rhs of goal is not in ctx")
 
@@ -1639,6 +1641,8 @@ class ReflMacro(Macro):
             return ProofTerm.assume(goal)
         if goal.rhs.is_var() and goal.rhs.name in ctxt and ctxt[goal.rhs.name] == goal.lhs:
             return ProofTerm.assume(Eq(goal.rhs, goal.lhs)).symmetric()
+        if goal.rhs == goal.lhs:
+            return ProofTerm.reflexive(goal.lhs)
         else:
             raise VeriTException("refl", "either lhs and rhs of goal is not in ctx")
 
@@ -5287,17 +5291,23 @@ class ReorderingMacro(Macro):
         return eq_pt.equal_elim(pt)
     
 @register_macro("verit_all_simplify")
-class ReorderingMacro(Macro):
+class AllsimplifyMacro(Macro):
     def __init__(self):
         self.level = 1
         self.sig = Term
         self.limit = None
 
-    def eval(self, args, prevs) -> Thm:
+    # def eval(self, args, prevs) -> Thm:
         
-        raise NotImplementedError
+    #     raise NotImplementedError
 
     def get_proof_term(self, args, prevs) -> ProofTerm:
-        lhs, rhs = args[0].args
+        lhs, rhs = args[0].args[0].args
         # 从头推导
-        raise NotImplementedError
+        pt = ProofTerm.assume(Eq(lhs, rhs))
+        pt2 = pt.symmetric()
+        pt3 = pt2.implies_intr(Eq(lhs, rhs))
+        pt4 = ProofTerm.assume(Eq(rhs, lhs))
+        pt5 = pt4.symmetric()
+        pt6 = pt5.implies_intr(Eq(rhs, lhs))
+        return pt3.equal_intr(pt6)

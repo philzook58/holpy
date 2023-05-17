@@ -114,6 +114,16 @@ def bvudiv(len) -> term.Term:
     argT = WordType[len]
     return Const('bvudiv', TFun(argT, argT, argT))
 
+def bvsmod(len) -> term.Term:
+    """unsigned smod function on bitvectors."""
+    argT = WordType[len]
+    return Const('bvsmod', TFun(argT, argT, argT))
+
+def bvurem(len) -> term.Term:
+    """unsigned smod function on bitvectors."""
+    argT = WordType[len]
+    return Const('bvurem', TFun(argT, argT, argT))
+
 def bvuge(len) -> term.Term:
     """unsigned ge function on bitvectors."""
     argT = WordType[len]
