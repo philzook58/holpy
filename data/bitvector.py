@@ -6,7 +6,7 @@ from kernel.proofterm import ProofTerm, refl
 from kernel.type import TFun, TConst
 from kernel import term
 from kernel.term import Const, Term
-from logic.conv import Conv, rewr_conv
+from logic.conv import Conv, rewr_conv, arg_conv, arg1_conv
 
 # List of currently allowed word lengths
 allowed_lengths = tuple(range(1, 129))
@@ -134,6 +134,16 @@ def bvule(len) -> term.Term:
     argT = WordType[len]
     return Const('bvule', TFun(argT, argT, type.BoolType))
 
+def bvlshr(len) -> term.Term:
+    """unsigned lshr function on bitvectors."""
+    argT = WordType[len]
+    return Const('bvlshr', TFun(argT, argT, type.BoolType))
+
+def bvshl(len) -> term.Term:
+    """unsigned shl function on bitvectors."""
+    argT = WordType[len]
+    return Const('bvshl', TFun(argT, argT, type.BoolType))
+
 
 # Conversions: compared to the case of natural numbers and real numbers,
 # additional complexity come from the fact that theorems are parameterized
@@ -160,4 +170,36 @@ class bv_add_assoc(Conv):
         inputLen = WordTypeInv[argT]
         pt = refl(t)
         pt = pt.on_rhs(rewr_conv("bv_add_assoc_" + str(inputLen)))
+        return pt
+    
+class bv_distrib_left(Conv):
+    """Associativity of addition."""
+    def get_proof_term(self, t: Term) -> ProofTerm:
+        argT = t.get_type()
+        assert is_word_type(argT), "bv_distrib_left: input is not valid word type"
+        inputLen = WordTypeInv[argT]
+        pt = refl(t)
+        pt = pt.on_rhs(rewr_conv("bv_distrib_left_" + str(inputLen)))
+        return pt
+    
+class bv_multi_comm(Conv):
+    """Commutativity of multiple."""
+    def get_proof_term(self, t: Term) -> ProofTerm:
+        argT = t.get_type()
+        assert is_word_type(argT), "bv_multi_comm: input is not valid word type"
+        inputLen = WordTypeInv[argT]
+        pt = refl(t)
+        pt = pt.on_rhs(rewr_conv("bv_multi_comm_" + str(inputLen)))
+        return pt
+    
+class bv_distrib_left2(Conv):
+    """Associativity of addition."""
+    def get_proof_term(self, t: Term) -> ProofTerm:
+        argT = t.get_type()
+        assert is_word_type(argT), "bv_distrib_left: input is not valid word type"
+        inputLen = WordTypeInv[argT]
+        pt = refl(t)
+        pt = pt.on_rhs(rewr_conv("bv_distrib_left_" + str(inputLen)))
+        pt = pt.on_rhs(arg_conv(rewr_conv("bv_multi_comm_" + str(inputLen))))
+        pt = pt.on_rhs(arg1_conv(rewr_conv("bv_multi_comm_" + str(inputLen))))
         return pt

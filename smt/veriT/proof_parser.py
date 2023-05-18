@@ -158,6 +158,8 @@ veriT_grammar = r"""
             | "(bvurem" term term ")" -> mk_bvurem_tm
             | "(bvuge" term term ")" -> mk_bvuge_tm
             | "(bvule" term term ")" -> mk_bvule_tm
+            | "(bvlshr" term term ")" -> mk_bvlshr_tm
+            | "(bvshl" term term ")" -> mk_bvshl_tm
             | "(" "(_" "zero_extend" INT ")" term ")" -> mk_zero_extend_tm
             | "(" "(_" "sign_extend" INT ")" term ")" -> mk_sign_extend_tm
             | "(" "(_" "extract" INT INT ")" term ")" -> mk_extract_tm
@@ -540,6 +542,24 @@ class ProofTransformer(Transformer):
         assert hol_bitvector.is_word_type(argT), "bvule: argument is not word type"
         arg_len = hol_bitvector.get_word_length(argT)
         return hol_bitvector.bvule(arg_len)(tm1, tm2)
+    
+    def mk_bvlshr_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        argT1 = tm1.get_type()
+        assert hol_bitvector.is_word_type(argT1), "bvlshr: argument1 is not word type"
+        argT2 = tm2.get_type()
+        assert hol_bitvector.is_word_type(argT2), "bvlshr: argument2 is not word type"
+        assert argT1 == argT2, "bvlshr: 2 argument is not the same type"
+        arg_len = hol_bitvector.get_word_length(argT1)
+        return hol_bitvector.bvlshr(arg_len)(tm1, tm2)
+    
+    def mk_bvshl_tm(self, tm1: hol_term.Term, tm2: hol_term.Term):
+        argT1 = tm1.get_type()
+        assert hol_bitvector.is_word_type(argT1), "bvshl: argument1 is not word type"
+        argT2 = tm2.get_type()
+        assert hol_bitvector.is_word_type(argT2), "bvshl: argument2 is not word type"
+        assert argT1 == argT2, "bvlshr: 2 argument is not the same type"
+        arg_len = hol_bitvector.get_word_length(argT1)
+        return hol_bitvector.bvshl(arg_len)(tm1, tm2)    
 
     def mk_zero_extend_tm(self, num, tm: hol_term.Term):
         num = int(num)

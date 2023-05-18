@@ -418,6 +418,64 @@ class ParserTest(unittest.TestCase):
             # 'BV/unsat/bvnor.smt2', #pass
             # 'BV/unsat/bvsmod.smt2', #pass
             # 'BV/unsat/repeat.smt2', #pass
+            # 'BV/unsat/bigHex.smt2', #SAT
+            # 'BV/unsat/bvsdiv.smt2', #SAT
+            # 'BV/unsat/symbols.smt2', #SAT
+            # 'BV/unsat/extensions.smt2', #kill, but shouldnt
+            # 'BV/unsat/modulus_true-unreach-call_true-no-overflow.i_242.smt2', #kill, but shouldnt
+
+            # 'BV/20190429-UltimateAutomizerSvcomp2019/byte_add_1_true-unreach-call_true-no-overflow_true-termination.i_0.smt2',#kill
+
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_1.smt2', #pass
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_2.smt2', #Undeclared variable bvlshr--too slow
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_3.smt2', #pass
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_4.smt2', #pass
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_5.smt2', #pass
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_6.smt2', #pass
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_7.smt2', #Undeclared variable bvlshr -- developed , passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_8.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_9.smt2', #Undeclared variable bvshl -- developed , passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_10.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_11.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_12.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_13.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_14.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_15.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_16.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_17.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_18.smt2', #too slow
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_19.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_20.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_21.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_22.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_23.smt2', #passed 
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_24.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_25.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_26.smt2', #kill
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_27.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_28.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_29.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_30.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_31.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_32.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_33.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_34.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_35.smt2', #kill
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_36.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_37.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_38.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_39.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_40.smt2', #too slow
+            'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_41.smt2', #passed
+            'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_42.smt2', #passed
+            'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_43.smt2', #passed
+            'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_44.smt2', #passed
+            'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_45.smt2', #passed
+            # 'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_46.smt2', #kill
+            'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_47.smt2', #passed
+            'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_48.smt2', #passed
+            'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_49.smt2', #passed
+            'BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_50.smt2', #passed
 
             # 'BV/unsat/counterexample.dump.ia32_Mul_base_disp--Add32.load32.Mul32.Mulh_u32.0005.smt2', #too large
             # 'BV/unsat/bitcount16.smt2', #kill

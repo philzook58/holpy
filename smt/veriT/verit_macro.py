@@ -5302,12 +5302,19 @@ class AllsimplifyMacro(Macro):
     #     raise NotImplementedError
 
     def get_proof_term(self, args, prevs) -> ProofTerm:
-        lhs, rhs = args[0].args[0].args
-        # 从头推导
-        pt = ProofTerm.assume(Eq(lhs, rhs))
-        pt2 = pt.symmetric()
-        pt3 = pt2.implies_intr(Eq(lhs, rhs))
-        pt4 = ProofTerm.assume(Eq(rhs, lhs))
-        pt5 = pt4.symmetric()
-        pt6 = pt5.implies_intr(Eq(rhs, lhs))
-        return pt3.equal_intr(pt6)
+        if args[0].is_equals() and args[0].lhs.is_equals() and args[0].rhs.is_equals():
+            lhs, rhs = args[0].args[0].args
+            # 从头推导
+            pt = ProofTerm.assume(Eq(lhs, rhs))
+            pt2 = pt.symmetric()
+            pt3 = pt2.implies_intr(Eq(lhs, rhs))
+            pt4 = ProofTerm.assume(Eq(rhs, lhs))
+            pt5 = pt4.symmetric()
+            pt6 = pt5.implies_intr(Eq(rhs, lhs))
+            return pt3.equal_intr(pt6)
+        if args[0].is_equals():
+            lhs = args[0].lhs
+            pt = refl(lhs)
+            from data import bitvector
+            pt.on_rhs(bitvector.bv_distrib_left())
+            return pt

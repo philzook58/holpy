@@ -790,8 +790,6 @@ class ProofrecTest(unittest.TestCase):
             p.print_stats(50)
 
     def test_BV(self):
-        # basic.load_theory("bitvector")
-        # basic.load_theory("verit")
         test_paths = [
             # 'BV/unsat/inf6.smt2',
             # 'BV/unsat/inf8.smt2',
