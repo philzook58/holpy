@@ -18,6 +18,7 @@ from logic import logic
 from logic.conv import try_conv, rewr_conv, arg_conv,\
          top_conv, arg1_conv, replace_conv, abs_conv, Conv, bottom_conv, beta_conv, binop_conv
 from data import integer, real
+from data import bitvector
 from data import list as hol_list
 from kernel import term_ord
 from smt.veriT import verit_conv
@@ -5315,6 +5316,5 @@ class AllsimplifyMacro(Macro):
         if args[0].is_equals():
             lhs = args[0].lhs
             pt = refl(lhs)
-            from data import bitvector
-            pt.on_rhs(bitvector.bv_distrib_left())
+            pt = pt.on_rhs(bitvector.bv_distrib_left2())
             return pt
