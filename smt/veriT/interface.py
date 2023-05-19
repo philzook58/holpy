@@ -52,10 +52,9 @@ def solve(filename, write_file=False, timeout=120):
         return None
     args =  "--dump-proofs "\
             "--proof-format-mode=alethe "\
-            "--simplification=none "\
             "--dag-thresh=0 "\
             "--proof-granularity=theory-rewrite "
-    
+            # "--simplification=none "\   
     with subprocess.Popen("cvc5-Win64.exe %s %s" % (args, filename),
                           stdout=subprocess.PIPE, 
                           stderr=subprocess.PIPE, shell=True) as p:

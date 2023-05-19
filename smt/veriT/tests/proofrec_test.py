@@ -67,6 +67,7 @@ def test_file(filename, show_time=True, test_eval=False, test_proofterm=False,
         return
     ctx = proof_rec.bind_var(abs_name)
     solve_time = time.perf_counter() - start_time
+    print("solved")
 
     # Optional: write to file
     if write_file:
@@ -807,7 +808,8 @@ class ProofrecTest(unittest.TestCase):
             # 'BV/unsat/ex49.smt2',
             # 'BV/unsat/intSqRoot.smt2',
             # 'BV/unsat/simpleWhile.smt2',
-             'BV/unsat/test1.smt2',
+            #  'BV/unsat/test1.smt2',
+             'BV/unsat/test2.smt2',
         ]
 
         profile = False

@@ -1,7 +1,7 @@
 """Utility functions for bitvectors."""
 
 from typing import Dict
-from kernel import type
+from kernel import term_ord, type
 from kernel.proofterm import ProofTerm, refl
 from kernel.type import TFun, TConst
 from kernel import term
@@ -203,3 +203,49 @@ class bv_distrib_left2(Conv):
         pt = pt.on_rhs(arg_conv(rewr_conv("bv_multi_comm_" + str(inputLen))))
         pt = pt.on_rhs(arg1_conv(rewr_conv("bv_multi_comm_" + str(inputLen))))
         return pt
+
+class bv_swap_mult_r(Conv):
+    """Rewrite (a * b) * c to (a * c) * b."""
+    def get_proof_term(self, t: Term) -> ProofTerm:
+        argT = t.get_type()
+        assert is_word_type(argT), "bv_multi_assoc: input is not valid word type"
+        inputLen = WordTypeInv[argT]
+        pt = refl(t)
+        pt = pt.on_rhs(rewr_conv("bv_multi_assoc_" + str(inputLen)))
+        pt = pt.on_rhs(arg_conv(rewr_conv("bv_multi_comm_" + str(inputLen))))
+        pt = pt.on_rhs(rewr_conv("bv_multi_assoc_" + str(inputLen), sym = True))
+        return pt
+    
+class bv_norm_mult_atom(Conv):
+    """ """
+    def get_proof_term(self, t: Term) -> ProofTerm:
+        argT = t.get_type()
+        assert is_word_type(argT), "norm_mult_atom: input is not valid word type"
+        inputLen = WordTypeInv[argT]
+        pt = refl(t)
+        if t.arg1.is_times():
+            cp = term_ord.fast_compare(t.arg1.arg, t.arg)
+            if cp > 0:
+                return pt.on_rhs(bv_swap_mult_r(), arg1_conv(self)) 
+            else:
+                return pt
+        else:
+            cp = term_ord.fast_compare(t.arg1, t.arg)
+            if cp > 0:
+                return pt.on_rhs(bv_multi_comm())
+            else:
+                return pt
+            
+class bv_norm_mult_monomial(Conv):
+    """ """
+    def get_proof_term(self, t: Term) -> ProofTerm:
+        argT = t.get_type()
+        assert is_word_type(argT), "norm_mult_atom: input is not valid word type"
+        inputLen = WordTypeInv[argT]
+        pt = refl(t)
+        if t.arg.is_times():
+            return pt.on_rhs(rewr_conv("bv_multi_assoc_" + str(inputLen), sym=True),
+                              arg1_conv(self), 
+                              bv_norm_mult_atom())
+        else:
+            return pt.on_rhs(bv_norm_mult_atom())

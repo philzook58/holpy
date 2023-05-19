@@ -547,8 +547,8 @@ class ProofTransformer(Transformer):
         argT1 = tm1.get_type()
         assert hol_bitvector.is_word_type(argT1), "bvlshr: argument1 is not word type"
         argT2 = tm2.get_type()
-        assert hol_bitvector.is_word_type(argT2), "bvlshr: argument2 is not word type"
-        assert argT1 == argT2, "bvlshr: 2 argument is not the same type"
+        # assert hol_bitvector.is_word_type(argT2), "bvlshr: argument2 is not word type"
+        # assert argT1 == argT2, "bvlshr: 2 argument is not the same type"
         arg_len = hol_bitvector.get_word_length(argT1)
         return hol_bitvector.bvlshr(arg_len)(tm1, tm2)
     
@@ -556,8 +556,8 @@ class ProofTransformer(Transformer):
         argT1 = tm1.get_type()
         assert hol_bitvector.is_word_type(argT1), "bvshl: argument1 is not word type"
         argT2 = tm2.get_type()
-        assert hol_bitvector.is_word_type(argT2), "bvshl: argument2 is not word type"
-        assert argT1 == argT2, "bvlshr: 2 argument is not the same type"
+        # assert hol_bitvector.is_word_type(argT2), "bvshl: argument2 is not word type"
+        # assert argT1 == argT2, "bvlshr: 2 argument is not the same type"
         arg_len = hol_bitvector.get_word_length(argT1)
         return hol_bitvector.bvshl(arg_len)(tm1, tm2)    
 

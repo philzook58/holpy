@@ -110,6 +110,26 @@
                 "x": "word64",
                 "y": "word64"
             }
+        },
+        {
+            "name": "bv_multi_assoc_32",
+            "prop": "(x * y) * z= x * (y * z)",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32",
+                "z": "word32"
+            }
+        },
+        {
+            "name": "bv_multi_assoc_64",
+            "prop": "(x * y) * z= x * (y * z)",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64",
+                "z": "word64"
+            }
         }
     ],
     "description": "definitions for bitvectors",
