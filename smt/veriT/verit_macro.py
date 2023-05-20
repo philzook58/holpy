@@ -376,7 +376,7 @@ class ThResolutionMacro(Macro):
             prems.append(strip_disj_n(prev.prop, cl_size))
 
         _, cl_concl = resolve_order(prems)
-        if set(cl_concl) <= set(cl):
+        if set(cl_concl) <= set(cl + (false,)):
             return Thm(Or(*cl), *(pt.hyps for pt in prevs))
         # Sometimes the expected goal is ~~A while resolve_order returns A.
         elif len(cl_concl) == 1 and len(cl) == 1 and Not(Not(cl_concl[0])) == cl[0]:
@@ -5303,7 +5303,11 @@ class AllsimplifyMacro(Macro):
     #     raise NotImplementedError
 
     def get_proof_term(self, args, prevs) -> ProofTerm:
-        if args[0].is_equals() and args[0].lhs.is_equals() and args[0].rhs.is_equals():
+        if args[0].rhs == false and args[0].lhs == Not(true):
+            lhs, rhs = args[0].args
+            pt = refl(lhs)
+            return pt.on_rhs(rewr_conv("verit_not_simplify1"))
+        elif args[0].is_equals() and args[0].lhs.is_equals() and args[0].rhs.is_equals() and args[0].lhs.lhs == args[0].rhs.rhs and args[0].rhs.lhs == args[0].lhs.rhs:#
             lhs, rhs = args[0].args[0].args
             # 从头推导
             pt = ProofTerm.assume(Eq(lhs, rhs))
@@ -5313,7 +5317,24 @@ class AllsimplifyMacro(Macro):
             pt5 = pt4.symmetric()
             pt6 = pt5.implies_intr(Eq(rhs, lhs))
             return pt3.equal_intr(pt6)
-        if args[0].is_equals():
+        elif args[0].is_equals() and bitvector.is_word_type(args[0].arg.get_type()):
+            lhs, rhs = args[0].args
+            pt1 = refl(lhs)
+            pt2 = pt1.on_rhs(bitvector.bv_norm_full())
+            pt3 = refl(rhs)
+            pt4 = pt3.on_rhs(bitvector.bv_norm_full())
+            pt5 = pt4.symmetric()
+            return pt2.transitive(pt5)
+        elif args[0].is_equals() and args[0].rhs == true:
+            lhs = args[0].args[0].lhs
+            rhs = args[0].args[0].rhs
+            pt1 = refl(lhs).on_rhs(bitvector.bv_norm_full())
+            pt2 = refl(rhs).on_rhs(bitvector.bv_norm_full())
+            pt3 = pt2.symmetric()
+            pt4 = pt1.transitive(pt3)
+            pt5 = logic.apply_theorem("eq_true", inst=Inst(A=pt4.prop))
+            return pt5.equal_elim(pt4)
+        elif args[0].is_equals():
             lhs = args[0].lhs
             pt = refl(lhs)
             pt = pt.on_rhs(bitvector.bv_distrib_left2())

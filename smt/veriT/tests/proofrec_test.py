@@ -808,8 +808,11 @@ class ProofrecTest(unittest.TestCase):
             # 'BV/unsat/ex49.smt2',
             # 'BV/unsat/intSqRoot.smt2',
             # 'BV/unsat/simpleWhile.smt2',
-            #  'BV/unsat/test1.smt2',
-             'BV/unsat/test2.smt2',
+            # 'BV/unsat/test1.smt2', #pass
+            # 'BV/unsat/test2.smt2', #pass
+            #  'BV/unsat/test3.smt2', #x + z = y + z <--> x = y
+            #  'BV/unsat/test4.smt2', #x + z = y + z <--> x = y
+            # 'BV/unsat/test5.smt2', #pass
         ]
 
         profile = False

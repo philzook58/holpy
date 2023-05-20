@@ -116,7 +116,84 @@ class BitvectorTest(unittest.TestCase):
         for expr, res in test_data:
             test_conv(self, 'bitvector', bitvector.bv_norm_mult_monomial(), vars=vars64, t=expr, t_res=res)
 
+    def testSwapAddR(self):
+        test_data = [
+            ("(x + y) + z", "(x + z) + y")
+        ]
 
+        vars32 = {"x": "word32", "y": "word32", "z": "word32"}
+        for expr, res in test_data:
+            test_conv(self, 'bitvector', bitvector.bv_swap_add_r(), vars=vars32, t=expr, t_res=res)
+
+        vars64 = {"x": "word64", "y": "word64", "z": "word64"}
+        for expr, res in test_data:
+            test_conv(self, 'bitvector', bitvector.bv_swap_add_r(), vars=vars64, t=expr, t_res=res)
+
+    def testNormAddMonomial(self):
+        test_data = [
+            # ("1 * y + 1 * x", "1 * x + 1 * y"),
+            ("(x + z) + y", "(x + y) + z"),
+            # ("0 + 2 * x", "2 * x"), #cant simplify 0
+            # ("1 * x + 2 * x", "3 * x")
+        ]
+
+        vars32 = {"x": "word32", "y": "word32", "z": "word32"}
+        for expr, res in test_data:
+            test_conv(self, 'bitvector', bitvector.bv_norm_add_monomial(), vars=vars32, t=expr, t_res=res)
+
+        vars64 = {"x": "word64", "y": "word64", "z": "word64"}
+        for expr, res in test_data:
+            test_conv(self, 'bitvector', bitvector.bv_norm_add_monomial(), vars=vars64, t=expr, t_res=res)
+
+    def testNormAddPolynomial(self):
+        test_data = [
+            # ("1 * y + 1 * x", "1 * x + 1 * y"),
+            # ("(x + z) + y", "(x + y) + z"),
+            # ("0 + 2 * x", "2 * x"), #cant simplify 0
+            ("0 + x", "x")
+        ]
+
+        vars32 = {"x": "word32", "y": "word32", "z": "word32"}
+        for expr, res in test_data:
+            test_conv(self, 'bitvector', bitvector.bv_norm_add_polynomial(), vars=vars32, t=expr, t_res=res)
+
+        vars64 = {"x": "word64", "y": "word64", "z": "word64"}
+        for expr, res in test_data:
+            test_conv(self, 'bitvector', bitvector.bv_norm_add_polynomial(), vars=vars64, t=expr, t_res=res)        
+
+    def testNormMultPolyMonomial(self):
+        test_data = [
+            # ("1 * y + 1 * x", "1 * x + 1 * y"),
+            # ("(x + z) + y", "(x + y) + z"),
+            # ("0 + 2 * x", "2 * x"), #cant simplify 0
+            ("(x + y) * (x + y)", "x * x + x * y + x * y + y * y")
+        ]
+
+        vars32 = {"x": "word32", "y": "word32", "z": "word32"}
+        for expr, res in test_data:
+            test_conv(self, 'bitvector', bitvector.bv_norm_mult_polynomials(), vars=vars32, t=expr, t_res=res)
+
+        vars64 = {"x": "word64", "y": "word64", "z": "word64"}
+        for expr, res in test_data:
+            test_conv(self, 'bitvector', bitvector.bv_norm_mult_polynomials(), vars=vars64, t=expr, t_res=res)
+
+    def testNormFull(self):
+        test_data = [
+            ("1 * y + 1 * x", "1 * x + 1 * y"), #order error
+            ("(x + z) + y", "(x + y) + z"),
+            ("0 + 2 * x", "2 * x"), #cant simplify 0
+            ("(x + y) * (x + y)", "x * x + x * y + x * y + y * y"),
+            # ("0*(x+y)" ,"0"),
+            ("0 + x + y", "x + y")
+        ]
+
+        vars32 = {"x": "word32", "y": "word32", "z": "word32"}
+        for expr, res in test_data:
+            test_conv(self, 'bitvector', bitvector.bv_norm_full(), vars=vars32, t=expr, t_res=res)
+
+        vars64 = {"x": "word64", "y": "word64", "z": "word64"}
+        for expr, res in test_data:
+            test_conv(self, 'bitvector', bitvector.bv_norm_full(), vars=vars64, t=expr, t_res=res)
 
 if __name__ == "__main__":
     unittest.main()
