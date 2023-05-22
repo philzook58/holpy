@@ -16,6 +16,9 @@ class Settings:
         # Line length
         self.line_length = None
 
+        # Whether to show structures
+        self.show_struct = False
+
     def __copy__(self):
         res = Settings()
         res.__dict__.update(self.__dict__)

@@ -1,0 +1,94 @@
+{
+    "content": [
+        {
+            "args": [],
+            "name": "i",
+            "ty": "type.ax"
+        },
+        {
+            "args": [],
+            "name": "struct",
+            "ty": "type.ax"
+        },
+        {
+            "name": "member",
+            "ty": "def.ax",
+            "type": "i ⇒ i ⇒ bool"
+        },
+        {
+            "name": "subset",
+            "ty": "def.ax",
+            "type": "i ⇒ i ⇒ bool"
+        },
+        {
+            "name": "funcSet",
+            "ty": "def.ax",
+            "type": "i ⇒ i ⇒ i"
+        },
+        {
+            "name": "funcSet2",
+            "ty": "def.ax",
+            "type": "i ⇒ i ⇒ i ⇒ i"
+        },
+        {
+            "name": "collectSet",
+            "ty": "def.ax",
+            "type": "i ⇒ (i ⇒ bool) ⇒ i"
+        },
+        {
+            "name": "identity",
+            "ty": "def.ax",
+            "type": "i ⇒ i"
+        },
+        {
+            "name": "compose",
+            "ty": "def.ax",
+            "type": "i ⇒ i ⇒ i"
+        },
+        {
+            "name": "Func",
+            "ty": "def.ax",
+            "type": "i ⇒ i ⇒ (i ⇒ i) ⇒ i"
+        },
+        {
+            "name": "Func2",
+            "ty": "def.ax",
+            "type": "i ⇒ i ⇒ i ⇒ (i ⇒ i ⇒ i) ⇒ i"
+        },
+        {
+            "name": "app",
+            "ty": "def.ax",
+            "type": "i ⇒ i ⇒ i"
+        },
+        {
+            "name": "app2",
+            "ty": "def.ax",
+            "type": "i ⇒ i ⇒ i ⇒ i"
+        },
+        {
+            "name": "unit",
+            "ty": "def.ax",
+            "type": "struct ⇒ i"
+        },
+        {
+            "name": "plusOp",
+            "ty": "def.ax",
+            "type": "struct ⇒ i ⇒ i ⇒ i"
+        },
+        {
+            "name": "minusOp",
+            "ty": "def.ax",
+            "type": "struct ⇒ i ⇒ i ⇒ i"
+        },
+        {
+            "name": "timesOp",
+            "ty": "def.ax",
+            "type": "struct ⇒ i ⇒ i ⇒ i"
+        }
+    ],
+    "description": "Basic results about sets.",
+    "imports": [
+        "logic_base"
+    ],
+    "name": "zfc"
+}
