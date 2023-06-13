@@ -5,7 +5,7 @@ Macros used in the proof reconstruction.
 import functools
 import itertools
 import operator
-from typing import Optional
+from typing import List, Optional
 
 from kernel.macro import Macro
 from kernel.theory import register_macro
@@ -5270,6 +5270,32 @@ class SymmMacro(Macro):
         pt = prevs[0]
         return pt.symmetric()
     
+@register_macro("verit_not_symm")
+class NotSymmMacro(Macro):
+    def __init__(self):
+        self.level = 1
+        self.sig = List[Term]
+        self.limit = None
+
+    def eval(self, args, prevs) -> Thm:
+        if len(args) != 1 or len(prevs) != 1:
+            raise VeriTException("not_symm", "unexpected number of arguments and prevs")
+        th = prevs[0]
+        expected_res = args[0]
+        if not th.prop.is_not() or not th.prop.arg.is_equals():
+            raise VeriTException("not_symm", "pt is not negation of an equality")
+        A, B = th.prop.arg.args
+        if not expected_res == Not(Eq(B, A)):
+            raise VeriTException("not_symm", "Unexpected result")
+        return Thm(expected_res, th.hyps)
+
+    def get_proof_term(self, args, prevs) -> ProofTerm:
+        pt = prevs[0]
+        A, B = pt.prop.arg.args
+        eq_pt = AllsimplifyMacro().get_proof_term([Eq(Eq(A, B), Eq(B, A))], [])
+        return pt.on_prop(arg_conv(replace_conv(eq_pt)))
+
+
 @register_macro("verit_reordering")
 class ReorderingMacro(Macro):
     def __init__(self):
@@ -5309,13 +5335,15 @@ class AllsimplifyMacro(Macro):
             return pt.on_rhs(rewr_conv("verit_not_simplify1"))
         elif args[0].is_equals() and args[0].lhs.is_equals() and args[0].rhs.is_equals() and args[0].lhs.lhs == args[0].rhs.rhs and args[0].rhs.lhs == args[0].lhs.rhs:#
             lhs, rhs = args[0].args[0].args
-            # 从头推导
+            # First obtain lhs = rhs --> rhs = lhs
             pt = ProofTerm.assume(Eq(lhs, rhs))
             pt2 = pt.symmetric()
             pt3 = pt2.implies_intr(Eq(lhs, rhs))
+            # Then obtain rhs = lhs --> lhs = rhs
             pt4 = ProofTerm.assume(Eq(rhs, lhs))
             pt5 = pt4.symmetric()
             pt6 = pt5.implies_intr(Eq(rhs, lhs))
+            # Finally get lhs = rhs <--> rhs = lhs
             return pt3.equal_intr(pt6)
         elif args[0].is_equals() and bitvector.is_word_type(args[0].arg.get_type()):
             lhs, rhs = args[0].args
