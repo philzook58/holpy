@@ -59,7 +59,7 @@ class TypeTest(unittest.TestCase):
             (TFun(Ta, Tb), ([Ta], Tb)),
             (TFun(Ta, Ta, Tb), ([Ta, Ta], Tb)),
         ]
-        print('')
+
         for T, res in test_data:
             self.assertEqual(T.strip_type(), res)
 
