@@ -53,15 +53,15 @@ class TypeTest(unittest.TestCase):
             # with global_setting(unicode=False):
             self.assertEqual(str(T), str_T)
 
-    # def testStripType(self):
-    #     test_data = [
-    #         (Ta, ([], Ta)),
-    #         (TFun(Ta, Tb), ([Ta], Tb)),
-    #         (TFun(Ta, Ta, Tb), ([Ta, Ta], Tb)),
-    #     ]
-
-    #     for T, res in test_data:
-    #         self.assertEqual(T.strip_type(), res)
+    def testStripType(self):
+        test_data = [
+            (Ta, ([], Ta)),
+            (TFun(Ta, Tb), ([Ta], Tb)),
+            (TFun(Ta, Ta, Tb), ([Ta, Ta], Tb)),
+        ]
+        print('')
+        for T, res in test_data:
+            self.assertEqual(T.strip_type(), res)
 
     # def testSubst(self):
     #     test_data = [
@@ -95,25 +95,25 @@ class TypeTest(unittest.TestCase):
     #     for pat, T in test_data:
     #         self.assertRaises(TypeMatchException, pat.match, T)
 
-    # def testGetTVars(self):
-    #     test_data = [
-    #         (BoolType, []),
-    #         (TFun(Ta,Ta), [Ta]),
-    #         (TFun(Ta,Tb), [Ta, Tb]),
-    #     ]
+    def testGetTVars(self):
+        test_data = [
+            (BoolType, []),
+            (TFun(Ta,Ta), [Ta]),
+            (TFun(Ta,Tb), [Ta, Tb]),
+        ]
 
-    #     for T, res in test_data:
-    #         self.assertEqual(T.get_tvars(), res)
+        for T, res in test_data:
+            self.assertEqual(T.get_tvars(), res)
 
-    # def testGetTSubs(self):
-    #     test_data = [
-    #         (BoolType, [BoolType]),
-    #         (TFun(Ta,Ta), [Ta, TFun(Ta,Ta)]),
-    #         (TFun(Ta,Tb), [Ta, Tb, TFun(Ta,Tb)]),
-    #     ]
+    def testGetTSubs(self):
+        test_data = [
+            (BoolType, [BoolType]),
+            (TFun(Ta,Ta), [Ta, TFun(Ta,Ta)]),
+            (TFun(Ta,Tb), [Ta, Tb, TFun(Ta,Tb)]),
+        ]
 
-    #     for T, res in test_data:
-    #         self.assertEqual(T.get_tsubs(), res)
+        for T, res in test_data:
+            self.assertEqual(T.get_tsubs(), res)
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ mod ast;
 
 use ast::{error, pool::TermPool, rc::Rc, Type};
 use pyo3::prelude::*;
+use pyo3::pyclass::CompareOp;
 use pyo3::types::{PyDict, PyTuple};
 use std::cell::RefCell;
 use std::thread_local;
@@ -10,6 +11,14 @@ use std::thread_local;
 // RefCell supports interior mutability.
 thread_local! {
     static CACHE: RefCell<TermPool> = RefCell::new(TermPool::new());
+}
+
+// print CACHE
+#[pyfunction]
+fn print_cache_types() {
+    CACHE.with(|cache| {
+        println!("{:#?}", cache.borrow());
+    })
 }
 
 fn push_cache(key: &Type) -> ast::rc::Rc<Type> {
@@ -96,20 +105,20 @@ impl PyType {
         }
     }
 
-    fn is_tvar(&self) -> PyResult<bool> {
-        Ok(self.ptr.is_tvar())
+    fn is_tvar(&self) -> bool {
+        self.ptr.is_tvar()
     }
 
-    fn is_tconst(&self) -> PyResult<bool> {
-        Ok(self.ptr.is_tconst())
+    fn is_tconst(&self) -> bool {
+        self.ptr.is_tconst()
     }
 
-    fn is_fun(&self) -> PyResult<bool> {
-        Ok(self.ptr.is_fun())
+    fn is_fun(&self) -> bool {
+        self.ptr.is_fun()
     }
 
-    fn is_stvar(&self) -> PyResult<bool> {
-        Ok(self.ptr.is_stvar())
+    fn is_stvar(&self) -> bool {
+        self.ptr.is_stvar()
     }
 
     fn domain_type(&self) -> PyResult<PyType> {
@@ -154,6 +163,49 @@ impl PyType {
         Ok(self.ptr.size().unwrap())
     }
 
+    fn get_stvars(&self) -> PyResult<Vec<PyType>> {
+        CACHE.with(|cache| {
+            let mut cache = cache.borrow_mut();
+            let res = self.ptr.get_stvars(&mut cache.types);
+            Ok(res
+                .iter()
+                .map(|stvar| PyType {
+                    ptr: ast::rc::Rc::clone(stvar),
+                })
+                .collect())
+        })
+    }
+
+    fn get_tvars(&self) -> PyResult<Vec<PyType>> {
+        CACHE.with(|cache| {
+            let mut cache = cache.borrow_mut();
+            let res = self.ptr.get_tvars(&mut cache.types);
+            Ok(res
+                .iter()
+                .map(|tvar| PyType {
+                    ptr: ast::rc::Rc::clone(tvar),
+                })
+                .collect())
+        })
+    }
+
+    fn get_tsubs(&self) -> PyResult<Vec<PyType>> {
+        CACHE.with(|cache| {
+            let mut cache = cache.borrow_mut();
+            let res = self.ptr.get_tsubs(&mut cache.types);
+            Ok(res
+                .iter()
+                .map(|tsub| PyType {
+                    ptr: ast::rc::Rc::clone(tsub),
+                })
+                .collect())
+        })
+    }
+
+    fn is_numeral_type(&self) -> PyResult<bool> {
+        Ok(self.ptr.is_numeral_type())
+    }
+
     /// There are some magic methods.
     fn __str__(&self) -> String {
         format!("{}", self.ptr)
@@ -161,6 +213,15 @@ impl PyType {
 
     fn __repr__(&self) -> String {
         self.ptr.repr()
+    }
+
+    /// There are some magic methods. 0.19.3
+    fn __richcmp__(&self, other: &Self, op: CompareOp) -> bool {
+        match op {
+            CompareOp::Eq => self.ptr == other.ptr,
+            CompareOp::Ne => self.ptr != other.ptr,
+            _ => self.ptr == other.ptr,
+        }
     }
 }
 
@@ -217,4 +278,12 @@ fn holrs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PySTVar>()?;
     m.add_class::<PyTConst>()?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn testStripType() {
+        println!("testStripType");
+    }
 }

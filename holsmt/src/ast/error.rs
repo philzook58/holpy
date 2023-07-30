@@ -8,6 +8,10 @@ use super::Type;
 pub enum TypeError {
     #[error("expected a fun type")]
     NotFun,
+
+    // todo
+    #[error("convert_stvar")]
+    ConvertSTVar,
 }
 
 impl std::convert::From<TypeError> for PyErr {

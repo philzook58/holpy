@@ -11,7 +11,6 @@ pub enum Term {
     Var(String, Rc<Type>),
 
     /// Constant with given name and type.
-    // todo 使用 Const{String, Rc<Type>} 这样的匿名结构体会不会更好一点
     Const(String, Rc<Type>),
 
     /// The function f applied to a, written as f a (of f(a))

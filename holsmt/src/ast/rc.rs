@@ -77,6 +77,11 @@ impl<T> Rc<T> {
     pub fn strong_count(this: &Self) -> usize {
         rc::Rc::strong_count(&this.0)
     }
+
+    /// Similar to [`std::rc::Rc::as_ptr`].
+    pub fn as_ptr(&self) -> *const T {
+        rc::Rc::as_ptr(&self.0)
+    }
 }
 
 #[cfg(test)]

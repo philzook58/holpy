@@ -2,6 +2,7 @@
 
 use super::{Rc, Term, Type};
 use ahash::{AHashMap, AHashSet};
+use std::fmt;
 
 /// A structure to store and manage all allocated types and terms.
 pub struct TermPool {
@@ -46,5 +47,30 @@ impl TermPool {
 
     pub fn add_all(&mut self, tys: Vec<Type>) -> Vec<Rc<Type>> {
         tys.into_iter().map(|t| self.add(t)).collect()
+    }
+}
+
+impl fmt::Debug for TermPool {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "TermPool {{")?;
+
+        for (key, value) in self.types.iter() {
+            writeln!(
+                f,
+                "    {}: {{ value: {:?}, count: {}, ptr: {:p} }},",
+                key,
+                value,
+                Rc::strong_count(value),
+                Rc::as_ptr(value)
+            )?;
+        }
+
+        write!(f, "}}")
+    }
+}
+
+impl fmt::Display for TermPool {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "TermPool")
     }
 }

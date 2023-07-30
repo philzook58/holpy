@@ -74,6 +74,17 @@ class Type:
         [a_1, ... a_n], b.
         
         """
+
+    def get_stvars(self) -> list(Type):
+        """Return the list of schematic type variables."""
+
+    def get_tvars(self) -> list(Type):
+        """Return the list of type variables."""
+
+    def get_tsubs(self) -> list(Type):
+        """Return the list of schematic type variables and type variables
+        appearing in self."""
+
     def size(self) -> int:
         """Return the size of the type."""
 
@@ -81,6 +92,12 @@ class Type:
         """Return the list of type variables."""
 
     def is_numeral_type(self) -> bool: ...
+
+    # # temporty methods
+    # # Pyo3 does not support __eq__ in 0.19.3, 0.20.0 will support it.
+    # def __eq__(self, other) -> bool:
+    #     print("hhh")
+    #     return self.cmp(other)
 
 class STVar(Type):
     """Schematic type variable."""
@@ -97,5 +114,5 @@ class TConst(Type):
 
     def __init__(self, name: str, *args) -> None: ...
 
-def TFun(*args):
+def TFun(*args) -> TConst:
     """Returns the function type arg1 => arg2 => ... => argn."""
