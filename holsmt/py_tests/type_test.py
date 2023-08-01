@@ -2,13 +2,7 @@
 
 import unittest
 
-from holrs import TConst, TVar, STVar, TFun
-
-BoolType = TConst("bool")
-
-NatType = TConst("nat")
-IntType = TConst("int")
-RealType = TConst("real")
+from holrs import TConst, TVar, STVar, TFun, TyInst, BoolType, TypeMatchException
 
 Ta = TVar("a")
 Tb = TVar("b")
@@ -63,37 +57,37 @@ class TypeTest(unittest.TestCase):
         for T, res in test_data:
             self.assertEqual(T.strip_type(), res)
 
-    # def testSubst(self):
-    #     test_data = [
-    #         (STa, Tb),
-    #         (STb, Ta),
-    #         (TFun(STa, Tb), TFun(Tb, Tb)),
-    #         (TFun(STa, STb), TFun(Tb, Ta)),
-    #         (TConst("list", STa), TConst("list", Tb)),
-    #     ]
+    def testSubst(self):
+        test_data = [
+            (STa, Tb),
+            (STb, Ta),
+            (TFun(STa, Tb), TFun(Tb, Tb)),
+            (TFun(STa, STb), TFun(Tb, Ta)),
+            (TConst("list", STa), TConst("list", Tb)),
+        ]
 
-    #     for T, res in test_data:
-    #         self.assertEqual(T.subst(TyInst(a=Tb, b=Ta)), res)
+        for T, res in test_data:
+            self.assertEqual(T.subst(TyInst(a=Tb, b=Ta)), res)
 
-    # def testMatch(self):
-    #     test_data = [
-    #         (STa, Tb, {"a" : Tb}),
-    #         (TFun(STa, STb), TFun(Tb,Ta), {"a" : Tb, "b" : Ta}),
-    #         (STa, BoolType, {"a" : BoolType}),
-    #         (TFun(STa, BoolType), TFun(BoolType, BoolType), {"a" : BoolType}),
-    #     ]
+    def testMatch(self):
+        test_data = [
+            (STa, Tb, {"a" : Tb}),
+            (TFun(STa, STb), TFun(Tb,Ta), {"a" : Tb, "b" : Ta}),
+            (STa, BoolType, {"a" : BoolType}),
+            (TFun(STa, BoolType), TFun(BoolType, BoolType), {"a" : BoolType}),
+        ]
 
-    #     for pat, T, tyinst in test_data:
-    #         self.assertEqual(pat.match(T), TyInst(tyinst))
+        for pat, T, tyinst in test_data:
+            self.assertEqual(pat.match(T), TyInst(tyinst))
 
-    # def testMatchFail(self):
-    #     test_data = [
-    #         (TFun(STa, STa), TFun(Ta,Tb)),
-    #         (BoolType, Ta),
-    #     ]
+    def testMatchFail(self):
+        test_data = [
+            (TFun(STa, STa), TFun(Ta,Tb)),
+            (BoolType, Ta),
+        ]
         
-    #     for pat, T in test_data:
-    #         self.assertRaises(TypeMatchException, pat.match, T)
+        for pat, T in test_data:
+            self.assertRaises(TypeMatchException, pat.match, T)
 
     def testGetTVars(self):
         test_data = [

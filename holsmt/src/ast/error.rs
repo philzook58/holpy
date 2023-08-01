@@ -2,8 +2,6 @@ use pyo3::exceptions::PyOSError;
 use pyo3::prelude::*;
 use thiserror::Error;
 
-use super::Type;
-
 #[derive(Debug, Error)]
 pub enum TypeError {
     #[error("expected a fun type")]
@@ -12,6 +10,12 @@ pub enum TypeError {
     // todo
     #[error("convert_stvar")]
     ConvertSTVar,
+
+    #[error("default error")]
+    Default,
+
+    #[error("{0}")]
+    MatchError(String),
 }
 
 impl std::convert::From<TypeError> for PyErr {

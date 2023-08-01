@@ -7,6 +7,7 @@ pub mod term;
 use ahash::{AHashMap, AHashSet};
 use error::TypeError;
 use rc::Rc;
+use std::collections::HashMap;
 use term::Term;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -99,105 +100,12 @@ impl Type {
         }
     }
 
-    /// Simultaneously substitute for the type variables using tyinst.
-    /// Parameters
-    /// ==========
-    /// tyinst : TyInst
-    ///     Type instantiation to be substituted.
-    pub fn subst(&self, tyinst: Option<Type>) -> Type {
-        unimplemented!()
-    }
-
-    pub fn match_incr() {
-        !unimplemented!()
-    }
-
-    pub fn _match() {
-        !unimplemented!()
-    }
-
-    /// Return the list of schematic type variables.
-    pub fn get_stvars(&self, cache: &mut AHashMap<Type, Rc<Type>>) -> Vec<Rc<Type>> {
-        let mut visited: AHashSet<Rc<Type>> = AHashSet::new();
-
-        fn collect(T: &Type, res: &mut AHashSet<Rc<Type>>, cache: &mut AHashMap<Type, Rc<Type>>) {
-            if T.is_stvar() {
-                res.insert(Rc::clone(cache.get(T).unwrap()));
-            } else if T.is_tvar() {
-            } else {
-                let args = T.get_args().unwrap();
-                for arg in args {
-                    collect(arg, res, cache);
-                }
-            }
-        }
-
-        collect(self, &mut visited, cache);
-        visited.into_iter().collect()
-    }
-
-    /// Return the list of type variables.
-    pub fn get_tvars(&self, cache: &mut AHashMap<Type, Rc<Type>>) -> Vec<Rc<Type>> {
-        let mut visited: AHashSet<Rc<Type>> = AHashSet::new();
-
-        fn collect(T: &Type, res: &mut AHashSet<Rc<Type>>, cache: &mut AHashMap<Type, Rc<Type>>) {
-            if T.is_tvar() {
-                res.insert(Rc::clone(cache.get(T).unwrap()));
-            } else if T.is_stvar() {
-            } else {
-                let args = T.get_args().unwrap();
-                for arg in args {
-                    collect(arg, res, cache);
-                }
-            }
-        }
-
-        collect(self, &mut visited, cache);
-        visited.into_iter().collect()
-    }
-
-    /// Return the list of schematic type variables and type variables appearing in self.
-    pub fn get_tsubs(&self, cache: &mut AHashMap<Type, Rc<Type>>) -> Vec<Rc<Type>> {
-        let mut visited: AHashSet<Rc<Type>> = AHashSet::new();
-
-        fn collect(T: &Type, res: &mut AHashSet<Rc<Type>>, cache: &mut AHashMap<Type, Rc<Type>>) {
-            if T.is_tconst() {
-                let args = T.get_args().unwrap();
-                for arg in args {
-                    collect(arg, res, cache);
-                }
-            }
-
-            res.insert(Rc::clone(cache.get(T).unwrap()));
-        }
-
-        collect(self, &mut visited, cache);
-        visited.into_iter().collect()
-    }
-
     fn get_name(&self) -> &String {
         match self {
             Type::STVar(name) => name,
             Type::TVar(name) => name,
             Type::TConst(name, _) => name,
         }
-    }
-
-    // todo, reallocation memory?
-    pub fn convert_stvar(&self) -> Result<Type, TypeError> {
-        // if self.is_stvar() {
-        //     Err(TypeError::ConvertSTVar)
-        // } else if self.is_tvar() {
-        //     Ok(Type::STVar(self.get_name().clone()))
-        // } else if self.is_tconst() {
-        //     let args = self.get_args().unwrap();
-        //     let converted_args: Result<Vec<Type>, TypeError> =
-        //         args.iter().map(|arg| arg.convert_stvar()).collect();
-        //     Ok(Type::TConst(self.get_name().clone(), converted_args?))
-        // } else {
-        //     Err(TypeError::ConvertSTVar)
-        // }
-        !unimplemented!()
     }
 
     pub fn is_numeral_type(&self) -> bool {
@@ -233,6 +141,183 @@ impl Rc<Type> {
             // todo modify clone
             return Ok((Vec::new(), rc::Rc::clone(self)));
         }
+    }
+
+    /// Simultaneously substitute for the type variables using tyinst.
+    /// Parameters
+    /// ==========
+    /// tyinst : TyInst
+    ///     Type instantiation to be substituted.
+    pub fn subst(
+        &self,
+        tyinst: &HashMap<String, Rc<Type>>,
+        push_cache: &dyn Fn(&Type) -> Rc<Type>,
+    ) -> Result<Rc<Type>, TypeError> {
+        if self.is_stvar() {
+            // todo calculate hashval twice?
+            if tyinst.contains_key(self.get_name()) {
+                Ok(rc::Rc::clone(tyinst.get(self.get_name()).unwrap()))
+            } else {
+                Ok(rc::Rc::clone(self))
+            }
+        } else if self.is_tvar() {
+            Ok(rc::Rc::clone(self))
+        } else if self.is_tconst() {
+            let args = self.get_args().unwrap();
+            // todo modify unwrap
+            let substituted_args = args
+                .iter()
+                .map(|T| T.subst(&tyinst, push_cache).unwrap())
+                .collect();
+            // todo add cache
+            let ty = Type::new_TConst(self.get_name(), substituted_args);
+            Ok(rc::Rc::clone(&push_cache(&ty)))
+        } else {
+            Err(TypeError::Default)
+        }
+    }
+
+    fn match_incr(
+        &self,
+        T: &Rc<Type>,
+        tyinst: &mut HashMap<String, Rc<Type>>,
+    ) -> Result<(), TypeError> {
+        if self.is_stvar() {
+            // todo calculate hashval twice?
+            if tyinst.contains_key(self.get_name()) {
+                let value = tyinst.get(self.get_name()).unwrap();
+                if value != T {
+                    Err(TypeError::MatchError(format!(
+                        "Unable to match {} with {}",
+                        T, value
+                    )))
+                } else {
+                    Ok(())
+                }
+            } else {
+                tyinst.insert(self.get_name().clone(), rc::Rc::clone(T));
+                Ok(())
+            }
+        } else if self.is_tvar() {
+            if self != T {
+                Err(TypeError::MatchError(format!(
+                    "Unable to match {} with {}",
+                    self, T,
+                )))
+            } else {
+                Ok(())
+            }
+        } else if self.is_tconst() {
+            if !T.is_tconst() || T.get_name() != self.get_name() {
+                Err(TypeError::MatchError(format!(
+                    "Unable to match {} with {}",
+                    self, T,
+                )))
+            } else {
+                // todo
+                // Implement the iteration over args and call match_incr recursively
+                let args_zip = self
+                    .get_args()
+                    .unwrap()
+                    .iter()
+                    .zip(T.get_args().unwrap().iter());
+                for (arg, argT) in args_zip {
+                    arg.match_incr(argT, tyinst)?;
+                }
+                Ok(())
+            }
+        } else {
+            Err(TypeError::Default)
+        }
+    }
+
+    pub fn _match(&self, T: &Rc<Type>) -> Result<HashMap<String, Rc<Type>>, TypeError> {
+        let mut res: HashMap<String, Rc<Type>> = HashMap::new();
+        self.match_incr(&T, &mut res)?;
+        Ok(res)
+    }
+
+    /// Return the list of schematic type variables.
+    pub fn get_stvars(&self) -> Vec<Rc<Type>> {
+        let mut res: Vec<Rc<Type>> = Vec::new();
+
+        fn collect(T: &Rc<Type>, res: &mut Vec<Rc<Type>>) {
+            if T.is_stvar() {
+                if !res.contains(T) {
+                    res.push(rc::Rc::clone(T));
+                }
+            } else if T.is_tvar() {
+                // Do nothing for TVar
+            } else {
+                let args = T.get_args().unwrap();
+                for arg in args {
+                    collect(arg, res);
+                }
+            }
+        }
+
+        collect(self, &mut res);
+        res
+    }
+
+    /// Return the list of type variables.
+    pub fn get_tvars(&self) -> Vec<Rc<Type>> {
+        let mut res: Vec<Rc<Type>> = Vec::new();
+
+        fn collect(T: &Rc<Type>, res: &mut Vec<Rc<Type>>) {
+            if T.is_tvar() {
+                // todo O(n)
+                if !res.contains(T) {
+                    res.push(rc::Rc::clone(T));
+                }
+            } else if T.is_stvar() {
+                // Do nothing for STVar
+            } else {
+                let args = T.get_args().unwrap();
+                for arg in args {
+                    collect(arg, res);
+                }
+            }
+        }
+        collect(self, &mut res);
+        res
+    }
+
+    /// Return the list of schematic type variables and type variables appearing in self.
+    pub fn get_tsubs(&self) -> Vec<Rc<Type>> {
+        let mut res: Vec<Rc<Type>> = Vec::new();
+
+        fn collect(T: &Rc<Type>, res: &mut Vec<Rc<Type>>) {
+            if T.is_tconst() {
+                let args = T.get_args().unwrap();
+                for arg in args {
+                    collect(arg, res);
+                }
+            }
+            // todo O(n)
+            if !res.contains(T) {
+                res.push(rc::Rc::clone(T));
+            }
+        }
+        collect(self, &mut res);
+        res
+    }
+
+    // todo, reallocation memory?
+    pub fn convert_stvar(&self) -> Result<Type, TypeError> {
+        // if self.is_stvar() {
+        //     Err(TypeError::ConvertSTVar)
+        // } else if self.is_tvar() {
+        //     Ok(Type::STVar(self.get_name().clone()))
+        // } else if self.is_tconst() {
+        //     let args = self.get_args().unwrap();
+        //     let converted_args: Result<Vec<Type>, TypeError> =
+        //         args.iter().map(|arg| arg.convert_stvar()).collect();
+        //     Ok(Type::TConst(self.get_name().clone(), converted_args?))
+        // } else {
+        //     Err(TypeError::ConvertSTVar)
+        // }
+        !unimplemented!()
     }
 }
 
