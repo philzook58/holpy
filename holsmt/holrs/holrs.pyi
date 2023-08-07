@@ -115,20 +115,81 @@ class Type:
     #     print("hhh")
     #     return self.cmp(other)
 
-class STVar(Type):
+def STVar(name: str) -> Type:
     """Schematic type variable."""
-    
-    def __init__(self, name: str) -> None: ...
 
-class TVar(Type):
+def TVar(name: str) -> Type:
     """Type variable."""
 
-    def __init__(self, name: str) -> None: ...
-
-class TConst(Type):
+def TConst(name: str, *args) -> Type:
     """Type constant, applied to a list of arguments."""
-
-    def __init__(self, name: str, *args) -> None: ...
 
 def TFun(*args) -> TConst:
     """Returns the function type arg1 => arg2 => ... => argn."""
+
+class Term:
+    """Represents a term in higher-order logic.
+    
+    There are six term constructors:
+    
+    SVar(name, T): schematic variable with given name and type.
+
+    Var(name, T): variable with given name and type.
+
+    Const(name, T): constant with given name and type.
+
+    Comb(f, a): the function f applied to a, written as f a (or f(a)).
+
+    Abs(x, T, body): abstraction. x is the suggested name of the bound
+    variable, and T is the type of the bound variable. body is the body of
+    the abstraction. This is written as %x::T. body, where the type T is
+    usually omitted.
+
+    Bound(n): bound variable with de Bruijn index n."""
+
+    def is_svar(self) -> bool:
+        """Return whether self is a schematic variable."""
+
+    def is_var(self) -> bool:
+        """Return whether self is a variable."""
+
+    def is_const(self, name=None) -> bool:
+        """Return whether the term is a constant.
+
+        name : optional str
+            If given, test whether the term has that name.
+
+        """
+
+    def is_comb(self) -> bool:
+        """Return whether self is a combination."""
+
+    def __call__(self, *args) -> Term:
+        """Apply self (as a function) to a list of arguments."""
+
+    def size(self) -> int:
+        """Return the size of the term."""
+    
+    def get_type(self) -> Type:
+        """Returns type of the term with minimal type checking."""
+
+    def is_open(self) -> bool:
+        """Whether t is an open term."""
+
+def SVar(name: str, T: Type) -> Term:
+    """Schematic variable."""
+
+def Var(name: str, T: Type) -> Term:
+    """Variable."""
+
+def Const(name: str, T: Type) -> Term:
+    """Constant."""
+
+def Comb(f: Term, a: Term) -> Term:
+    """Combination."""
+
+def Abs(x: str, T: Type, body: Term) -> Term:
+    """Abstraction."""
+
+def Bound(n: int) -> Term:
+    """Bound variable with de Bruijn index n."""

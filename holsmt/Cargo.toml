@@ -9,7 +9,7 @@ name = "holrs"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = "0.19.0"
+pyo3 = "0.19.2"
 ahash = "0.8.3"
 thiserror = "1.0.40"
 # print colored text

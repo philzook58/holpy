@@ -151,14 +151,12 @@ impl Rc<Type> {
     pub fn subst(
         &self,
         tyinst: &HashMap<String, Rc<Type>>,
-        push_cache: &dyn Fn(&Type) -> Rc<Type>,
+        push_cache: &dyn Fn(Type) -> Rc<Type>,
     ) -> Result<Rc<Type>, TypeError> {
         if self.is_stvar() {
-            // todo calculate hashval twice?
-            if tyinst.contains_key(self.get_name()) {
-                Ok(rc::Rc::clone(tyinst.get(self.get_name()).unwrap()))
-            } else {
-                Ok(rc::Rc::clone(self))
+            match tyinst.get(self.get_name()) {
+                Some(value) => Ok(rc::Rc::clone(value)),
+                None => Ok(rc::Rc::clone(self)),
             }
         } else if self.is_tvar() {
             Ok(rc::Rc::clone(self))
@@ -171,7 +169,7 @@ impl Rc<Type> {
                 .collect();
             // todo add cache
             let ty = Type::new_TConst(self.get_name(), substituted_args);
-            Ok(rc::Rc::clone(&push_cache(&ty)))
+            Ok(rc::Rc::clone(&push_cache(ty)))
         } else {
             Err(TypeError::Default)
         }

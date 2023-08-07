@@ -16,6 +16,9 @@ pub enum TypeError {
 
     #[error("{0}")]
     MatchError(String),
+
+    #[error("{0}")]
+    Custom(String),
 }
 
 impl std::convert::From<TypeError> for PyErr {

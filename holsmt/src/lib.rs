@@ -1,6 +1,6 @@
 mod ast;
 
-use ast::{error, pool::TermPool, rc::Rc, Type};
+use ast::{error, pool::TermPool, rc::Rc, term::Term, Type};
 use pyo3::create_exception;
 use pyo3::exceptions::PyException;
 use pyo3::pyclass::CompareOp;
@@ -27,19 +27,21 @@ fn print_cache_types() {
     })
 }
 
-fn push_cache(key: &Type) -> ast::rc::Rc<Type> {
+fn push_type_to_cache(key: Type) -> ast::rc::Rc<Type> {
     CACHE.with(|cache| {
         let mut cache = cache.borrow_mut();
-        if let Some(value) = cache.types.get(&key) {
-            return ast::rc::Rc::clone(value);
-        }
-        let value = ast::rc::Rc::new(key.clone());
-        cache.types.insert(key.clone(), ast::rc::Rc::clone(&value));
-        value
+        cache.add_type(key)
     })
 }
 
-#[pyclass(unsendable, subclass, extends=PyDict)]
+fn push_term_to_cache(key: Term) -> ast::rc::Rc<Term> {
+    CACHE.with(|cache| {
+        let mut cache = cache.borrow_mut();
+        cache.add_term(key)
+    })
+}
+
+#[pyclass(unsendable, subclass)]
 #[derive(Default)]
 struct TyInst {
     data: HashMap<String, PyType>,
@@ -53,48 +55,59 @@ impl ToPyObject for TyInst {
 
 #[pymethods]
 impl TyInst {
-    // *args, **kwargs support implicitly call __new__ method for BaseClass, when create a instance from Python
-    // todo implementation by self use **kwargs? HashMap<String, PyType>
     #[new]
-    #[pyo3(signature = (*args, **kwargs))]
-    fn new(args: &PyAny, kwargs: Option<&PyAny>) -> Self {
-        Self {
-            data: HashMap::new(),
+    #[pyo3(signature = (*dict, **kwargs))]
+    fn new(dict: &PyTuple, kwargs: Option<&PyDict>) -> Self {
+        let mut data = HashMap::new();
+
+        if !dict.is_empty() {
+            let _dict = dict.get_item(0).unwrap().downcast::<PyDict>().unwrap();
+            for (key, value) in _dict.iter() {
+                if let Ok(key_str) = key.extract::<String>() {
+                    if let Ok(value_type) = value.extract::<PyType>() {
+                        data.insert(key_str, value_type);
+                    }
+                }
+            }
+            Self { data }
+        } else if let Some(kwargs_dict) = kwargs {
+            for (key, value) in kwargs_dict.iter() {
+                if let Ok(key_str) = key.extract::<String>() {
+                    if let Ok(value_type) = value.extract::<PyType>() {
+                        data.insert(key_str, value_type);
+                    }
+                }
+            }
+            Self { data }
+        } else {
+            panic!("Invalid argument")
         }
     }
 
-    // fn __str__(&self) -> String {
-    //     let gil = Python::acquire_gil();
-    //     let py = gil.python();
+    fn __str__(&self) -> String {
+        // self.data
+        //     .iter()
+        //     .map(|(name, T)| format!("{}: {}", name, T.ptr))
+        //     .collect::<Vec<_>>()
+        //     .join(", ")
+        let mut result = String::new();
+        for (name, ty) in &self.data {
+            result.push_str(&format!("{} := {}, ", name, ty.ptr));
+        }
+        // Remove trailing comma and space
+        if let Some(last) = result.rfind(", ") {
+            result.truncate(last);
+        }
+        result
+    }
 
-    //     let dict: &PyDict = self.dict.as_ref(py);
-    //     let items = dict.items(py);
-
-    //     let mut result = Vec::new();
-
-    //     for item in items.iter() {
-    //         let (key, value) = item.extract::<(String, String)>(py).unwrap();
-    //         result.push(format!("'{} := {}'", key, value));
-    //     }
-
-    //     result.join(", ")
-    // }
-
-    // fn __str__(mut self_: PyRefMut<'_, Self>) -> String {
-    //     let py = self_.py();
-    //     let dict: &PyDict = unsafe { py.from_borrowed_ptr_or_err(self_.as_ptr()).unwrap() };
-    //     println!("{}", dict.len());
-    //     // for (key, value) in self.iter() {
-    //     //     println!("key: {}, value: {}", key, value);
-    //     // }
-    //     "".to_string()
-    // }
-
-    // fn set(mut self_: PyRefMut<'_, Self>, key: String, value: PyType) {
-    //     let py = self_.py();
-    //     let dict: &PyDict = unsafe { py.from_borrowed_ptr_or_err(self_.as_ptr()).unwrap() };
-    //     dict.set_item(key, value).unwrap();
-    // }
+    fn __richcmp__(&self, other: &Self, op: CompareOp) -> bool {
+        match op {
+            CompareOp::Eq => self.data == other.data,
+            CompareOp::Ne => self.data != other.data,
+            _ => self.data == other.data,
+        }
+    }
 }
 
 // todo use unsendable | std::sync::Arc
@@ -108,60 +121,6 @@ impl ToPyObject for PyType {
     fn to_object(&self, py: Python) -> PyObject {
         // todo, clone()?
         self.clone().into_py(py)
-    }
-}
-
-#[pyclass(subclass, name = "TVar", extends = PyType)]
-struct PyTVar;
-
-#[pymethods]
-impl PyTVar {
-    #[new]
-    fn new(name: String) -> (Self, PyType) {
-        let ty = Type::new_TVar(name);
-        let ty_ref = push_cache(&ty);
-
-        (PyTVar {}, PyType { ptr: ty_ref })
-    }
-}
-
-#[pyclass(subclass, name = "STVar", extends = PyType)]
-struct PySTVar;
-
-#[pymethods]
-impl PySTVar {
-    #[new]
-    fn new(name: String) -> (Self, PyType) {
-        let stvar = Type::new_STVar(name);
-        let stvar_ref = push_cache(&stvar);
-
-        (PySTVar {}, PyType { ptr: stvar_ref })
-    }
-}
-
-#[pyclass(subclass, name = "TConst", extends = PyType)]
-struct PyTConst;
-
-#[pymethods]
-impl PyTConst {
-    #[new]
-    #[pyo3(signature = (name, *args))]
-    fn new(name: String, args: &PyTuple) -> (Self, PyType) {
-        let mut type_args = Vec::new();
-
-        for arg in args {
-            if let Ok(pytype) = arg.extract::<PyType>() {
-                type_args.push(ast::rc::Rc::clone(&pytype.ptr))
-            } else {
-                // process error
-                unimplemented!()
-            }
-        }
-
-        let tconst = Type::new_TConst(name, type_args);
-        let tconst_ref = push_cache(&tconst);
-
-        (PyTConst {}, PyType { ptr: tconst_ref })
     }
 }
 
@@ -265,20 +224,14 @@ impl PyType {
     }
 
     #[pyo3(signature = (tyinst=None, **kwargs))]
-    fn subst(&self, tyinst: Option<&PyDict>, kwargs: Option<&PyDict>) -> PyResult<PyType> {
+    fn subst(&self, tyinst: Option<&TyInst>, kwargs: Option<&PyDict>) -> PyResult<PyType> {
         // Create a HashMap to hold the type instantiation
         let mut subst_tyinst: HashMap<String, Rc<Type>> = HashMap::new();
 
         if let Some(tyinst_dict) = tyinst {
             // Iterate over the items in `tyinst_dict` and populate the HashMap
-            for (key, value) in tyinst_dict.iter() {
-                if let Ok(key_str) = key.extract::<String>() {
-                    if let Ok(value_type) = value.extract::<PyType>() {
-                        // todo, rc::Rc::clone()
-                        // subst_tyinst.insert(key_str, value_type.ptr);
-                        subst_tyinst.insert(key_str, ast::rc::Rc::clone(&value_type.ptr));
-                    }
-                }
+            for (key, value) in tyinst_dict.data.iter() {
+                subst_tyinst.insert(key.clone(), ast::rc::Rc::clone(&value.ptr));
             }
         } else if let Some(kwargs_dict) = kwargs {
             // If `tyinst` is not provided, try extracting the type instantiation from `kwargs`
@@ -293,7 +246,7 @@ impl PyType {
             }
         }
 
-        match self.ptr.subst(&subst_tyinst, &push_cache) {
+        match self.ptr.subst(&subst_tyinst, &push_type_to_cache) {
             Ok(res) => Ok(PyType {
                 ptr: ast::rc::Rc::clone(&res),
             }),
@@ -303,7 +256,7 @@ impl PyType {
 
     // todo match is a Rust keyword, so we use _match instead.
 
-    fn _match(&self, T: PyType, py: Python) -> PyResult<PyObject> {
+    fn _match(&self, T: PyType, py: Python) -> PyResult<TyInst> {
         match self.ptr._match(&T.ptr) {
             Ok(res) => {
                 let hashmap: HashMap<String, PyType> = res
@@ -319,8 +272,8 @@ impl PyType {
                     .collect();
 
                 let tyinst = TyInst { data: hashmap };
-                // Ok(mydict)
-                Ok(tyinst.to_object(py))
+                // Ok(tyinst)
+                Ok(tyinst)
             }
             Err(error) => Err(TypeMatchException::new_err(error.to_string())),
         }
@@ -355,6 +308,43 @@ impl PyType {
     }
 }
 
+#[pyfunction]
+fn STVar(name: String) -> PyType {
+    let stvar = Type::new_STVar(name);
+    let stvar_ref = push_type_to_cache(stvar);
+
+    PyType { ptr: stvar_ref }
+}
+
+// todo
+#[pyfunction]
+fn TVar(name: String) -> PyType {
+    let tvar = Type::new_TVar(name);
+    let tvar_ref = push_type_to_cache(tvar);
+
+    PyType { ptr: tvar_ref }
+}
+
+// todo
+#[pyfunction(signature = (name, *args))]
+fn TConst(name: String, args: &PyTuple) -> PyType {
+    let mut type_args = Vec::new();
+
+    for arg in args {
+        if let Ok(pytype) = arg.extract::<PyType>() {
+            type_args.push(ast::rc::Rc::clone(&pytype.ptr))
+        } else {
+            // process error
+            unimplemented!()
+        }
+    }
+
+    let tconst = Type::new_TConst(name, type_args);
+    let tconst_ref = push_type_to_cache(tconst);
+
+    PyType { ptr: tconst_ref }
+}
+
 #[pyfunction(signature = (*args))]
 fn TFun(args: &PyTuple) -> PyType {
     let mut type_args = Vec::new();
@@ -372,7 +362,7 @@ fn TFun(args: &PyTuple) -> PyType {
     for arg in type_args.iter().rev() {
         let name = "fun".to_string();
         let tconst = Type::new_TConst(name, vec![ast::rc::Rc::clone(arg), res]);
-        res = push_cache(&tconst);
+        res = push_type_to_cache(tconst);
     }
 
     PyType { ptr: res }
@@ -391,16 +381,248 @@ fn print_address(pytype: PyType) -> PyResult<String> {
     ))
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[pyclass(unsendable, name = "Term", subclass)]
+struct PyTerm {
+    ptr: ast::rc::Rc<Term>,
+}
+
+#[pymethods]
+impl PyTerm {
+    // todo, unneccessary?
+    #[new]
+    fn new(name: String, ty: PyType) -> Self {
+        Self {
+            ptr: ast::rc::Rc::new(Term::new_var(name, ty.ptr)),
+        }
+    }
+
+    /// There are some magic methods.
+    fn __str__(&self) -> String {
+        format!("{}", self.ptr)
+    }
+
+    fn __repr__(&self) -> String {
+        self.ptr.repr()
+    }
+
+    #[pyo3(signature = (*args))]
+    fn __call__(&self, args: &PyTuple) -> Self {
+        let mut term_args = Vec::new();
+
+        for arg in args {
+            if let Ok(pyterm) = arg.extract::<PyTerm>() {
+                term_args.push(ast::rc::Rc::clone(&pyterm.ptr))
+            } else {
+                // process error
+                unimplemented!()
+            }
+        }
+
+        // args always in CACHE
+        let mut res = ast::rc::Rc::clone(&self.ptr);
+        for arg in term_args {
+            res = push_term_to_cache(Term::new_comb(res, arg));
+        }
+        PyTerm { ptr: res }
+    }
+
+    /// There are some magic methods. 0.19.3
+    fn __richcmp__(&self, other: &Self, op: CompareOp) -> bool {
+        match op {
+            CompareOp::Eq => {
+                if self.ptr == other.ptr {
+                    return true;
+                }
+
+                self.ptr.eq(&other.ptr)
+            }
+            CompareOp::Ne => {
+                if self.ptr != other.ptr {
+                    return true;
+                }
+
+                !self.ptr.eq(&other.ptr)
+            }
+            _ => self.ptr == other.ptr,
+        }
+    }
+
+    fn get_type(&self) -> PyResult<PyType> {
+        // funciton ptr
+        match self
+            .ptr
+            .get_type(&(push_type_to_cache as fn(Type) -> ast::rc::Rc<Type>))
+        {
+            Ok(res) => Ok(PyType {
+                ptr: ast::rc::Rc::clone(&res),
+            }),
+            Err(error) => Err(error.into()),
+        }
+    }
+
+    fn is_open(&self) -> bool {
+        self.ptr.is_open()
+    }
+
+    #[pyo3(signature = (tyinst=None, **kwargs))]
+    fn subst_type(&self, tyinst: Option<&TyInst>, kwargs: Option<&PyDict>) -> PyTerm {
+        let subst_dict: HashMap<String, Rc<Type>> = match tyinst {
+            Some(dict) => dict
+                .data
+                .iter()
+                .map(|(k, v)| (k.clone(), v.ptr.clone()))
+                .collect(),
+            None => {
+                let mut subst_dict = HashMap::new();
+                if let Some(kwargs_dict) = kwargs {
+                    for (key, value) in kwargs_dict.iter() {
+                        if let Ok(key_str) = key.extract::<String>() {
+                            if let Ok(value_type) = value.extract::<PyType>() {
+                                subst_dict.insert(key_str, ast::rc::Rc::clone(&value_type.ptr));
+                            }
+                        }
+                    }
+                }
+                subst_dict
+            }
+        };
+
+        PyTerm {
+            ptr: self.ptr.subst_type(
+                &subst_dict,
+                &(push_term_to_cache as fn(Term) -> ast::rc::Rc<Term>),
+                &(push_type_to_cache as fn(Type) -> ast::rc::Rc<Type>),
+            ),
+        }
+    }
+
+    fn is_conj(&self) -> bool {
+        self.ptr.is_conj()
+    }
+
+    fn is_disj(&self) -> bool {
+        self.ptr.is_disj()
+    }
+
+    fn is_forall(&self) -> bool {
+        self.ptr.is_forall()
+    }
+
+    fn is_exists(&self) -> bool {
+        self.ptr.is_exists()
+    }
+
+    fn is_let(&self) -> bool {
+        self.ptr.is_let()
+    }
+
+    fn is_equal(&self) -> bool {
+        self.ptr.is_equal()
+    }
+
+    fn is_VAR(&self) -> bool {
+        self.ptr.is_var()
+    }
+}
+
+#[pyfunction]
+fn SVar(name: String, ty: PyType) -> PyTerm {
+    let term = Term::new_svar(name, ty.ptr);
+    let term_ref = push_term_to_cache(term);
+
+    PyTerm { ptr: term_ref }
+}
+
+#[pyfunction]
+fn Var(name: String, ty: PyType) -> PyTerm {
+    let term = Term::new_var(name, ty.ptr);
+    let term_ref = push_term_to_cache(term);
+
+    PyTerm { ptr: term_ref }
+}
+
+#[pyfunction]
+fn Const(name: String, ty: PyType) -> PyTerm {
+    let term = Term::new_const(name, ty.ptr);
+    let term_ref = push_term_to_cache(term);
+
+    PyTerm { ptr: term_ref }
+}
+
+// todo, Rc::clone()?
+#[pyfunction]
+fn Comb(fun: PyTerm, arg: PyTerm) -> PyTerm {
+    let term = Term::new_comb(fun.ptr, arg.ptr);
+    let term_ref = push_term_to_cache(term);
+
+    PyTerm { ptr: term_ref }
+}
+
+#[pyfunction(signature = (*args))]
+fn Abs(args: &PyTuple) -> PyTerm {
+    if args.len() < 3 || args.len() % 2 == 0 {
+        panic!("Invalid argument length");
+    }
+    let args_vec: Vec<&PyAny> = args.iter().collect();
+    let mut args_iter = args_vec.iter().rev();
+    let body = args_iter
+        .next()
+        .and_then(|arg| arg.extract::<PyTerm>().ok())
+        .expect("Invalid argument: body");
+    let mut current_term = ast::rc::Rc::clone(&body.ptr);
+
+    loop {
+        let var_ty = match args_iter
+            .next()
+            .and_then(|arg| arg.extract::<PyType>().ok())
+        {
+            Some(var_ty) => var_ty,
+            None => break,
+        };
+        let var_name = match args_iter
+            .next()
+            .and_then(|arg| arg.extract::<String>().ok())
+        {
+            Some(var_name) => var_name,
+            None => break,
+        };
+
+        let new_term = Term::Abs(var_name, var_ty.ptr, current_term);
+        current_term = push_term_to_cache(new_term);
+    }
+
+    // println!("{:?}", current_term);
+    PyTerm { ptr: current_term }
+}
+
+#[pyfunction]
+fn Bound(n: usize) -> PyTerm {
+    let term = Term::new_bound(n);
+    let term_ref = push_term_to_cache(term);
+
+    PyTerm { ptr: term_ref }
+}
+
 /// A Python module implemented in Rust.
 #[pymodule]
 #[pyo3(name = "holrs")] // todo, modify name
 fn holrs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(print_address, m)?)?;
     m.add_function(wrap_pyfunction!(TFun, m)?)?;
+    m.add_function(wrap_pyfunction!(STVar, m)?)?;
+    m.add_function(wrap_pyfunction!(TVar, m)?)?;
+    m.add_function(wrap_pyfunction!(TConst, m)?)?;
+
+    m.add_function(wrap_pyfunction!(SVar, m)?)?;
+    m.add_function(wrap_pyfunction!(Var, m)?)?;
+    m.add_function(wrap_pyfunction!(Const, m)?)?;
+    m.add_function(wrap_pyfunction!(Comb, m)?)?;
+    m.add_function(wrap_pyfunction!(Abs, m)?)?;
+    m.add_function(wrap_pyfunction!(Bound, m)?)?;
+
     m.add_class::<PyType>()?;
-    m.add_class::<PyTVar>()?;
-    m.add_class::<PySTVar>()?;
-    m.add_class::<PyTConst>()?;
+    m.add_class::<PyTerm>()?;
     m.add_class::<TyInst>()?;
 
     // add exception
