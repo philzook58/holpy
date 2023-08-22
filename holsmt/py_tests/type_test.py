@@ -1,6 +1,7 @@
 """Unit test for type"""
 
 import unittest
+import sys
 
 from holrs import TConst, TVar, STVar, TFun, TyInst, BoolType, TypeMatchException
 

@@ -8,7 +8,7 @@ use std::fmt;
 pub struct TermPool {
     /// A map of the types in the pool.
     pub(crate) types: AHashMap<Type, Rc<Type>>,
-    /// A map of the terms in the pool.
+    // todo types_cache is neccessary?
     pub(crate) terms: AHashMap<Term, Rc<Term>>,
 }
 
@@ -64,6 +64,7 @@ impl TermPool {
     }
 
     /// Takes a type and returns a possibly newly allocated `Rc` that references it.
+    ///
     pub fn add_term(&mut self, ty: Term) -> Rc<Term> {
         let ty = Self::add_term_to_map(&mut self.terms, ty);
         // deduciton type, the store in cache?

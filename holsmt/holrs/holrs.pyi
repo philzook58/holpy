@@ -1,7 +1,11 @@
+
 from typing import Tuple, Union
 
 class TyInst:
     """Indicates error in processing types."""
+
+class Inst:
+    """Indicates error in processing terms."""
 
 class Type:
     """Represents a type in higher-order logic.
@@ -175,6 +179,9 @@ class Term:
 
     def is_open(self) -> bool:
         """Whether t is an open term."""
+
+    def occurs_var(self, t: Term) -> bool:
+        """Whether the variable t occurs in self."""
 
 def SVar(name: str, T: Type) -> Term:
     """Schematic variable."""

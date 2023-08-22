@@ -1,0 +1,46 @@
+use std::str::FromStr;
+use crate::ast;
+
+
+// seperate rust code from grammar
+grammar;
+
+pub Type: ast::Type = {
+    #[precedence(level="1")]
+    "'" <name: CNAME> => ast::Type::TVar(name), // type variable
+    #[precedence(level="1")]
+    "?" <name: CNAME> => ast::Type::STVar(name), // sechematic type variable
+    #[precedence(level="2")]
+    #[assoc(side="left")]
+    <domain: Type> IMPLY <range: Type> => ast::Type::TConst("fun".to_string(), vec![ast::rc::Rc::new(domain), ast::rc::Rc::new(range)]), // function types
+    #[precedence(level="1")]
+    <name: CNAME> => ast::Type::TConst(name, vec![]), // type constants
+    // Type <name: CNAME> => ast::Type::TConst(name, vec![ast::rc::Rc::new(<>)]), // type constructor with one argument
+    #[precedence(level="2")]
+    "(" <t:Type> ")" => t, // Parenthesis
+}
+
+CNAME: String = {
+    <s:r"[_a-zA-Z][_a-zA-Z0-9]*"> => s.to_owned()
+};
+
+// todo, use rug for big int
+INT: i32 = {
+    <s:r"[0-9][0-9]+"> => i32::from_str(s).unwrap()
+}
+
+DIGIT: u8 = {
+    <s:r"[0-9]"> => u8::from_str(s).unwrap()
+}
+
+IMPLY = {
+    "=>",
+    "⇒"
+}
+
+
+// todo
+// LETTER: u8 = {
+//     <s:r"[a-zA-Z]"> => u8::from_str(s).unwrap()
+// }
+

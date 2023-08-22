@@ -1,0 +1,8 @@
+# clippy.toml
+# https://rust-lang.github.io/rust-clippy/master/index.html
+
+disallowed-methods = [
+    "std::rc::Rc::new",
+    "alloc::rc::Rc::new",
+    "ast::rc::Rc::new",
+]

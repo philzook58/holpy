@@ -45,6 +45,8 @@ impl fmt::Display for Type {
 
 impl fmt::Display for Rc<Term> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // todo
+
         fn helper(t: &Rc<Term>, bd_vars: &mut Vec<String>) -> String {
             if t.is_svar() {
                 let (name, _) = t.get_name_type().unwrap();
@@ -53,6 +55,7 @@ impl fmt::Display for Rc<Term> {
                 let (name, _) = t.get_name_type().unwrap();
                 return format!("{}", name);
             } else if t.is_comb(None, None) {
+                // todo
                 let (fun, arg) = t.get_fun_and_arg().unwrap();
                 let str_fun: String;
                 let str_arg: String;
@@ -68,8 +71,12 @@ impl fmt::Display for Rc<Term> {
                 }
                 return format!("{} {}", str_fun, str_arg);
             } else if t.is_abs() {
+                // todo
                 let (var_name, _, body) = t.get_varname_varty_body().unwrap();
+                // println!("var_name: {}", var_name);
+                // println!("bd_vars: {:?}", bd_vars);
                 let mut new_bd_vars = vec![var_name.clone(), bd_vars.clone().concat()];
+                // println!("new_bd_vars: {:?}", new_bd_vars);
                 let body_repr = helper(body, &mut new_bd_vars);
                 return format!("%{}. {}", var_name, body_repr);
             } else if t.is_bound() {

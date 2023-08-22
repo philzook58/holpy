@@ -126,6 +126,18 @@ impl Type {
             }
         }
     }
+
+    pub fn is_real(&self) -> bool {
+        matches!(self, Type::TConst(name, _) if name == "real")
+    }
+
+    pub fn is_int(&self) -> bool {
+        matches!(self, Type::TConst(name, _) if name == "int")
+    }
+
+    pub fn is_nat(&self) -> bool {
+        matches!(self, Type::TConst(name, _) if name == "nat")
+    }
 }
 
 impl Rc<Type> {
@@ -302,7 +314,7 @@ impl Rc<Type> {
     }
 
     // todo, reallocation memory?
-    pub fn convert_stvar(&self) -> Result<Type, TypeError> {
+    pub fn convert_stvar(&self) -> Result<Rc<Type>, TypeError> {
         // if self.is_stvar() {
         //     Err(TypeError::ConvertSTVar)
         // } else if self.is_tvar() {
@@ -324,33 +336,45 @@ impl Eq for Rc<Type> {}
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use std::mem;
+    use super::{pool::TermPool, *};
 
     #[test]
-    fn test_print() {
-        let BoolType = Type::TConst("bool".to_string(), vec![]);
-        println!("{}", BoolType);
-        println!("{}", BoolType.is_tconst());
-        let NatType = Type::TConst("nat".to_string(), vec![]);
-        println!("{}", NatType);
-        let fun = Type::TConst(
-            "fun".to_string(),
-            vec![Rc::new(NatType.clone()), Rc::new(BoolType.clone())],
-        );
-        println!("{}", fun);
-        println!("{}", fun.is_fun());
-        let a = Type::new_TVar("a");
-        println!("{}", a);
-        println!("{}", Type::STVar("a".to_string()))
-    }
+    fn test_repr_type() {
+        let mut pool = TermPool::new();
+        let Ta = pool.add_type(Type::new_TVar("a"));
+        let Tb = pool.add_type(Type::new_TVar("b"));
+        let Tc = pool.add_type(Type::new_TVar("c"));
+        let STa = pool.add_type(Type::new_STVar("a"));
+        let STb = pool.add_type(Type::new_STVar("b"));
+        let STc = pool.add_type(Type::new_STVar("c"));
 
-    #[test]
-    fn print_size() {
-        println!("Alignment of Type enum: {} bytes", mem::align_of::<Type>());
-        println!("Type: {}", mem::size_of::<Type>());
-        println!("Rc<Type> size: {}", mem::size_of::<Rc<Type>>());
-        println!("String size: {}", mem::size_of::<String>());
-        println!("Vec<Rc<Type>> size: {}", mem::size_of::<Vec<Rc<Type>>>());
+        let test_data = vec![
+            (Rc::clone(&Ta), "TVar(a)"),
+            (
+                pool.add_type(Type::new_TConst("bool", Vec::new())),
+                "TConst(bool, [])",
+            ),
+            (
+                pool.add_type(Type::new_TConst("list", vec![Rc::clone(&Ta)])),
+                "TConst(list, [TVar(a)])",
+            ),
+            (
+                pool.add_type(Type::new_TConst(
+                    "tree",
+                    vec![Rc::clone(&Ta), Rc::clone(&Tb)],
+                )),
+                "TConst(tree, [TVar(a), TVar(b)])",
+            ),
+            (
+                pool.add_type(Type::new_TConst(
+                    "fun",
+                    vec![Rc::clone(&Ta), Rc::clone(&Tb)],
+                )),
+                "TConst(fun, [TVar(a), TVar(b)])",
+            ),
+        ];
+        for (T, repr_T) in test_data {
+            assert_eq!(T.repr().as_str(), repr_T);
+        }
     }
 }

@@ -10,6 +10,7 @@ import unittest
 
 from holrs import TConst, TVar, STVar, TFun, TyInst, BoolType, TypeMatchException
 from holrs import Term, SVar, Var, Const, Comb, Abs, Bound
+from holrs import term
 
 Ta = TVar("a")
 Tb = TVar("b")
@@ -127,17 +128,17 @@ class TermTest(unittest.TestCase):
         for t, res in test_data:
             self.assertEqual(t.subst_type(TyInst(a=Tb)), res)
 
-    # def testSubst(self):
-    #     test_data = [
-    #         (SVar('a', Ta), c),
-    #         (c, c),
-    #         (f(SVar('a', Ta)), f(c)),
-    #         (Abs("x", Ta, B0), Abs("x", Ta, B0)),
-    #         (Abs("x", Ta, SVar('a', Ta)), Abs("x", Ta, c)),
-    #     ]
+    def testSubst(self):
+        test_data = [
+            (SVar('a', Ta), c),
+            (c, c),
+            (f(SVar('a', Ta)), f(c)),
+            (Abs("x", Ta, B0), Abs("x", Ta, B0)),
+            (Abs("x", Ta, SVar('a', Ta)), Abs("x", Ta, c)),
+        ]
 
-    #     for t, res in test_data:
-    #         self.assertEqual(t.subst(Inst(a=c)), res)
+        for t, res in test_data:
+            self.assertEqual(t.subst(Inst(a=c)), res)
 
     # def testSubstFail(self):
     #     self.assertRaises(TermException, SVar('a', TVar('a')).subst, Inst(a=b))
@@ -184,19 +185,19 @@ class TermTest(unittest.TestCase):
     #     for t, res in test_data:
     #         self.assertEqual(t.beta_norm(), res)
 
-    # def testOccursVar(self):
-    #     test_data = [
-    #         (a, a, True),
-    #         (a, b, False),
-    #         (f(a), a, True),
-    #         (f(a), b, False),
-    #         (Abs("a", Ta, a), a, True),
-    #         (Abs("a", Ta, b), b, True),
-    #         (Abs("a", Ta, B0), a, False),
-    #     ]
+    def testOccursVar(self):
+        test_data = [
+            (a, a, True),
+            (a, b, False),
+            (f(a), a, True),
+            (f(a), b, False),
+            (Abs("a", Ta, a), a, True),
+            (Abs("a", Ta, b), b, True),
+            (Abs("a", Ta, B0), a, False),
+        ]
 
-    #     for s, t, res in test_data:
-    #         self.assertEqual(s.occurs_var(t), res)
+        for s, t, res in test_data:
+            self.assertEqual(s.occurs_var(t), res)
 
     # def testAbstractOver(self):
     #     test_data = [
@@ -241,16 +242,16 @@ class TermTest(unittest.TestCase):
     #     for t in test_data:
     #         self.assertRaises(TypeCheckException, t.checked_get_type)
 
-    # def testGetVars(self):
-    #     test_data = [
-    #         (a, [a]),
-    #         (f(a), [f, a]),
-    #         (f(c), [f]),
-    #         ([a, f(c)], [a, f]),
-    #     ]
+    def testGetVars(self):
+        test_data = [
+            (a, [a]),
+            (f(a), [f, a]),
+            (f(c), [f]),
+            ([a, f(c)], [a, f]),
+        ]
 
-    #     for t, res in test_data:
-    #         self.assertEqual(term.get_vars(t), res)
+        for t, res in test_data:
+            self.assertEqual(term.get_vars(t), res)
 
     # def testConj(self):
     #     test_data = [
