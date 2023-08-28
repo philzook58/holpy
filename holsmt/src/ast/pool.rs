@@ -1,14 +1,14 @@
 //! This module implements `TermPool`, a structure that stores terms and implements hash consing.
 
 use super::{Rc, Term, Type};
-use ahash::{AHashMap, AHashSet};
+use ahash::AHashMap;
 use std::fmt;
 
 /// A structure to store and manage all allocated types and terms.
 pub struct TermPool {
     /// A map of the types in the pool.
     pub(crate) types: AHashMap<Type, Rc<Type>>,
-    // todo types_cache is neccessary?
+    /// A map of the terms in the pool.
     pub(crate) terms: AHashMap<Term, Rc<Term>>,
 }
 
@@ -40,7 +40,6 @@ impl TermPool {
     }
 
     /// Takes a type and returns a possibly newly allocated `Rc` that references it.
-    ///
     pub fn add_type(&mut self, ty: Type) -> Rc<Type> {
         let ty = Self::add_type_to_map(&mut self.types, ty);
         // deduciton type, the store in cache?

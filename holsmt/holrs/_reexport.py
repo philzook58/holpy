@@ -1,4 +1,4 @@
-from holrs import Term
+from holrs import Term, Var, SVar, Const, Comb, Abs, Bound, TermException
 from holrs import TConst, Type, Const, TFun
 
 __all__ = [
@@ -7,4 +7,10 @@ __all__ = [
     "Type", 
     "Const", 
     "TFun",
+    "Var",
+    "SVar",
+    "Const",
+    "Comb",
+    "Abs",
+    "Bound",
 ]

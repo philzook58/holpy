@@ -8,9 +8,9 @@ import unittest
 # from kernel.term import SVar, Var, Const, Comb, Abs, Bound, And, Or, Lambda, Binary, Inst
 # from kernel.term import TermException, TypeCheckException
 
-from holrs import TConst, TVar, STVar, TFun, TyInst, BoolType, TypeMatchException
+from holrs import TConst, TVar, STVar, TFun, TyInst, BoolType, TypeMatchException, TermException, Lambda
 from holrs import Term, SVar, Var, Const, Comb, Abs, Bound
-from holrs import term
+from holrs import term, TypeCheckException, Or, And, Inst
 
 Ta = TVar("a")
 Tb = TVar("b")
@@ -140,50 +140,50 @@ class TermTest(unittest.TestCase):
         for t, res in test_data:
             self.assertEqual(t.subst(Inst(a=c)), res)
 
-    # def testSubstFail(self):
-    #     self.assertRaises(TermException, SVar('a', TVar('a')).subst, Inst(a=b))
+    def testSubstFail(self):
+        self.assertRaises(TermException, SVar('a', TVar('a')).subst, Inst(a=b))
 
-    # def testSubstBound(self):
-    #     test_data = [
-    #         (Abs("x", Ta, B0), c, c),
-    #         (Abs("x", Ta, a), c, a),
-    #         (Abs("x", Ta, "y", Tb, B0), c, Abs("y", Tb, B0)),
-    #         (Abs("x", Ta, "y", Tb, B1), c, Abs("y", Tb, c)),
-    #         (Abs("x", Ta, "y", Tb, f2(B1,B0)), c, Abs("y", Tb, f2(c,B0))),
-    #         (Abs("x", Ta, B0), B0, B0),
-    #     ]
+    def testSubstBound(self):
+        test_data = [
+            (Abs("x", Ta, B0), c, c),
+            (Abs("x", Ta, a), c, a),
+            (Abs("x", Ta, "y", Tb, B0), c, Abs("y", Tb, B0)),
+            (Abs("x", Ta, "y", Tb, B1), c, Abs("y", Tb, c)),
+            (Abs("x", Ta, "y", Tb, f2(B1,B0)), c, Abs("y", Tb, f2(c,B0))),
+            (Abs("x", Ta, B0), B0, B0),
+        ]
 
-    #     for t, s, res in test_data:
-    #         self.assertEqual(t.subst_bound(s), res)
+        for t, s, res in test_data:
+            self.assertEqual(t.subst_bound(s), res)
 
-    # def testSubstBoundFail(self):
-    #     self.assertRaises(TermException, a.subst_bound, b)
+    def testSubstBoundFail(self):
+        self.assertRaises(TermException, a.subst_bound, b)
 
-    # def testStripComb(self):
-    #     self.assertEqual(f2.strip_comb(), (f2, []))
-    #     self.assertEqual(f2(a).strip_comb(), (f2, [a]))
-    #     self.assertEqual(f2(a,b).strip_comb(), (f2, [a, b]))
+    def testStripComb(self):
+        self.assertEqual(f2.strip_comb(), (f2, []))
+        self.assertEqual(f2(a).strip_comb(), (f2, [a]))
+        self.assertEqual(f2(a,b).strip_comb(), (f2, [a, b]))
 
-    # def testBetaConv(self):
-    #     test_data = [
-    #         (Comb(Abs("x", Ta, B0), c), c),
-    #         (Comb(Abs("x", Ta, a), c), a),
-    #     ]
+    def testBetaConv(self):
+        test_data = [
+            (Comb(Abs("x", Ta, B0), c), c),
+            (Comb(Abs("x", Ta, a), c), a),
+        ]
 
-    #     for t, res in test_data:
-    #         self.assertEqual(t.beta_conv(), res)
+        for t, res in test_data:
+            self.assertEqual(t.beta_conv(), res)
 
-    # def testBetaNorm(self):
-    #     x = Var('x', Ta)
-    #     y = Var('y', Ta)
-    #     test_data = [
-    #         (Lambda(x, x)(x), x),
-    #         (Lambda(x, Lambda(y, y))(x, y), y),
-    #         (Lambda(x, Lambda(y, x))(x, y), x),
-    #     ]
+    def testBetaNorm(self):
+        x = Var('x', Ta)
+        y = Var('y', Ta)
+        test_data = [
+            (Lambda(x, x)(x), x),
+            (Lambda(x, Lambda(y, y))(x, y), y),
+            (Lambda(x, Lambda(y, x))(x, y), x),
+        ]
 
-    #     for t, res in test_data:
-    #         self.assertEqual(t.beta_norm(), res)
+        for t, res in test_data:
+            self.assertEqual(t.beta_norm(), res)
 
     def testOccursVar(self):
         test_data = [
@@ -199,48 +199,48 @@ class TermTest(unittest.TestCase):
         for s, t, res in test_data:
             self.assertEqual(s.occurs_var(t), res)
 
-    # def testAbstractOver(self):
-    #     test_data = [
-    #         (a, a, B0),
-    #         (Abs("b", Ta, a), a, Abs("b", Ta, B1)),
-    #         (Abs("a", Ta, a), a, Abs("a", Ta, B1)),
-    #         (f(a), a, f(B0)),
-    #         (c, a, c),
-    #     ]
+    def testAbstractOver(self):
+        test_data = [
+            (a, a, B0),
+            (Abs("b", Ta, a), a, Abs("b", Ta, B1)),
+            (Abs("a", Ta, a), a, Abs("a", Ta, B1)),
+            (f(a), a, f(B0)),
+            (c, a, c),
+        ]
 
-    #     for s, t, res in test_data:
-    #         self.assertEqual(s.abstract_over(t), res)
+        for s, t, res in test_data:
+            self.assertEqual(s.abstract_over(t), res)
 
-    # def testAbstractOverFail(self):
-    #     self.assertRaises(TermException, Comb(f,a).abstract_over, Comb(f,a))
+    def testAbstractOverFail(self):
+        self.assertRaises(TermException, Comb(f,a).abstract_over, Comb(f,a))
 
-    # def testAbstractOverFail2(self):
-    #     self.assertRaises(TermException, a.abstract_over, Var("a", Tb))
+    def testAbstractOverFail2(self):
+        self.assertRaises(TermException, a.abstract_over, Var("a", Tb))
 
-    # def testCheckedGetType(self):
-    #     test_data = [
-    #         (a, Ta),
-    #         (c, Ta),
-    #         (f(a), Tb),
-    #         (f2(a,a), Tb),
-    #         (f(g(a)), Tb),
-    #         (Comb(Abs("x", Ta, B0), a), Ta),
-    #     ]
+    def testCheckedGetType(self):
+        test_data = [
+            (a, Ta),
+            (c, Ta),
+            (f(a), Tb),
+            (f2(a,a), Tb),
+            (f(g(a)), Tb),
+            (Comb(Abs("x", Ta, B0), a), Ta),
+        ]
 
-    #     for t, T in test_data:
-    #         self.assertEqual(t.checked_get_type(), T)
+        for t, T in test_data:
+            self.assertEqual(t.checked_get_type(), T)
 
-    # def testCheckedGetTypeFail(self):
-    #     test_data = [
-    #         Comb(a,a),
-    #         Comb(f,f),
-    #         f(a,a),
-    #         f(b),
-    #         Comb(Abs("x", Ta, B0), b),
-    #     ]
+    def testCheckedGetTypeFail(self):
+        test_data = [
+            Comb(a,a),
+            Comb(f,f),
+            f(a,a),
+            f(b),
+            Comb(Abs("x", Ta, B0), b),
+        ]
 
-    #     for t in test_data:
-    #         self.assertRaises(TypeCheckException, t.checked_get_type)
+        for t in test_data:
+            self.assertRaises(TypeCheckException, t.checked_get_type)
 
     def testGetVars(self):
         test_data = [
@@ -253,51 +253,51 @@ class TermTest(unittest.TestCase):
         for t, res in test_data:
             self.assertEqual(term.get_vars(t), res)
 
-    # def testConj(self):
-    #     test_data = [
-    #         ([], term.true),
-    #         ([a], a),
-    #         ([a, b], term.conj(a, b)),
-    #         ([a, b, a], term.conj(a, term.conj(b, a)))
-    #     ]
+    def testConj(self):
+        test_data = [
+            ([], term.true),
+            ([a], a),
+            ([a, b], term.conj(a, b)),
+            ([a, b, a], term.conj(a, term.conj(b, a)))
+        ]
 
-    #     for ts, res in test_data:
-    #         self.assertEqual(And(*ts), res)
+        for ts, res in test_data:
+            self.assertEqual(And(*ts), res)
 
     # def testConjFail(self):
     #     self.assertRaises(TypeError, And, [a])
 
-    # def testStripConj(self):
-    #     test_data = [
-    #         (a, [a]),
-    #         (And(a, b, a), [a, b, a])
-    #     ]
+    def testStripConj(self):
+        test_data = [
+            (a, [a]),
+            (And(a, b, a), [a, b, a])
+        ]
 
-    #     for t, res in test_data:
-    #         self.assertEqual(t.strip_conj(), res)
+        for t, res in test_data:
+            self.assertEqual(t.strip_conj(), res)
 
-    # def testDisj(self):
-    #     test_data = [
-    #         ([], term.false),
-    #         ([a], a),
-    #         ([a, b], term.disj(a, b)),
-    #         ([a, b, a], term.disj(a, term.disj(b, a)))
-    #     ]
+    def testDisj(self):
+        test_data = [
+            ([], term.false),
+            ([a], a),
+            ([a, b], term.disj(a, b)),
+            ([a, b, a], term.disj(a, term.disj(b, a)))
+        ]
 
-    #     for ts, res in test_data:
-    #         self.assertEqual(Or(*ts), res)
+        for ts, res in test_data:
+            self.assertEqual(Or(*ts), res)
 
     # def testDisjFail(self):
     #     self.assertRaises(TypeError, Or, [a])
 
-    # def testStripDisj(self):
-    #     test_data = [
-    #         (a, [a]),
-    #         (Or(a, b, a), [a, b, a])
-    #     ]
+    def testStripDisj(self):
+        test_data = [
+            (a, [a]),
+            (Or(a, b, a), [a, b, a])
+        ]
 
-    #     for t, res in test_data:
-    #         self.assertEqual(t.strip_disj(), res)
+        for t, res in test_data:
+            self.assertEqual(t.strip_disj(), res)
 
     # def testBinary(self):
     #     zero = term.nat_zero

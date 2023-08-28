@@ -4,6 +4,7 @@ import unittest
 
 from holrs import Type, TConst, TVar, STVar, TFun, print_address, TyInst, BoolType, NatType, IntType, RealType
 from collections import UserDict
+from holrs import Abs, Var, Inst
 
 def basic_test(T: Type):
     display = str(T)
@@ -24,20 +25,28 @@ def main():
     Tb = TVar("b")
     Tc = TVar("c")
     STa = STVar("a")
-    PyDict = {
-        "a": "Ta",
-        "b": "Tb",
-    }
+
+    c_term = Var("c", NatType)
+
+    # c = c_term.name
+    # print(c)
+
+    # abs_term = Abs("x", NatType, c_term)
+    # abs_name = abs_term.name
+    # print(abs_name)
+
+    inst = Inst(a=c_term)
+    print(inst)
 
     # my_dict = UserDict(PyDict)
 
     # print(STa.subst({"a": "Ta", "b": "Tb"}))
-    print(STa.subst(TyInst(a=Ta, b=Tb)))
-    p = TFun(STVar("a"), STVar("b"))
-    print(p.subst(a=STVar("b"), b=STVar("a")))
-    print(p.match(TFun(NatType, BoolType)))
-    tyinst = TyInst(a=STVar("b"), b=STVar("a"))
-    print(tyinst)
+    # print(STa.subst(TyInst(a=Ta, b=Tb)))
+    # p = TFun(STVar("a"), STVar("b"))
+    # print(p.subst(a=STVar("b"), b=STVar("a")))
+    # print(p.match(TFun(NatType, BoolType)))
+    # tyinst = TyInst(a=STVar("b"), b=STVar("a"))
+    # print(tyinst)
     # test_data = [
     #         (STa, Tb),
     #         (STb, Ta),

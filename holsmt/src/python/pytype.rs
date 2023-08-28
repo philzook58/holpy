@@ -1,20 +1,15 @@
 use crate::ast;
-use crate::ast::{pool::TermPool, rc::Rc, term::Term, Type};
-use crate::python::error::{
-    CheckProofException, InvalidDerivationException, ParameterQueryException, TacticException,
-    TermException, TheoryException, TypeCheckException, TypeException, TypeMatchException,
-};
-use crate::python::pyterm::{register_term_module, Abs, Bound, Comb, Const, PyTerm, SVar, Var};
-use crate::{push_term_to_cache, push_type_to_cache};
+use crate::ast::{rc::Rc, Type};
+use crate::push_type_to_cache;
+use crate::python::error::HolPyErr;
+use pyo3::prelude::*;
 use pyo3::pyclass::CompareOp;
 use pyo3::types::{PyDict, PyTuple};
-use pyo3::{prelude::*, PyNativeType};
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::thread_local;
 
 #[pyclass(unsendable, subclass)]
-#[derive(Default)]
+#[repr(transparent)]
+#[derive(Default, Debug)]
 pub struct TyInst {
     pub data: HashMap<String, PyType>,
 }
@@ -98,7 +93,7 @@ impl PyType {
     #[new]
     fn new(name: String, args: Option<String>) -> Self {
         Self {
-            ptr: ast::rc::Rc::new(Type::new_TVar(name)),
+            ptr: ast::rc::Rc::new(Type::new_tvar(name)),
         }
     }
 
@@ -123,7 +118,7 @@ impl PyType {
             Ok(res) => Ok(PyType {
                 ptr: ast::rc::Rc::clone(&res),
             }),
-            Err(error) => Err(error.into()),
+            Err(error) => Err(HolPyErr::from(error).into()),
         }
         // Ok(self.ptr.domain_type().unwrap())
     }
@@ -133,7 +128,7 @@ impl PyType {
             Ok(res) => Ok(PyType {
                 ptr: ast::rc::Rc::clone(&res),
             }),
-            Err(error) => Err(error.into()),
+            Err(error) => Err(HolPyErr::from(error).into()),
         }
         // Ok(self.ptr.range_type().unwrap())
     }
@@ -151,13 +146,12 @@ impl PyType {
                     ptr: ast::rc::Rc::clone(&range),
                 },
             )),
-            Err(error) => Err(error.into()),
+            Err(error) => Err(HolPyErr::from(error).into()),
         }
     }
 
-    fn size(&self) -> PyResult<usize> {
-        // todo: process error
-        Ok(self.ptr.size().unwrap())
+    fn size(&self) -> usize {
+        self.ptr.size()
     }
 
     fn get_stvars(&self) -> PyResult<Vec<PyType>> {
@@ -190,34 +184,28 @@ impl PyType {
             .collect())
     }
 
-    #[pyo3(signature = (tyinst=None, **kwargs))]
-    fn subst(&self, tyinst: Option<&TyInst>, kwargs: Option<&PyDict>) -> PyResult<PyType> {
+    fn subst(&self, tyinst: Option<&TyInst>, kwargs: Option<&PyDict>) -> PyType {
         // Create a HashMap to hold the type instantiation
         let mut subst_tyinst: HashMap<String, Rc<Type>> = HashMap::new();
 
         if let Some(tyinst_dict) = tyinst {
             // Iterate over the items in `tyinst_dict` and populate the HashMap
             for (key, value) in tyinst_dict.data.iter() {
-                subst_tyinst.insert(key.clone(), ast::rc::Rc::clone(&value.ptr));
+                subst_tyinst.insert(key.clone(), Rc::clone(&value.ptr));
             }
         } else if let Some(kwargs_dict) = kwargs {
             // If `tyinst` is not provided, try extracting the type instantiation from `kwargs`
             for (key, value) in kwargs_dict.iter() {
                 if let Ok(key_str) = key.extract::<String>() {
                     if let Ok(value_type) = value.extract::<PyType>() {
-                        // todo, rc::Rc::clone()
-                        // subst_tyinst.insert(key_str, value_type.ptr);
-                        subst_tyinst.insert(key_str, ast::rc::Rc::clone(&value_type.ptr));
+                        subst_tyinst.insert(key_str, Rc::clone(&value_type.ptr));
                     }
                 }
             }
         }
 
-        match self.ptr.subst(&subst_tyinst, &push_type_to_cache) {
-            Ok(res) => Ok(PyType {
-                ptr: ast::rc::Rc::clone(&res),
-            }),
-            Err(error) => Err(error.into()),
+        PyType {
+            ptr: Rc::clone(&self.ptr.subst(&subst_tyinst, &push_type_to_cache)),
         }
     }
 
@@ -242,7 +230,7 @@ impl PyType {
                 // Ok(tyinst)
                 Ok(tyinst)
             }
-            Err(error) => Err(TypeMatchException::new_err(error.to_string())),
+            Err(error) => Err(HolPyErr::from(error).into()),
         }
     }
 
@@ -271,7 +259,7 @@ impl PyType {
 
 #[pyfunction]
 pub fn STVar(name: String) -> PyType {
-    let stvar = Type::new_STVar(name);
+    let stvar = Type::new_stvar(name);
     let stvar_ref = push_type_to_cache(stvar);
 
     PyType { ptr: stvar_ref }
@@ -280,7 +268,7 @@ pub fn STVar(name: String) -> PyType {
 // todo
 #[pyfunction]
 pub fn TVar(name: String) -> PyType {
-    let tvar = Type::new_TVar(name);
+    let tvar = Type::new_tvar(name);
     let tvar_ref = push_type_to_cache(tvar);
 
     PyType { ptr: tvar_ref }
@@ -300,19 +288,20 @@ pub fn TConst(name: String, args: &PyTuple) -> PyType {
         }
     }
 
-    let tconst = Type::new_TConst(name, type_args);
+    let tconst = Type::new_tconst(name, type_args);
     let tconst_ref = push_type_to_cache(tconst);
 
     PyType { ptr: tconst_ref }
 }
 
 #[pyfunction(signature = (*args))]
+#[allow(non_snake_case)]
 pub fn TFun(args: &PyTuple) -> PyType {
     let mut type_args = Vec::new();
 
     for arg in args {
         if let Ok(pytype) = arg.extract::<PyType>() {
-            type_args.push(ast::rc::Rc::clone(&pytype.ptr))
+            type_args.push(Rc::clone(&pytype.ptr))
         } else {
             // process error
             unimplemented!()
@@ -322,7 +311,7 @@ pub fn TFun(args: &PyTuple) -> PyType {
     let mut res = type_args.pop().unwrap();
     for arg in type_args.iter().rev() {
         let name = "fun".to_string();
-        let tconst = Type::new_TConst(name, vec![ast::rc::Rc::clone(arg), res]);
+        let tconst = Type::new_tconst(name, vec![ast::rc::Rc::clone(arg), res]);
         res = push_type_to_cache(tconst);
     }
 

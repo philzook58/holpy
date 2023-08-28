@@ -1,28 +1,18 @@
-use pyo3::exceptions::PyOSError;
-use pyo3::prelude::*;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum TypeError {
-    #[error("expected a fun type")]
-    NotFun,
+pub enum HolrsError {
+    #[error("type error: {0}")]
+    TypeError(String),
 
-    // todo
-    #[error("convert_stvar")]
-    ConvertSTVar,
+    #[error("type match error: {0}")]
+    TypeMatchError(String),
 
-    #[error("default error")]
-    Default,
+    #[error("term error: {0}")]
+    TermError(String),
 
-    #[error("{0}")]
-    MatchError(String),
-
-    #[error("{0}")]
-    Custom(String),
+    #[error("type check error: {0}")]
+    TypeCheckError(String),
 }
 
-impl std::convert::From<TypeError> for PyErr {
-    fn from(err: TypeError) -> PyErr {
-        PyOSError::new_err(err.to_string())
-    }
-}
+pub type HolrsResult<T> = Result<T, HolrsError>;

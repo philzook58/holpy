@@ -1,19 +1,23 @@
+use crate::ast;
 use crate::ast::{rc::Rc, term::Term, Type};
-use crate::{ast, push_term_to_cache};
 use crate::{
-    push_type_to_cache,
+    push_term_to_cache, push_type_to_cache,
     python::pytype::{PyType, TyInst},
 };
+use pyo3::exceptions::PyAttributeError;
 use pyo3::prelude::*;
 use pyo3::pyclass::CompareOp;
-use pyo3::types::{PyDict, PyTuple};
+use pyo3::types::{PyDateAccess, PyDict, PyList, PyTuple};
 use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
+use super::error::HolPyErr;
+
 #[pyclass(unsendable, subclass)]
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Inst {
+    pub data: HashMap<String, PyTerm>,
     pub tyinst: TyInst,
     pub var_inst: HashMap<String, PyTerm>,
     pub abs_name_inst: HashMap<String, PyTerm>,
@@ -24,56 +28,54 @@ impl Inst {
     #[new]
     #[pyo3(signature = (*dict, **kwargs))]
     fn new(dict: &PyTuple, kwargs: Option<&PyDict>) -> Self {
-        let mut data = HashMap::new();
+        let data: HashMap<String, PyTerm> = {
+            let mut _data: HashMap<String, PyTerm> = HashMap::new();
+            if !dict.is_empty() {
+                let _dict = dict.get_item(0).unwrap().downcast::<PyDict>().unwrap();
+                for (key, value) in _dict.iter() {
+                    if let Ok(key_str) = key.extract::<String>() {
+                        if let Ok(value_type) = value.extract::<PyTerm>() {
+                            _data.insert(key_str, value_type);
+                        }
+                    }
+                }
+            } else if let Some(kwargs_dict) = kwargs {
+                for (key, value) in kwargs_dict.iter() {
+                    if let Ok(key_str) = key.extract::<String>() {
+                        if let Ok(value_type) = value.extract::<PyTerm>() {
+                            _data.insert(key_str, value_type);
+                        }
+                    }
+                }
+            } else {
+                panic!("Invalid argument")
+            }
+            _data
+        };
 
-        if !dict.is_empty() {
-            let _dict = dict.get_item(0).unwrap().downcast::<PyDict>().unwrap();
-            for (key, value) in _dict.iter() {
-                if let Ok(key_str) = key.extract::<String>() {
-                    if let Ok(value_type) = value.extract::<PyType>() {
-                        data.insert(key_str, value_type);
-                    }
-                }
-            }
-            Self {
-                tyinst: TyInst { data: data },
-                ..Default::default()
-            }
-        } else if let Some(kwargs_dict) = kwargs {
-            for (key, value) in kwargs_dict.iter() {
-                if let Ok(key_str) = key.extract::<String>() {
-                    if let Ok(value_type) = value.extract::<PyType>() {
-                        data.insert(key_str, value_type);
-                    }
-                }
-            }
-            Self {
-                tyinst: TyInst { data: data },
-                ..Default::default()
-            }
-        } else {
-            panic!("Invalid argument")
+        Self {
+            data: data,
+            tyinst: TyInst::default(),
+            var_inst: HashMap::new(),
+            abs_name_inst: HashMap::new(),
         }
     }
 
     fn __str__(&self) -> String {
-        // def __str__(self):
-        // res = ''
-        // if self.tyinst:
-        //     res = str(self.tyinst) + ', '
-        // res += ', '.join('?%s := %s' % (nm, t) for nm, t in self.items())
-        // res += ', '.join('%s := %s' % (nm, t) for nm, t in self.var_inst.items())
-        // res += ', '.join('%s -> %s' % (nm, nm2) for nm, nm2 in self.abs_name_inst.items())
-        // return res
-        // let mut result = String::new();
         let mut res = String::new();
 
         if !self.tyinst.data.is_empty() {
             res = format!("{}, ", self.tyinst.__str__());
-            res.push_str(", ");
         }
 
-        // todo? self.items()
+        res.push_str(
+            self.data
+                .iter()
+                .map(|(nm, t)| format!("?{} := {}", nm, t.ptr))
+                .collect::<Vec<String>>()
+                .join(", ")
+                .as_str(),
+        );
         res.push_str(
             self.var_inst
                 .iter()
@@ -103,8 +105,9 @@ impl Inst {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[pyclass(unsendable, name = "Term", subclass)]
+#[repr(transparent)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PyTerm {
     ptr: ast::rc::Rc<Term>,
 }
@@ -116,6 +119,26 @@ impl PyTerm {
     fn new(name: String, ty: PyType) -> Self {
         Self {
             ptr: ast::rc::Rc::new(Term::new_var(name, ty.ptr)),
+        }
+    }
+
+    #[getter(name)]
+    fn get_name(&self) -> PyResult<String> {
+        match self.ptr.as_ref() {
+            Term::Var(ref name, _) => Ok(name.clone()),
+            Term::Const(ref name, _) => Ok(name.clone()),
+            Term::SVar(ref name, _) => Ok(name.clone()),
+            _ => Err(PyAttributeError::new_err("Term has no attribute 'name'")),
+        }
+    }
+
+    #[getter(T)]
+    fn get_T(&self) -> PyResult<PyType> {
+        match self.ptr.as_ref() {
+            Term::SVar(_, ty) | Term::Var(_, ty) | Term::Const(_, ty) => {
+                Ok(PyType { ptr: Rc::clone(ty) })
+            }
+            _ => Err(PyAttributeError::new_err("Term has no attribute 'T'")),
         }
     }
 
@@ -135,6 +158,7 @@ impl PyTerm {
         self.ptr.repr()
     }
 
+    /// Apply self (as a function) to a list of arguments.
     #[pyo3(signature = (*args))]
     fn __call__(&self, args: &PyTuple) -> Self {
         let mut term_args = Vec::new();
@@ -177,6 +201,14 @@ impl PyTerm {
         }
     }
 
+    fn is_var(&self) -> bool {
+        self.ptr.is_var()
+    }
+
+    fn is_svar(&self) -> bool {
+        self.ptr.is_svar()
+    }
+
     fn get_type(&self) -> PyResult<PyType> {
         // funciton ptr
         match self
@@ -186,7 +218,7 @@ impl PyTerm {
             Ok(res) => Ok(PyType {
                 ptr: ast::rc::Rc::clone(&res),
             }),
-            Err(error) => Err(error.into()),
+            Err(error) => Err(HolPyErr::from(error).into()),
         }
     }
 
@@ -194,44 +226,161 @@ impl PyTerm {
         self.ptr.is_open()
     }
 
-    #[pyo3(signature = (tyinst=None, **kwargs))]
-    fn subst_type(&self, tyinst: Option<&TyInst>, kwargs: Option<&PyDict>) -> PyTerm {
-        let subst_dict: HashMap<String, Rc<Type>> = match tyinst {
-            Some(dict) => dict
-                .data
-                .iter()
-                .map(|(k, v)| (k.clone(), v.ptr.clone()))
-                .collect(),
-            None => {
-                let mut subst_dict = HashMap::new();
-                if let Some(kwargs_dict) = kwargs {
-                    for (key, value) in kwargs_dict.iter() {
-                        if let Ok(key_str) = key.extract::<String>() {
-                            if let Ok(value_type) = value.extract::<PyType>() {
-                                subst_dict.insert(key_str, ast::rc::Rc::clone(&value_type.ptr));
-                            }
-                        }
-                    }
-                }
-                subst_dict
-            }
-        };
+    fn subst_type(&self, tyinst: &TyInst) -> PyTerm {
+        let subst_tyinst: HashMap<String, Rc<Type>> = tyinst
+            .data
+            .iter()
+            .map(|(k, v)| (k.clone(), v.ptr.clone()))
+            .collect();
 
         PyTerm {
             ptr: self.ptr.subst_type(
-                &subst_dict,
+                &subst_tyinst,
                 &(push_term_to_cache as fn(Term) -> ast::rc::Rc<Term>),
                 &(push_type_to_cache as fn(Type) -> ast::rc::Rc<Type>),
             ),
         }
     }
 
+    fn subst(&self, inst: &Inst) -> PyResult<PyTerm> {
+        let subst_inst: HashMap<String, Rc<Term>> = inst
+            .data
+            .iter()
+            .map(|(k, v)| (k.clone(), v.ptr.clone()))
+            .collect();
+        let subst_tyinst: HashMap<String, Rc<Type>> = inst
+            .tyinst
+            .data
+            .iter()
+            .map(|(k, v)| (k.clone(), v.ptr.clone()))
+            .collect();
+        let subst_var_inst: HashMap<String, Rc<Term>> = inst
+            .var_inst
+            .iter()
+            .map(|(k, v)| (k.clone(), v.ptr.clone()))
+            .collect();
+        let subst_abs_name_inst: HashMap<String, Rc<Term>> = inst
+            .abs_name_inst
+            .iter()
+            .map(|(k, v)| (k.clone(), v.ptr.clone()))
+            .collect();
+
+        let result = self.ptr.subst(
+            subst_inst,
+            subst_tyinst,
+            subst_var_inst,
+            subst_abs_name_inst,
+            &push_type_to_cache,
+            &push_term_to_cache,
+        );
+        match result {
+            Ok(res) => Ok(PyTerm { ptr: res }),
+            Err(error) => Err(HolPyErr::from(error).into()),
+        }
+    }
+
+    fn strip_comb(&self) -> (PyTerm, Vec<PyTerm>) {
+        let res = self.ptr.strip_comb();
+        (
+            PyTerm { ptr: res.0 },
+            res.1.into_iter().map(|t| PyTerm { ptr: t }).collect(),
+        )
+    }
+
+    #[pyo3(signature = (*, num=None))]
+    fn strip_forall(&self, num: Option<i32>) -> (Vec<PyTerm>, PyTerm) {
+        let res = self.ptr.strip_forall(num, &push_term_to_cache);
+        (
+            res.0.into_iter().map(|t| PyTerm { ptr: t }).collect(),
+            PyTerm { ptr: res.1 },
+        )
+    }
+
+    #[pyo3(signature = (*, num=None))]
+    fn strip_exists(&self, num: Option<i32>) -> (Vec<PyTerm>, PyTerm) {
+        let res = self.ptr.strip_exists(num, &push_term_to_cache);
+        (
+            res.0.into_iter().map(|t| PyTerm { ptr: t }).collect(),
+            PyTerm { ptr: res.1 },
+        )
+    }
+
+    fn strip_quant(&self) -> (Vec<PyTerm>, PyTerm) {
+        let res = self.ptr.strip_quant(&push_term_to_cache);
+        (
+            res.0.into_iter().map(|t| PyTerm { ptr: t }).collect(),
+            PyTerm { ptr: res.1 },
+        )
+    }
+
+    #[getter(head)]
+    fn get_head(&self) -> PyTerm {
+        PyTerm {
+            ptr: Rc::clone(&self.ptr.get_head()),
+        }
+    }
+
+    #[getter(args)]
+    fn get_args(&self) -> Vec<PyTerm> {
+        self.ptr
+            .get_args()
+            .into_iter()
+            .map(|t| PyTerm { ptr: t })
+            .collect()
+    }
+
+    fn is_binop(&self) -> bool {
+        self.ptr.is_binop()
+    }
+
+    #[getter(arg1)]
+    fn get_arg1(&self) -> PyResult<PyTerm> {
+        match self.ptr.get_arg1() {
+            Some(res) => Ok(PyTerm {
+                ptr: Rc::clone(res),
+            }),
+            None => Err(PyAttributeError::new_err("Term has no attribute 'T'")),
+        }
+    }
+
+    fn is_not(&self) -> bool {
+        self.ptr.is_not()
+    }
+
+    fn is_implies(&self) -> bool {
+        self.ptr.is_implies()
+    }
+
+    fn strip_implies(&self) -> (Vec<PyTerm>, PyTerm) {
+        let res = self.ptr.strip_implies();
+        (
+            res.0.into_iter().map(|t| PyTerm { ptr: t }).collect(),
+            PyTerm { ptr: res.1 },
+        )
+    }
+
     fn is_conj(&self) -> bool {
         self.ptr.is_conj()
     }
 
+    fn strip_conj(&self) -> Vec<PyTerm> {
+        self.ptr
+            .strip_conj()
+            .into_iter()
+            .map(|t| PyTerm { ptr: t })
+            .collect()
+    }
+
     fn is_disj(&self) -> bool {
         self.ptr.is_disj()
+    }
+
+    fn strip_disj(&self) -> Vec<PyTerm> {
+        self.ptr
+            .strip_disj()
+            .into_iter()
+            .map(|t| PyTerm { ptr: t })
+            .collect()
     }
 
     fn is_forall(&self) -> bool {
@@ -250,8 +399,72 @@ impl PyTerm {
         self.ptr.is_equal()
     }
 
+    fn is_equals(&self) -> bool {
+        self.ptr.is_equals()
+    }
+
+    fn is_compares(&self) -> bool {
+        self.ptr.is_compares()
+    }
+
+    fn is_reflexive(&self) -> bool {
+        self.ptr.is_reflexive()
+    }
+
+    #[allow(non_snake_case)]
     fn is_VAR(&self) -> bool {
-        self.ptr.is_var()
+        self.ptr.is_VAR()
+    }
+
+    fn subst_bound(&self, t: &PyTerm) -> PyResult<PyTerm> {
+        match self.ptr.subst_bound(&t.ptr, &push_term_to_cache) {
+            Ok(res) => Ok(PyTerm { ptr: res }),
+            Err(error) => Err(HolPyErr::from(error).into()),
+        }
+    }
+
+    fn beta_conv(&self) -> PyResult<PyTerm> {
+        match self.ptr.beta_conv(&push_term_to_cache) {
+            Ok(res) => Ok(PyTerm { ptr: res }),
+            Err(error) => Err(HolPyErr::from(error).into()),
+        }
+    }
+
+    fn beta_norm(&self) -> PyResult<PyTerm> {
+        match self.ptr.beta_norm(&push_term_to_cache) {
+            Ok(res) => Ok(PyTerm { ptr: res }),
+            Err(error) => Err(HolPyErr::from(error).into()),
+        }
+    }
+
+    fn occurs_var(&self, var: &PyTerm) -> bool {
+        self.ptr.occurs_var(&var.ptr)
+    }
+
+    fn abstract_over(&self, t: &PyTerm) -> PyResult<PyTerm> {
+        match self.ptr.abstract_over(&t.ptr, &push_term_to_cache) {
+            Ok(res) => Ok(PyTerm { ptr: res }),
+            Err(error) => Err(HolPyErr::from(error).into()),
+        }
+    }
+
+    fn checked_get_type(&self) -> PyResult<PyType> {
+        match self.ptr.checked_get_type(&push_type_to_cache) {
+            Ok(res) => Ok(PyType {
+                ptr: ast::rc::Rc::clone(&res),
+            }),
+            Err(error) => Err(HolPyErr::from(error).into()),
+        }
+    }
+
+    fn convert_svar(&self) -> PyResult<PyTerm> {
+        match self
+            .ptr
+            .convert_svar(&push_term_to_cache, &push_type_to_cache)
+        {
+            Ok(res) => Ok(PyTerm { ptr: res }),
+            Err(error) => Err(HolPyErr::from(error).into()),
+        }
     }
 
     fn is_less_eq(&self) -> bool {
@@ -270,21 +483,9 @@ impl PyTerm {
         self.ptr.is_greater()
     }
 
-    fn has_var(&self) -> bool {
-        self.ptr.has_var()
-    }
-
-    fn get_stvars(&self) -> Vec<PyType> {
+    fn get_svars(&self) -> Vec<PyTerm> {
         self.ptr
-            .get_stvars()
-            .into_iter()
-            .map(|t| PyType { ptr: t })
-            .collect()
-    }
-
-    fn get_consts(&self) -> Vec<PyTerm> {
-        self.ptr
-            .get_consts()
+            .get_svars()
             .into_iter()
             .map(|t| PyTerm { ptr: t })
             .collect()
@@ -298,16 +499,35 @@ impl PyTerm {
             .collect()
     }
 
-    fn get_svars(&self) -> Vec<PyTerm> {
+    fn get_consts(&self) -> Vec<PyTerm> {
         self.ptr
-            .get_svars()
+            .get_consts()
             .into_iter()
             .map(|t| PyTerm { ptr: t })
             .collect()
     }
 
-    fn occurs_var(&self, var: &PyTerm) -> bool {
-        self.ptr.occurs_var(&var.ptr)
+    fn has_var(&self) -> bool {
+        self.ptr.has_var()
+    }
+
+    fn has_vars(&self, vs: Vec<PyTerm>) -> bool {
+        let vs: Vec<Rc<Term>> = vs.iter().map(|v| Rc::clone(&v.ptr)).collect();
+        self.ptr.has_vars(&vs)
+    }
+
+    fn get_stvars(&self) -> Vec<PyType> {
+        self.ptr
+            .get_stvars()
+            .into_iter()
+            .map(|t| PyType { ptr: t })
+            .collect()
+    }
+
+    // another way to implement
+    fn get_stvars_with_pylist(&self, py: Python) -> PyObject {
+        let iter = self.ptr.get_stvars().into_iter().map(|t| PyType { ptr: t });
+        PyList::new(py, iter).to_object(py)
     }
 }
 

@@ -8,25 +8,22 @@ mod tests {
 
     #[test]
     fn test_valid_type_variable() {
-        assert!(TypeParser::new().parse("'_").is_ok());
-        assert!(TypeParser::new().parse("'a").is_ok());
-        assert!(TypeParser::new().parse("'A").is_ok());
-        assert!(TypeParser::new().parse("'_a").is_ok());
-        assert!(TypeParser::new().parse("'_A").is_ok());
-        assert!(TypeParser::new().parse("'_1").is_ok());
-        assert!(TypeParser::new().parse("'a1").is_ok());
-        assert!(TypeParser::new().parse("'A1").is_ok());
-        assert!(TypeParser::new().parse("'_abc_a_b_c_1").is_ok());
-        assert!(TypeParser::new().parse("('a)").is_ok());
-        assert_eq!(
-            TypeParser::new().parse("('a)").unwrap(),
-            Type::new_TVar("a")
-        );
-    }
-
-    #[test]
-    fn test_valid_simple_type_variable() {
-        assert!(TypeParser::new().parse("?a_1").is_ok());
+        let test_data = vec![
+            ("'_", Type::new_tvar("_")),
+            ("'a", Type::new_tvar("a")),
+            ("'A", Type::new_tvar("A")),
+            ("'_a", Type::new_tvar("_a")),
+            ("'_A", Type::new_tvar("_A")),
+            ("'_1", Type::new_tvar("_1")),
+            ("'a1", Type::new_tvar("a1")),
+            ("'A1", Type::new_tvar("A1")),
+            ("'_abc_a_b_c_1", Type::new_tvar("_abc_a_b_c_1")),
+            ("?_abc_a_b_c_1", Type::new_stvar("_abc_a_b_c_1")),
+            ("(((?_abc_a_b_c_1)))", Type::new_stvar("_abc_a_b_c_1")),
+        ];
+        for (input, target) in test_data {
+            assert_eq!(TypeParser::new().parse(input).unwrap(), target);
+        }
     }
 
     #[test]
@@ -39,9 +36,9 @@ mod tests {
             format!("{}", TypeParser::new().parse("('a => 'b)").unwrap()),
             format!(
                 "{}",
-                Type::new_TConst(
+                Type::new_tconst(
                     "fun",
-                    vec![Rc::new(Type::new_TVar("a")), Rc::new(Type::new_TVar("b"))],
+                    vec![Rc::new(Type::new_tvar("a")), Rc::new(Type::new_tvar("b"))],
                 )
             )
         );
