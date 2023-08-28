@@ -3,7 +3,7 @@ mod parser;
 pub mod python;
 
 use crate::python::pyterm::{
-    register_term_module, Abs, Bound, Comb, Const, Inst, PyTerm, SVar, Var,
+    register_term_module, Abs, Binary, Bound, Comb, Const, Inst, PyTerm, SVar, Var,
 };
 use crate::python::pytype::{print_address, PyType, STVar, TConst, TFun, TVar, TyInst};
 use ast::{pool::TermPool, term::Term, Type};
@@ -60,6 +60,7 @@ fn holrs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(Comb, m)?)?;
     m.add_function(wrap_pyfunction!(Abs, m)?)?;
     m.add_function(wrap_pyfunction!(Bound, m)?)?;
+    m.add_function(wrap_pyfunction!(Binary, m)?)?;
 
     m.add_class::<PyType>()?;
     m.add_class::<PyTerm>()?;

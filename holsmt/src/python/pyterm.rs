@@ -4,6 +4,7 @@ use crate::{
     push_term_to_cache, push_type_to_cache,
     python::pytype::{PyType, TyInst},
 };
+use num_bigint::BigInt;
 use pyo3::exceptions::PyAttributeError;
 use pyo3::prelude::*;
 use pyo3::pyclass::CompareOp;
@@ -529,6 +530,17 @@ impl PyTerm {
         let iter = self.ptr.get_stvars().into_iter().map(|t| PyType { ptr: t });
         PyList::new(py, iter).to_object(py)
     }
+
+    fn is_binary(&self) -> bool {
+        self.ptr.is_binary()
+    }
+
+    fn dest_binary(&self) -> PyResult<BigInt> {
+        match self.ptr.dest_binary() {
+            Ok(res) => Ok(res),
+            Err(error) => Err(HolPyErr::from(error).into()),
+        }
+    }
 }
 
 #[pyfunction]
@@ -607,6 +619,45 @@ pub fn Bound(n: usize) -> PyTerm {
     let term_ref = push_term_to_cache(term);
 
     PyTerm { ptr: term_ref }
+}
+
+#[pyfunction]
+// pub fn Binary(n: i128) -> PyTerm {
+pub fn Binary(n: BigInt) -> PyTerm {
+    let num_str = n.to_string();
+    let binary_num = n.to_radix_be(2);
+    let mut iter = binary_num.1.iter();
+    let nat_ty = Type::new_tconst("nat", vec![]);
+    let nat_ty_ref = push_type_to_cache(nat_ty);
+    let fun_ty = Type::new_tconst("fun", vec![Rc::clone(&nat_ty_ref), Rc::clone(&nat_ty_ref)]);
+    let fun_ty_ref = push_type_to_cache(fun_ty);
+    let t = match iter.next() {
+        Some(&0) => Term::new_const("zero".to_string(), Rc::clone(&nat_ty_ref)),
+        Some(&1) => Term::new_const("one".to_string(), Rc::clone(&nat_ty_ref)),
+        _ => panic!("Invalid argument"),
+    };
+    let mut t_ref = push_term_to_cache(t);
+
+    let bit0 = Term::new_const("bit0".to_string(), Rc::clone(&fun_ty_ref));
+    let bit0_ref = push_term_to_cache(bit0);
+    let bit1 = Term::new_const("bit1".to_string(), Rc::clone(&fun_ty_ref));
+    let bit1_ref = push_term_to_cache(bit1);
+
+    for &elem in iter {
+        if elem == 0 {
+            let next_t = Term::new_comb(Rc::clone(&bit0_ref), Rc::clone(&t_ref));
+            t_ref = push_term_to_cache(next_t);
+        } else if elem == 1 {
+            let next_t = Term::new_comb(Rc::clone(&bit1_ref), Rc::clone(&t_ref));
+            t_ref = push_term_to_cache(next_t);
+        } else {
+            unreachable!();
+        }
+    }
+
+    PyTerm {
+        ptr: Rc::clone(&t_ref),
+    }
 }
 
 pub fn register_term_module(py: Python<'_>) -> PyResult<&PyModule> {

@@ -1,3 +1,5 @@
+use num_bigint::BigInt;
+
 use super::rc::Rc;
 use super::Type;
 use crate::push_type_to_cache;
@@ -88,7 +90,10 @@ impl Term {
     /// `name`: Optional string. If given, test whether the term has that name.
     pub fn is_const(&self, name: Option<String>) -> bool {
         match name {
-            Some(name) => matches!(self, Term::Const(name, _)),
+            Some(name) => match self {
+                Term::Const(name_val, _) => name_val == &name,
+                _ => false,
+            },
             None => matches!(self, Term::Const(_, _)),
         }
     }
@@ -304,10 +309,6 @@ impl Term {
         } else {
             false
         }
-    }
-
-    pub fn dest_binary(&self) {
-        unimplemented!("dest_binary")
     }
 
     pub fn is_nat(&self) -> bool {
@@ -861,6 +862,36 @@ impl Rc<Term> {
         let new_body = &self.subst_bound(&var_ref, push_term_cache)?;
 
         return Ok((var_ref, Rc::clone(new_body)));
+    }
+
+    pub fn dest_binary(&self) -> HolrsResult<BigInt> {
+        let mut vec_num: Vec<u8> = vec![];
+        let mut t = self;
+        loop {
+            if t.is_const(Some("zero".to_string())) {
+                vec_num.push(0);
+                break;
+            } else if t.is_const(Some("one".to_string())) {
+                vec_num.push(1);
+                break;
+            } else if t.is_comb(Some("bit0".to_string()), Some(1)) {
+                let arg = t.get_fun_and_arg().unwrap().1;
+                vec_num.push(0);
+                t = arg;
+            } else if t.is_comb(Some("bit1".to_string()), Some(1)) {
+                let arg = t.get_fun_and_arg().unwrap().1;
+                vec_num.push(1);
+                t = arg;
+            } else {
+                return Err(HolrsError::TermError(format!(
+                    "dest_binary: term is not in binary form."
+                )));
+            }
+        }
+
+        vec_num.reverse();
+        let res = BigInt::from_radix_be(num_bigint::Sign::Plus, vec_num.as_slice(), 2).unwrap();
+        Ok(res)
     }
 
     /// Given a term of the form (let x = t in body), return (x, t, body)
