@@ -46,7 +46,7 @@ def veriT_solve(f, write_file=False, timeout=5):
                 print("Proof extraction from veriT is timeout (veriT)")
                 return None
             
-def solve(filename, write_file=False, timeout=120):
+def cvc5_solve(filename, write_file=False, timeout=120):
     res = check_sat_from_file(filename)
     if res in ("sat", "unknown", "none"):
         return None

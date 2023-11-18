@@ -34,7 +34,7 @@ def test_file(filename, test_eval=False, test_proofterm=False,
 
     # Solve
     start_time = time.perf_counter()
-    verit_proof = interface.solve(filename, timeout=100)
+    verit_proof = interface.veriT_solve(filename, timeout=100)
     if verit_proof is None:
         print([filename, 'NO PROOF (veriT)', '', '', ''])
         return [filename, 'NO PROOF (veriT)', '', '', '']
