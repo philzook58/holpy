@@ -1,0 +1,20 @@
+[build-system]
+requires = ["maturin>=1.1,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "holrs"
+description = "A Higher Order Logic theorem prover written in Rust"
+readme = "README.md"
+requires-python = ">=3.7"
+
+keywords = ["theorem-prover", "higher-order-logic", "HolPy"]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+
+[tool.maturin]
+features = ["pyo3/extension-module"]

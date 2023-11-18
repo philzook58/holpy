@@ -1,0 +1,248 @@
+{
+    "content": [
+        {
+            "depth": 0,
+            "name": "Definition of word types",
+            "ty": "header"
+        },
+        {
+            "args": [],
+            "name": "word32",
+            "ty": "type.ax"
+        },
+        {
+            "args": [],
+            "name": "word64",
+            "ty": "type.ax"
+        },
+        {
+            "name": "plus",
+            "ty": "def.ax",
+            "type": "word32 ⇒ word32 ⇒ word32"
+        },
+        {
+            "name": "times",
+            "ty": "def.ax",
+            "type": "word32 ⇒ word32 ⇒ word32"
+        },
+        {
+            "name": "plus",
+            "ty": "def.ax",
+            "type": "word64 ⇒ word64 ⇒ word64"
+        },
+        {
+            "name": "times",
+            "ty": "def.ax",
+            "type": "word64 ⇒ word64 ⇒ word64"
+        },
+        {
+            "name": "equal_true",
+            "prop": "x = x ⟷ true",
+            "ty": "thm",
+            "vars": {
+                "x": "'a"
+            }
+        },
+        {
+            "name": "bv_add_comm_32",
+            "prop": "x + y = y + x",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32"
+            }
+        },
+        {
+            "name": "bv_add_comm_64",
+            "prop": "x + y = y + x",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64"
+            }
+        },
+        {
+            "name": "bv_add_assoc_32",
+            "prop": "x + y + z = x + (y + z)",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32",
+                "z": "word32"
+            }
+        },
+        {
+            "name": "bv_add_assoc_64",
+            "prop": "x + y + z = x + (y + z)",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64",
+                "z": "word64"
+            }
+        },
+        {
+            "name": "bv_distrib_left_32",
+            "prop": "x * (y + z) = x * y +  x * z",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32",
+                "z": "word32"
+            }
+        },
+        {
+            "name": "bv_distrib_left_64",
+            "prop": "x * (y + z) = x * y +  x * z",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64",
+                "z": "word64"
+            }
+        },
+        {
+            "name": "bv_distrib_r_32",
+            "prop": "(x + y) * z = x * z +  y * z",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32",
+                "z": "word32"
+            }
+        },
+        {
+            "name": "bv_distrib_r_64",
+            "prop": "(x + y) * z = x * z +  y * z",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64",
+                "z": "word64"
+            }
+        },
+        {
+            "name": "bv_multi_comm_32",
+            "prop": "x * y = y * x",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32"
+            }
+        },
+        {
+            "name": "bv_multi_comm_64",
+            "prop": "x * y = y * x",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64"
+            }
+        },
+        {
+            "name": "bv_multi_assoc_32",
+            "prop": "(x * y) * z= x * (y * z)",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32",
+                "z": "word32"
+            }
+        },
+        {
+            "name": "bv_multi_assoc_64",
+            "prop": "(x * y) * z= x * (y * z)",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64",
+                "z": "word64"
+            }
+        },
+        {
+            "name": "bv_add_0_right_32",
+            "prop": "x + 0 = x",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32",
+                "z": "word32"
+            }
+        },
+        {
+            "name": "bv_add_0_right_64",
+            "prop": "x + 0 = x",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64",
+                "z": "word64"
+            }
+        },
+        {
+            "name": "bv_nat_plus_def_1_32",
+            "prop": "0 + x = x",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32",
+                "z": "word32"
+            }
+        },
+        {
+            "name": "bv_nat_plus_def_1_64",
+            "prop": "0 + x = x",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64",
+                "z": "word64"
+            }
+        },
+        {
+            "name": "bv_mult_0_right_32",
+            "prop": "x * 0 = 0",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32",
+                "z": "word32"
+            }
+        },
+        {
+            "name": "bv_mult_0_right_64",
+            "prop": "x * 0 = 0",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64",
+                "z": "word64"
+            }
+        },
+        {
+            "name": "bv_nat_times_def_1_32",
+            "prop": "0 * x = x",
+            "ty": "thm",
+            "vars": {
+                "x": "word32",
+                "y": "word32",
+                "z": "word32"
+            }
+        },
+        {
+            "name": "bv_nat_times_def_1_64",
+            "prop": "0 * x = x",
+            "ty": "thm",
+            "vars": {
+                "x": "word64",
+                "y": "word64",
+                "z": "word64"
+            }
+        }
+    ],
+    "description": "definitions for bitvectors",
+    "imports": [
+        "nat"
+    ],
+    "name": "bitvector"
+}

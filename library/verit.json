@@ -1813,7 +1813,8 @@
     ],
     "description": "Schematic verit proof rule.",
     "imports": [
-        "real"
+        "real",
+        "bitvector"
     ],
     "name": "verit"
 }

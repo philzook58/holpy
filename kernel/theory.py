@@ -116,17 +116,17 @@ class Theory:
         """Returns data for the given data type."""
         return self.data[name]
 
-    def add_type_sig(self, name, n):
+    def add_type_sig(self, name: str, n: int):
         """Add to the type signature. The type constructor with the given name
         is associated to arity n.
 
         """
         self.add_data("type_sig", name, n)
 
-    def has_type_sig(self, name):
+    def has_type_sig(self, name: str):
         return name in self.get_data("type_sig")
 
-    def get_type_sig(self, name):
+    def get_type_sig(self, name: str):
         """Returns the arity of the type."""
         data = self.get_data("type_sig")
         if name not in data:
@@ -134,7 +134,7 @@ class Theory:
 
         return data[name]
 
-    def add_term_sig(self, name, T):
+    def add_term_sig(self, name: str, T: Type):
         """Add to the term signature. The constant term with the given name
         is defined in the theory with the given most general type.
 
@@ -158,10 +158,10 @@ class Theory:
 
             self.add_data("term_sig", name, T)
 
-    def has_term_sig(self, name):
+    def has_term_sig(self, name: str):
         return name in self.get_data("term_sig")
 
-    def get_term_sig(self, name, stvar=False):
+    def get_term_sig(self, name: str, stvar=False):
         """Returns the most general type of the term."""
         data = self.get_data("term_sig")
         if name not in data:

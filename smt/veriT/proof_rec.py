@@ -256,6 +256,7 @@ class ProofReconstruction:
         if with_bar:
             with alive_bar(len(self.steps), spinner=None, bar=None) as bar:
                 for i, step in enumerate(self.steps):
+                    print(step)
                     self.validate_step(step, is_eval=is_eval, omit_proofterm=omit_proofterm,
                                        test_expand=test_expand, rpt=rpt)
                     bar()

@@ -5,7 +5,7 @@ Macros used in the proof reconstruction.
 import functools
 import itertools
 import operator
-from typing import Optional
+from typing import List, Optional
 
 from kernel.macro import Macro
 from kernel.theory import register_macro
@@ -18,6 +18,7 @@ from logic import logic
 from logic.conv import try_conv, rewr_conv, arg_conv,\
          top_conv, arg1_conv, replace_conv, abs_conv, Conv, bottom_conv, beta_conv, binop_conv
 from data import integer, real
+from data import bitvector
 from data import list as hol_list
 from kernel import term_ord
 from smt.veriT import verit_conv
@@ -375,7 +376,7 @@ class ThResolutionMacro(Macro):
             prems.append(strip_disj_n(prev.prop, cl_size))
 
         _, cl_concl = resolve_order(prems)
-        if set(cl_concl) <= set(cl):
+        if set(cl_concl) <= set(cl + (false,)):
             return Thm(Or(*cl), *(pt.hyps for pt in prevs))
         # Sometimes the expected goal is ~~A while resolve_order returns A.
         elif len(cl_concl) == 1 and len(cl) == 1 and Not(Not(cl_concl[0])) == cl[0]:
@@ -1630,6 +1631,8 @@ class ReflMacro(Macro):
             return Thm(goal, goal)
         if goal.rhs.is_var() and goal.rhs.name in ctxt and ctxt[goal.rhs.name] == goal.lhs:
             return Thm(goal, Eq(goal.rhs, goal.lhs))
+        if goal.rhs == goal.lhs:
+            return Thm(goal)
         else:
             raise VeriTException("refl", "either lhs and rhs of goal is not in ctx")
 
@@ -1639,6 +1642,8 @@ class ReflMacro(Macro):
             return ProofTerm.assume(goal)
         if goal.rhs.is_var() and goal.rhs.name in ctxt and ctxt[goal.rhs.name] == goal.lhs:
             return ProofTerm.assume(Eq(goal.rhs, goal.lhs)).symmetric()
+        if goal.rhs == goal.lhs:
+            return ProofTerm.reflexive(goal.lhs)
         else:
             raise VeriTException("refl", "either lhs and rhs of goal is not in ctx")
 
@@ -5241,3 +5246,124 @@ class NotITE1Macro(Macro):
     def get_proof_term(self, args, prevs) -> ProofTerm:
         pt = prevs[0]
         return logic.apply_theorem("verit_not_ite2", pt, concl=Or(*args))
+    
+@register_macro("verit_symm")
+class SymmMacro(Macro):
+    def __init__(self):
+        self.level = 1
+        self.sig = Term
+        self.limit = None
+
+    def eval(self, args, prevs) -> Thm:
+        if len(args) != 1 or len(prevs) != 1:
+            raise VeriTException("symm", "unexpected number of arguments and prevs")
+        th = prevs[0]
+        expected_res = args[0]
+        if not th.prop.is_equals():
+            raise VeriTException("symm", "pt is not an equality")
+        A, B = th.prop.args
+        if not expected_res == Eq(B, A):
+            raise VeriTException("symm", "Unexpected result")
+        return Thm(expected_res, th.hyps)
+
+    def get_proof_term(self, args, prevs) -> ProofTerm:
+        pt = prevs[0]
+        return pt.symmetric()
+    
+@register_macro("verit_not_symm")
+class NotSymmMacro(Macro):
+    def __init__(self):
+        self.level = 1
+        self.sig = List[Term]
+        self.limit = None
+
+    def eval(self, args, prevs) -> Thm:
+        if len(args) != 1 or len(prevs) != 1:
+            raise VeriTException("not_symm", "unexpected number of arguments and prevs")
+        th = prevs[0]
+        expected_res = args[0]
+        if not th.prop.is_not() or not th.prop.arg.is_equals():
+            raise VeriTException("not_symm", "pt is not negation of an equality")
+        A, B = th.prop.arg.args
+        if not expected_res == Not(Eq(B, A)):
+            raise VeriTException("not_symm", "Unexpected result")
+        return Thm(expected_res, th.hyps)
+
+    def get_proof_term(self, args, prevs) -> ProofTerm:
+        pt = prevs[0]
+        A, B = pt.prop.arg.args
+        eq_pt = AllsimplifyMacro().get_proof_term([Eq(Eq(A, B), Eq(B, A))], [])
+        return pt.on_prop(arg_conv(replace_conv(eq_pt)))
+
+
+@register_macro("verit_reordering")
+class ReorderingMacro(Macro):
+    def __init__(self):
+        self.level = 1
+        self.sig = Term
+        self.limit = None
+
+    def eval(self, args, prevs) -> Thm:
+        if len(prevs) != 1:
+            raise VeriTException("reordering", "unexpected number of prevs")
+        th = prevs[0]
+        disjs = th.prop.strip_disj()
+        if set(disjs) != set(args):
+            raise VeriTException("reordering", "prevs and arg is not the same")
+        return Thm(Or(*args), th.hyps)
+
+    def get_proof_term(self, args, prevs) -> ProofTerm:
+        pt = prevs[0]
+        eq_pt = logic.imp_disj_iff(Eq(pt.prop, Or(*args)))
+        return eq_pt.equal_elim(pt)
+    
+@register_macro("verit_all_simplify")
+class AllsimplifyMacro(Macro):
+    def __init__(self):
+        self.level = 1
+        self.sig = Term
+        self.limit = None
+
+    # def eval(self, args, prevs) -> Thm:
+        
+    #     raise NotImplementedError
+
+    def get_proof_term(self, args, prevs) -> ProofTerm:
+        if args[0].rhs == false and args[0].lhs == Not(true):
+            lhs, rhs = args[0].args
+            pt = refl(lhs)
+            return pt.on_rhs(rewr_conv("verit_not_simplify1"))
+        elif args[0].is_equals() and args[0].lhs.is_equals() and args[0].rhs.is_equals() and args[0].lhs.lhs == args[0].rhs.rhs and args[0].rhs.lhs == args[0].lhs.rhs:#
+            lhs, rhs = args[0].args[0].args
+            # First obtain lhs = rhs --> rhs = lhs
+            pt = ProofTerm.assume(Eq(lhs, rhs))
+            pt2 = pt.symmetric()
+            pt3 = pt2.implies_intr(Eq(lhs, rhs))
+            # Then obtain rhs = lhs --> lhs = rhs
+            pt4 = ProofTerm.assume(Eq(rhs, lhs))
+            pt5 = pt4.symmetric()
+            pt6 = pt5.implies_intr(Eq(rhs, lhs))
+            # Finally get lhs = rhs <--> rhs = lhs
+            return pt3.equal_intr(pt6)
+        elif args[0].is_equals() and bitvector.is_word_type(args[0].arg.get_type()):
+            lhs, rhs = args[0].args
+            pt1 = refl(lhs)
+            pt2 = pt1.on_rhs(bitvector.bv_norm_full())
+            pt3 = refl(rhs)
+            pt4 = pt3.on_rhs(bitvector.bv_norm_full())
+            pt5 = pt4.symmetric()
+            return pt2.transitive(pt5)
+        elif args[0].is_equals() and args[0].rhs == true:
+            lhs = args[0].args[0].lhs
+            rhs = args[0].args[0].rhs
+            pt1 = refl(lhs).on_rhs(bitvector.bv_norm_full())
+            pt2 = refl(rhs).on_rhs(bitvector.bv_norm_full())
+            pt3 = pt2.symmetric()
+            pt4 = pt1.transitive(pt3)
+            pt5 = logic.apply_theorem("eq_true", inst=Inst(A=pt4.prop))
+            return pt5.equal_elim(pt4)
+        elif args[0].is_equals():
+            lhs = args[0].lhs
+            pt = refl(lhs)
+            pt = pt.on_rhs(bitvector.bv_distrib_left2())
+            return pt
