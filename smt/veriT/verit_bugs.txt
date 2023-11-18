@@ -4,7 +4,7 @@ step: t9 bind
 reason: step t9 uses t9.t1 but doesn't include it in premises
 2.
 file_name: QF_UFLIA\\wisas\\xs_5_5.smt2
-step: t213 resolution
+step: t138 resolution
 reason: resolving one proof term for twice
 3.
 file_name: QF_UFLIA\\wisas\\xs_5_10.smt2
@@ -31,11 +31,11 @@ step t183 (ite_intro)
 problem: expected rhs has fewer conjuncts.
 step t201 (ite_intro)
 problem: expected rhs has no extra conjuncts.
-9.
+9. (Can't be replayed)
 file_name: UFLIA/sledgehammer/Fundamental_Theorem_Algebra/smtlib.1438328.smt2
 step t292 (th_resolution)
 problem: repeated clauses hindering resolution getting correct result.
-10.
+10. (Can't be replayed)
 file_name: UF/sledgehammer/Arrow_Order/smtlib.617784.smt2
 step 31 (bind)
 problem: suspected variable name conflict
@@ -58,10 +58,12 @@ rule: ite_simplify
 problem: f15 = (if true then f15 else f3 (f12 (f13 f14 f15) f6) f15)
 13.
 file_name: LRA/keymaera/intersection-example-simple.proof-node6512.smt2
+step id: t21
 rule: qnt_simplify
 problem: qnt_simplify is applied to an existential quantifier, but in the document, it can only be applied to forall quantifier.
 14.
 file_name: UF/sledgehammer/Fundamental_Theorem_Algebra/uf.560771.smt2
+step id: t110
 rule: th_resolution
 problem: input is of the form A, ~~A <--> B.
 15.
