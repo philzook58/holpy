@@ -376,6 +376,30 @@ class TermTest(unittest.TestCase):
             with self.subTest(t=t):
                 self.assertEqual(t.is_number(), expected_result)
 
+    def testIsFracNumber(self):
+        zero = term.nat_zero
+        one = term.nat_one
+
+        nat_divdies = term.divides(hol_type.NatType)
+        # real_divides = term.divides(hol_type.RealType)
+
+        nat_frac_a = nat_divdies(term.Number(hol_type.NatType, 42), term.Number(hol_type.NatType, 84)) # 42 / 84
+        nat_frac_b = nat_divdies(term.Number(hol_type.NatType, 43), term.Number(hol_type.NatType, 84)) # 43 / 84
+
+        test_data = [
+            # Test case where self is divides
+            (nat_frac_a, False),
+            (nat_frac_b, True),
+
+            # Test case where self is not divides
+            (zero, True),
+            (one, True),
+        ]
+
+        for t, expected_result in test_data:
+            with self.subTest(t=t):
+                self.assertEqual(t.is_frac_number(), expected_result)
+
 
 if __name__ == "__main__":
     unittest.main()
