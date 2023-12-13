@@ -8,6 +8,8 @@ from kernel import term
 from kernel.term import SVar, Var, Const, Comb, Abs, Bound, And, Or, Lambda, Binary, Inst
 from kernel.term import TermException, TypeCheckException
 
+import fractions
+
 Ta = TVar("a")
 Tb = TVar("b")
 STa = STVar("a")
@@ -340,6 +342,39 @@ class TermTest(unittest.TestCase):
 
         for n, b in test_data:
             self.assertEqual(n.is_binary(), b)
+
+    def testIsNumber(self):
+        zero = term.nat_zero
+        one = term.nat_one
+        bit0 = term.bit0
+        bit1 = term.bit1
+        real_frac = term.Number(hol_type.RealType, 3) / term.Number(hol_type.RealType, 4)
+        real_frac_b = term.Number(hol_type.RealType, fractions.Fraction(3, 4)) / term.Number(hol_type.RealType, fractions.Fraction(1, 2))
+        nat_frac = term.Number(hol_type.NatType, 42) / term.Number(hol_type.NatType, 84)
+
+        test_data = [
+            (zero, True),
+            (one, True),
+            (term.Number(hol_type.NatType, 42), True),
+            (term.Number(hol_type.NatType, 11112222333344445555), True),
+            (term.Number(hol_type.RealType, fractions.Fraction(2, 4)), True),
+            (term.Number(hol_type.RealType, fractions.Fraction(11112222333344445555, 2222333344445555)), True),
+            (-term.Number(hol_type.NatType, 42), True),
+            (-term.Number(hol_type.NatType, 11112222333344445555), True),
+            (-term.Number(hol_type.RealType, fractions.Fraction(2, 4)), True),
+            (-term.Number(hol_type.RealType, fractions.Fraction(11112222333344445555, 2222333344445555)), True),
+            (-one, True),
+            (real_frac, True),
+            (real_frac_b, False),
+            (-zero, False),
+            (bit0, False),
+            (bit1, False),
+            (nat_frac, False),
+        ]
+
+        for t, expected_result in test_data:
+            with self.subTest(t=t):
+                self.assertEqual(t.is_number(), expected_result)
 
 
 if __name__ == "__main__":
